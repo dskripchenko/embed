@@ -1,0 +1,159 @@
+/*
+ * The embed's own base styles: element boxes, loading placeholders, the
+ * kit's reset scoped to our elements, and the diagram colours on the kit's
+ * theme tokens. Everything here is zero-specificity (`:where`) or scoped to
+ * our tags, so the host page's own CSS wins.
+ */
+
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor) {
+  display: block;
+  min-width: 0;
+  position: relative;
+}
+
+/* Before the upgrade: the raw source is not shown. */
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor):not([data-dsk-state]) {
+  visibility: hidden;
+  min-height: 2rem;
+  overflow: hidden;
+}
+
+:where(.dsk-root) {
+  display: block;
+  min-width: 0;
+}
+
+/* Loading placeholders, sized like what comes. */
+:where([data-dsk-state='loading'], .dsk-block[data-dsk-state='loading']) {
+  border-radius: var(--uid-radius-md, 8px);
+  background: var(--uid-color-bg-subtle, rgb(127 127 127 / 0.08));
+  animation: dsk-pulse 1.4s ease-in-out infinite;
+}
+:where(dsk-video[data-dsk-state='loading']) { aspect-ratio: 16 / 9; }
+:where(dsk-audio[data-dsk-state='loading']) { min-height: 72px; }
+:where(dsk-diagram[data-dsk-state='loading'], dsk-markdown[data-dsk-state='loading']) { min-height: 120px; }
+:where(dsk-openapi[data-dsk-state='loading'], dsk-editor[data-dsk-state='loading']) { min-height: 240px; }
+:where(.dsk-block[data-dsk-state='loading']) { min-height: 96px; }
+@keyframes dsk-pulse { 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) {
+  :where([data-dsk-state='loading'], .dsk-block[data-dsk-state='loading']) { animation: none; }
+}
+
+:where(.dsk-error) {
+  padding: var(--uid-space-sm, 8px) var(--uid-space-md, 12px);
+  border: 1px solid var(--uid-danger, #dc2626);
+  border-radius: var(--uid-radius-md, 8px);
+  color: var(--uid-danger, #dc2626);
+  background: var(--uid-danger-subtle, rgb(220 38 38 / 0.08));
+  font: 13px/1.45 var(--uid-font-family-mono, ui-monospace, monospace);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * The kit's reset and base text (its reset.css and global.css), kept to our
+ * own elements: they live in someone else's page, whose paragraphs, headings
+ * and images must stay as they are. Overlays (menus, drawers, tooltips) are
+ * teleported to <body>, hence the uid-* match.
+ */
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']),
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *,
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::before,
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::after {
+  box-sizing: border-box;
+}
+:where(dsk-video, dsk-audio, dsk-openapi, dsk-flow, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) :where(button, input, textarea, select) {
+  font: inherit;
+}
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, body > [class^='uid-'], body > [class*=' uid-']) {
+  font-family: var(--uid-font-family-sans);
+  line-height: var(--uid-line-height-normal);
+  color: var(--uid-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+:where(body > [class^='uid-'], body > [class*=' uid-']) { font-size: var(--uid-font-size-md); }
+:where([class^='uid-'], [class*=' uid-']):focus-visible {
+  outline: 2px solid var(--uid-color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Diagrams: SVG with --dg-* colours, here on the kit's semantic tokens so both themes follow. */
+:root {
+  --dg-font-family: var(--uid-font-family-sans);
+  --dg-text: var(--uid-text-primary);
+  --dg-text-muted: var(--uid-text-secondary);
+  --dg-line: var(--uid-text-tertiary);
+  --dg-node-fill: var(--uid-accent-subtle);
+  --dg-node-stroke: var(--uid-accent);
+  --dg-node-text: var(--uid-text-primary);
+  --dg-cluster-fill: var(--uid-color-bg-subtle);
+  --dg-cluster-stroke: var(--uid-border-default);
+  --dg-cluster-text: var(--uid-text-secondary);
+  --dg-edge-label-fill: var(--uid-surface-raised);
+  --dg-note-fill: var(--uid-warning-subtle);
+  --dg-note-stroke: var(--uid-warning);
+  --dg-note-text: var(--uid-text-primary);
+  --dg-actor-fill: var(--uid-accent-subtle);
+  --dg-actor-stroke: var(--uid-accent);
+  --dg-activation-fill: var(--uid-accent-subtle);
+  --dg-lifeline: var(--uid-border-default);
+  --dg-block-stroke: var(--uid-border-hover);
+  --dg-block-label-fill: var(--uid-color-bg-subtle);
+  --dg-grid: var(--uid-border-subtle);
+  --dg-task-fill: var(--uid-accent);
+  --dg-task-stroke: var(--uid-accent-hover);
+  --dg-task-active-fill: var(--uid-accent-subtle);
+  --dg-task-done-fill: var(--uid-border-default);
+  --dg-task-done-stroke: var(--uid-border-hover);
+  --dg-task-crit-fill: var(--uid-danger);
+  --dg-task-crit-stroke: var(--uid-danger-hover);
+  --dg-task-text: var(--uid-text-on-accent);
+  --dg-task-text-dark: var(--uid-text-primary);
+  --dg-today: var(--uid-danger);
+  --dg-state-start: var(--uid-text-primary);
+  --dg-pie-stroke: var(--uid-surface-raised);
+  --dg-row-fill: var(--uid-surface-raised);
+  --dg-row-alt-fill: var(--uid-color-bg-subtle);
+  --dg-c4-boundary-stroke: var(--uid-text-secondary);
+  --dg-c4-boundary-text: var(--uid-text-primary);
+  --dg-c4-node-stroke: var(--uid-text-secondary);
+  --dg-c4-node-text: var(--uid-text-primary);
+}
+:root[data-theme='dark'] {
+  --dg-c4-person-fill: #1f5c99;
+  --dg-c4-person-stroke: #6aa5e0;
+  --dg-c4-system-fill: #1f6fbf;
+  --dg-c4-system-stroke: #7bb4ee;
+  --dg-c4-container-fill: #3b7fc0;
+  --dg-c4-container-stroke: #93c5fd;
+  --dg-c4-component-stroke: #bfdbfe;
+  --dg-c4-external-fill: #5f6670;
+  --dg-c4-external-stroke: #9ca3af;
+}
+
+:where(.dsk-diagram) {
+  overflow-x: auto;
+}
+:where(.dsk-diagram) svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+/* Live blocks in pages, markdown and the editor. */
+:where(.dsk-block) {
+  margin: var(--uid-space-md, 12px) 0;
+  min-width: 0;
+}
+:where(.dsk-block--mermaid) { overflow-x: auto; }
+:where(.dsk-block--mermaid) svg { display: block; max-width: 100%; height: auto; margin-inline: auto; }
+:where(.dsk-flow-frame) {
+  position: relative;
+  border: 1px solid var(--uid-border-subtle);
+  border-radius: var(--uid-radius-md);
+  overflow: hidden;
+  background: var(--uid-surface-raised);
+}
+:where(.dsk-media) { min-width: 0; }

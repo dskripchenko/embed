@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>embed — loader as a module script</title>
+  <script type="module" src="{{EMBED_SRC}}"></script>
+</head>
+<body>
+  <dsk-markdown id="md">
+    <script type="text/markdown">
+      # Модуль
+
+      ```mermaid
+      graph LR; A-->B
+      ```
+    </script>
+  </dsk-markdown>
+  <dsk-audio id="a" src="/media/track-1.mp3" track-title="Track"></dsk-audio>
+</body>
+</html>

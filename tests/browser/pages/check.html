@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>embed — technical check</title>
+  <script src="{{EMBED_SRC}}"></script>
+  <style>body { font: 14px system-ui, sans-serif; margin: 16px; } section { margin: 16px 0; }</style>
+</head>
+<body>
+  <section>
+    <dsk-flow id="api-flow" src="/data/order-process.json" poll-url="/api/state" poll-interval="600"
+              toggle-url="/api/toggle" subgraph-url="/api/process/{ref}" height="360" openapi-target="#ref2"></dsk-flow>
+    <dsk-openapi id="ref2" src="/data/orders.yaml" height="400" hash-navigation="false"></dsk-openapi>
+  </section>
+  <section>
+    <dsk-flow id="mermaid-flow" height="240">
+      <script type="text/plain">
+        stateDiagram-v2
+          [*] --> Draft
+          Draft --> Review: submit
+          Review --> [*]: approve
+      </script>
+    </dsk-flow>
+  </section>
+  <section>
+    <dsk-flow id="editor-flow" editable name="process" height="420">
+      <script type="application/json">{"version":1,"nodes":[{"id":"a","type":"start","label":"A"},{"id":"b","type":"end","label":"B"}],"edges":[{"id":"ab","from":"a","to":"b"}]}</script>
+    </dsk-flow>
+  </section>
+  <section>
+    <dsk-video id="hls" muted>
+      <source src="/media/hls/master.m3u8">
+    </dsk-video>
+  </section>
+  <section>
+    <dsk-openapi id="block-mode" mode="block" editable>
+      <script type="text/yaml">
+        method: GET
+        url: https://api.example.com/v1/orders/{id}
+        summary: Get an order
+      </script>
+    </dsk-openapi>
+  </section>
+  <section>
+    <dsk-diagram id="broken">flowchart LR
+      A --></dsk-diagram>
+    <dsk-diagram id="from-src" src="/fixtures/diagram.mmd"></dsk-diagram>
+  </section>
+  <section id="cms">
+    <pre><code class="language-mermaid">graph TD; A-->B</code></pre>
+    <pre><code class="language-chart">1,2,3</code></pre>
+    <pre><code class="language-video">/media/walkthrough.webm</code></pre>
+    <pre><code class="language-flow">{"version":1,"nodes":[{"id":"x","type":"start"},{"id":"y","type":"end"}],"edges":[{"id":"xy","from":"x","to":"y"}]}</code></pre>
+  </section>
+  <div id="dynamic"></div>
+  <script>
+    // A host renderer through the registry: works in renderBlocks, markdown and the editor alike.
+    DskEmbed.blocks.register('chart', (code) => ({ html: `<div class="host-chart">${code.split(',').length} bars</div>` }))
+    DskEmbed.renderBlocks(document.querySelector('#cms'))
+  </script>
+</body>
+</html>

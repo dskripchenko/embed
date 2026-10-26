@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>embed — page with its own import map</title>
+  <!-- The page maps vue itself (to the very file the embed would use) and its own app module. -->
+  <script type="importmap">{ "imports": { "vue": "{{CDN}}vue@3.5.44/dist/vue.runtime.esm-browser.prod.js", "app/": "/fixtures/app/" } }</script>
+  <script src="{{EMBED_SRC}}"></script>
+</head>
+<body>
+  <dsk-video id="v" src="/media/walkthrough.webm"></dsk-video>
+  <div id="host-app"></div>
+  <script type="module">
+    // The host's own Vue code shares the one Vue of the page.
+    import { createApp, h, version } from 'vue'
+    createApp({ render: () => h('p', { id: 'host-vue' }, `host vue ${version}`) }).mount('#host-app')
+  </script>
+</body>
+</html>

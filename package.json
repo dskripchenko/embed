@@ -1,0 +1,72 @@
+{
+  "name": "@dskripchenko/embed",
+  "version": "1.0.0",
+  "description": "Drop-in custom elements for any web page from a CDN: video and audio players, Mermaid diagrams, OpenAPI references, process flows, live markdown and a WYSIWYG editor, sharing one Vue runtime and cooperating through a block registry and an event bus.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Denis Skripchenko (https://github.com/dskripchenko)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dskripchenko/embed.git"
+  },
+  "keywords": [
+    "custom-elements",
+    "web-components",
+    "embed",
+    "cdn",
+    "import-map",
+    "video-player",
+    "audio-player",
+    "mermaid",
+    "openapi",
+    "workflow",
+    "wysiwyg",
+    "markdown",
+    "vue"
+  ],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    "./embed.js": "./dist/embed.js",
+    "./embed.bundle.js": "./dist/embed.bundle.js",
+    "./package.json": "./package.json"
+  },
+  "jsdelivr": "dist/embed.js",
+  "unpkg": "dist/embed.js",
+  "sideEffects": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "vitest run",
+    "lint": "eslint src tests scripts",
+    "typecheck": "tsc --noEmit",
+    "check:browser": "node scripts/browser-check.mjs",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "@dskripchenko/diagrams": "1.1.0",
+    "@dskripchenko/flow": "1.0.1",
+    "@dskripchenko/openapi": "1.1.0",
+    "@dskripchenko/ui": "1.15.1",
+    "@dskripchenko/wysiwyg": "0.5.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "eslint": "^10.13.0",
+    "jsdom": "^29.1.1",
+    "lucide-vue-next": "0.460.0",
+    "playwright": "1.64.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.0",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5",
+    "vue": "3.5.44"
+  },
+  "packageManager": "pnpm@10.28.0"
+}

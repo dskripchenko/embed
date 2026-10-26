@@ -1,0 +1,195 @@
+// Builds dist/:
+//   embed.js              the loader (classic script, no Vue)
+//   plugins/*.js, chunks/ the plugin modules (ESM; vue and the packages external, via the import map)
+//   vendor/lucide-vue-next.js  one-file ESM of the icons the packages use
+//   embed.bundle.js       the fat bundle (classic script, everything inside)
+//   importmap.json        the runtime's import map on jsDelivr, for pages that write their own
+import { mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync, readdirSync, statSync } from 'node:fs'
+import { gzipSync } from 'node:zlib'
+import { join, resolve } from 'node:path'
+import { build } from 'vite'
+
+const root = resolve(import.meta.dirname, '..')
+const dist = resolve(root, 'dist')
+const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
+
+/** The runtime packages, pinned to the exact versions installed (and tested). */
+const RUNTIME = ['vue', '@dskripchenko/ui', '@dskripchenko/wysiwyg', '@dskripchenko/diagrams', '@dskripchenko/openapi', '@dskripchenko/flow']
+// Not every package exports ./package.json: read it from node_modules directly.
+const pkgDir = (name) => realpathSync(resolve(root, 'node_modules', name))
+const versions = Object.fromEntries(RUNTIME.map((name) => [name, JSON.parse(readFileSync(join(pkgDir(name), 'package.json'), 'utf8')).version]))
+for (const name of RUNTIME) {
+  const declared = pkg.devDependencies[name]
+  if (declared !== versions[name]) throw new Error(`${name}: package.json pins ${declared}, installed ${versions[name]} — pin exact versions`)
+}
+
+const define = {
+  __EMBED_VERSION__: JSON.stringify(pkg.version),
+  __EMBED_VERSIONS__: JSON.stringify(versions),
+}
+
+/** The kit's light theme block on `:root:not([data-theme])`. */
+function lightFallback() {
+  const themes = readFileSync(join(pkgDir('@dskripchenko/ui'), 'dist/styles/themes.css'), 'utf8')
+  const block = /:root\[data-theme='light'\]\s*\{[^}]*\}/.exec(themes)?.[0]
+  if (!block) throw new Error('light theme block not found in @dskripchenko/ui themes.css')
+  return block.replace(":root[data-theme='light']", ':root:not([data-theme])').replace(/\s+/g, ' ')
+}
+
+const virtualLight = {
+  name: 'dsk-light-fallback',
+  resolveId: (id) => (id === 'virtual:dsk-light-fallback' ? '\0dsk-light' : null),
+  load: (id) => (id === '\0dsk-light' ? `export default ${JSON.stringify(lightFallback())}` : null),
+}
+
+const vueFlags = {
+  'process.env.NODE_ENV': JSON.stringify('production'),
+  __VUE_OPTIONS_API__: 'true',
+  __VUE_PROD_DEVTOOLS__: 'false',
+  __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
+}
+
+rmSync(dist, { recursive: true, force: true })
+mkdirSync(dist, { recursive: true })
+
+// ---- 1. The icons: every name the packages import from lucide-vue-next ----
+function iconNames() {
+  const names = new Set()
+  const files = [
+    ['@dskripchenko/ui', 'dist/index.mjs'],
+    ['@dskripchenko/openapi', 'dist/vue.mjs'],
+    ['@dskripchenko/flow', 'dist/vue.mjs'],
+    ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
+  ]
+  for (const [name, file] of files) {
+    const code = readFileSync(join(pkgDir(name), file), 'utf8')
+    for (const m of code.matchAll(/import\s*\{([^}]*)\}\s*from\s*"(?:lucide-vue-next|@dskripchenko\/ui\/icons)"/g)) {
+      for (const part of m[1].split(',')) {
+        const imported = part.trim().split(/\s+as\s+/)[0]
+        if (imported && imported !== 'UidIcon') names.add(imported)
+      }
+    }
+    // wysiwyg reads the icons off a dynamic import: `c.Bold`, `c.Italic`, …
+    for (const m of code.matchAll(/const (\w+) = await import\("lucide-vue-next"\);([\s\S]{0,4000}?)\}/g)) {
+      for (const n of m[2].matchAll(new RegExp(`\\b${m[1]}\\.([A-Z]\\w+)`, 'g'))) names.add(n[1])
+    }
+  }
+  return [...names].sort()
+}
+
+const icons = iconNames()
+const lucideDir = pkgDir('lucide-vue-next')
+const lucideIndex = readFileSync(join(lucideDir, 'dist/esm/lucide-vue-next.js'), 'utf8')
+const missing = icons.filter((n) => !new RegExp(`\\bas ${n}\\b`).test(lucideIndex))
+if (missing.length) throw new Error(`icons not in lucide-vue-next: ${missing.join(', ')}`)
+const iconEntry = resolve(root, 'node_modules/.dsk-embed-icons.js')
+writeFileSync(
+  iconEntry,
+  `// Generated: the lucide-vue-next icons the embed's packages import.\nexport { createLucideIcon, ${icons.join(', ')} } from 'lucide-vue-next'\n`,
+)
+await build({
+  root,
+  configFile: false,
+  logLevel: 'warn',
+  build: {
+    emptyOutDir: false,
+    outDir: dist,
+    minify: true,
+    lib: { entry: iconEntry, formats: ['es'], fileName: () => 'vendor/lucide-vue-next.js' },
+    // Served as is from the CDN: minified in full (lib mode keeps ES output readable by default).
+    rollupOptions: { external: ['vue'], output: { minify: true } },
+  },
+})
+
+// ---- 2. The plugin modules ----
+const plugins = ['media', 'diagram', 'openapi', 'flow', 'markdown', 'editor']
+await build({
+  root,
+  configFile: false,
+  logLevel: 'warn',
+  define,
+  plugins: [virtualLight],
+  build: {
+    emptyOutDir: false,
+    outDir: dist,
+    minify: true,
+    target: 'es2022',
+    lib: {
+      entry: Object.fromEntries(plugins.map((p) => [`plugins/${p}`, resolve(root, `src/plugins/${p}.ts`)])),
+      formats: ['es'],
+      fileName: (_format, alias) => `${alias}.js`,
+    },
+    rollupOptions: {
+      external: ['vue', 'lucide-vue-next', /^@dskripchenko\//],
+      output: { chunkFileNames: 'chunks/[name]-[hash].js', minify: true },
+    },
+  },
+})
+
+// ---- 3. The loader ----
+await build({
+  root,
+  configFile: false,
+  logLevel: 'warn',
+  define,
+  plugins: [virtualLight],
+  build: {
+    emptyOutDir: false,
+    outDir: dist,
+    minify: true,
+    target: 'es2022',
+    lib: { entry: resolve(root, 'src/loader.ts'), formats: ['iife'], name: 'DskEmbedLoader', fileName: () => 'embed.js' },
+  },
+})
+
+// ---- 4. The fat bundle ----
+await build({
+  root,
+  configFile: false,
+  logLevel: 'warn',
+  define: { ...define, ...vueFlags },
+  plugins: [virtualLight],
+  build: {
+    emptyOutDir: false,
+    outDir: dist,
+    minify: true,
+    target: 'es2022',
+    cssMinify: true,
+    lib: { entry: resolve(root, 'src/bundle.ts'), formats: ['iife'], name: 'DskEmbedBundle', fileName: () => 'embed.bundle.js' },
+  },
+})
+
+// ---- 5. The import map, for pages that compose their own ----
+const cdn = 'https://cdn.jsdelivr.net/npm/'
+const files = {
+  vue: ['vue', 'dist/vue.runtime.esm-browser.prod.js'],
+  '@dskripchenko/ui': ['@dskripchenko/ui', 'dist/index.mjs'],
+  '@dskripchenko/ui/icons': ['@dskripchenko/ui', 'dist/icons/index.mjs'],
+  '@dskripchenko/ui/hls': ['@dskripchenko/ui', 'dist/hls/index.mjs'],
+  '@dskripchenko/wysiwyg': ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
+  '@dskripchenko/diagrams': ['@dskripchenko/diagrams', 'dist/index.mjs'],
+  '@dskripchenko/openapi': ['@dskripchenko/openapi', 'dist/index.mjs'],
+  '@dskripchenko/openapi/vue': ['@dskripchenko/openapi', 'dist/vue.mjs'],
+  '@dskripchenko/flow': ['@dskripchenko/flow', 'dist/index.mjs'],
+  '@dskripchenko/flow/vue': ['@dskripchenko/flow', 'dist/vue.mjs'],
+  '@dskripchenko/flow/mermaid': ['@dskripchenko/flow', 'dist/mermaid.mjs'],
+}
+const imports = Object.fromEntries(Object.entries(files).map(([spec, [name, path]]) => [spec, `${cdn}${name}@${versions[name]}/${path}`]))
+imports['lucide-vue-next'] = `${cdn}@dskripchenko/embed@${pkg.version}/dist/vendor/lucide-vue-next.js`
+writeFileSync(resolve(dist, 'importmap.json'), JSON.stringify({ imports }, null, 2) + '\n')
+// Every runtime file the map names must exist in the installed packages.
+for (const [name, path] of Object.values(files)) statSync(join(pkgDir(name), path))
+
+// ---- Sizes ----
+function walk(dir) {
+  return readdirSync(dir).flatMap((f) => {
+    const p = join(dir, f)
+    return statSync(p).isDirectory() ? walk(p) : [p]
+  })
+}
+const kb = (n) => `${(n / 1024).toFixed(1)} KB`
+console.log(`\n@dskripchenko/embed ${pkg.version} — runtime: ${Object.entries(versions).map(([k, v]) => `${k}@${v}`).join(', ')}; ${icons.length} icons`)
+for (const file of walk(dist).sort()) {
+  const buf = readFileSync(file)
+  console.log(`  ${file.slice(dist.length + 1).padEnd(40)} ${kb(buf.length).padStart(10)}  gzip ${kb(gzipSync(buf, { level: 9 }).length).padStart(9)}`)
+}

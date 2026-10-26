@@ -1,0 +1,192 @@
+/**
+ * `<dsk-openapi>` and ```openapi blocks, through @dskripchenko/openapi:
+ *
+ * - reference mode (default): the whole reference, one spec or several with
+ *   a switcher;
+ * - operation mode (`operation="createOrder"`): one operation as a card;
+ * - block mode: the YAML/JSON of an ```openapi block — a request or a whole
+ *   document — as the live widget, editable with `editable`.
+ */
+import { h, shallowReactive } from 'vue'
+import { OpenApiBlock, OpenApiOperation, OpenApiReference } from '@dskripchenko/openapi/vue'
+import { cssLength } from '../core/attrs'
+import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
+import { errorText, fetchText, instanceRef, mountElementView, mountView, setupRuntime, state, hc } from './runtime'
+
+export function setup(host: Host): void {
+  setupRuntime(host)
+}
+
+/** One loader function per URL: the reference reloads when the function changes, so it must stay the same. */
+const loaders = new Map<string, () => Promise<string>>()
+
+export function specLoader(url: string): () => Promise<string> {
+  let loader = loaders.get(url)
+  if (!loader) {
+    loader = () => fetchText(url)
+    loaders.set(url, loader)
+  }
+  return loader
+}
+
+interface SpecEntry {
+  id: string
+  name?: string
+  spec: unknown
+}
+
+/** `specs` JSON: `[{ id, name?, src | content }]`. */
+export function toSpecs(value: unknown): SpecEntry[] | undefined {
+  if (!Array.isArray(value)) return undefined
+  const out: SpecEntry[] = []
+  value.forEach((item, i) => {
+    if (!item || typeof item !== 'object') return
+    const o = item as Record<string, unknown>
+    const id = typeof o.id === 'string' && o.id !== '' ? o.id : `spec-${i + 1}`
+    const spec = typeof o.src === 'string' ? specLoader(o.src) : o.content ?? o.spec
+    if (spec === undefined) return
+    out.push({ id, ...(typeof o.name === 'string' ? { name: o.name } : {}), spec })
+  })
+  return out
+}
+
+/** `createOrder` → `operation/createOrder`; anchors pass as they are. */
+export function anchorOf(target: string): string {
+  return /^(operation|schema|tag|webhook)\//.test(target) || target.startsWith('#') ? target.replace(/^#/, '') : `operation/${target}`
+}
+
+type Reference = { go(anchor: string, options?: { tryIt?: boolean }): Promise<void>; open(id: string): Promise<void>; spec: unknown; print?: () => void }
+
+const COMMON = ['tryIt', 'baseUrl', 'defaultSnippet', 'snippetTargets', 'persistCredentials', 'send', 'labels'] as const
+
+function common(props: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {}
+  for (const key of COMMON) if (props[key] !== undefined) out[key] = props[key]
+  return out
+}
+
+function titleOf(spec: unknown): string | undefined {
+  const doc = (spec as { document?: { info?: { title?: string } } } | null)?.document
+  return doc?.info?.title
+}
+
+export function mountElement(ctx: ElementContext): ElementInstance {
+  const comp = instanceRef<Reference>()
+  // Block mode: the text as edited in the widget.
+  let blockText: string | null = null
+
+  const v = mountElementView(ctx, (view) => {
+    const props = view.props
+    const mode = props.mode ?? (props.operation ? 'operation' : 'reference')
+    const locale = view.locale
+    const height = cssLength(props.height)
+    const wrap = (child: ReturnType<typeof h>) =>
+      h('div', { class: `dsk-openapi dsk-openapi--${String(mode)}`, style: height ? { height: `var(--dsk-openapi-height, ${height})`, overflow: 'auto' } : undefined }, [child])
+
+    if (mode === 'block') {
+      const source = blockText ?? view.source
+      return wrap(
+        hc(OpenApiBlock, {
+          ...common(props),
+          source,
+          editable: props.editable === true,
+          locale,
+          'onUpdate:source': (text: string) => {
+            blockText = text
+            ctx.emit('change', { source: text })
+          },
+        }),
+      )
+    }
+
+    const spec = props.spec ?? (typeof props.src === 'string' && props.src !== '' ? specLoader(props.src) : view.source || undefined)
+    const events = {
+      ref: comp.set,
+      onLoaded: (loaded: unknown, id?: string) => ctx.emit('loaded', { id: id ?? 'spec', title: titleOf(loaded) }),
+      onError: (error: unknown, id?: string) => ctx.emit('error', { id: id ?? 'spec', message: errorText(error) }),
+    }
+
+    if (mode === 'operation') {
+      return wrap(
+        hc(OpenApiOperation, {
+          ...common(props),
+          ...events,
+          spec,
+          operation: String(props.operation ?? ''),
+          locale,
+          ...(props.referenceUrl ? { referenceUrl: props.referenceUrl } : {}),
+          ...(props.specId ? { specId: props.specId } : {}),
+        }),
+      )
+    }
+
+    const specs = toSpecs(props.specs)
+    return wrap(
+      hc(OpenApiReference, {
+        ...common(props),
+        ...events,
+        ...(specs ? { specs } : { spec }),
+        ...(props.active ? { active: props.active } : {}),
+        ...(props.heading ? { title: props.heading } : {}),
+        ...(props.hashNavigation !== undefined ? { hashNavigation: props.hashNavigation } : {}),
+        locale,
+        'onUpdate:active': (id: string) => ctx.emit('active', { id }),
+      }),
+    )
+  })
+
+  const reference = (): Reference => {
+    const r = comp.ref.value
+    if (!r) throw new Error('the reference is not ready')
+    return r
+  }
+
+  return {
+    update() {
+      // A new source from outside replaces what was edited in the widget.
+      if (ctx.source() !== v.view.source) blockText = null
+      v.refresh()
+    },
+    destroy: () => v.unmount(),
+    api: {
+      /** Opens an operation (`createOrder`, `operation/createOrder`), a schema or a tag. */
+      go: (target: string, options?: { tryIt?: boolean }) => reference().go(anchorOf(String(target)), options),
+      open: (id: string) => reference().open(id),
+      print: () => reference().print?.(),
+      get loaded() {
+        return comp.ref.value?.spec ?? null
+      },
+      get value() {
+        return blockText ?? ctx.source()
+      },
+    },
+  }
+}
+
+export const renderers: Record<string, BlockRenderer> = {
+  openapi() {
+    return {
+      mount(el, ctx) {
+        el.classList.add('dsk-openapi-block')
+        const view = shallowReactive({ code: ctx.code })
+        const mounted = mountView(el, () => state.locale, () =>
+          hc(OpenApiBlock, {
+            source: view.code,
+            editable: ctx.editable,
+            locale: state.locale,
+            'onUpdate:source': (text: string) => {
+              view.code = text
+              ctx.setCode(text)
+            },
+          }),
+        )
+        return {
+          update(code) {
+            if (code !== view.code) view.code = code
+          },
+          destroy: () => mounted.unmount(),
+        }
+      },
+    }
+  },
+}
