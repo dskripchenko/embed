@@ -113,7 +113,7 @@ Die Map, die er schreibt (auch als `dist/importmap.json` veröffentlicht):
 |---|---|
 | `vue` | `vue@3.5.44/dist/vue.runtime.esm-browser.prod.js` |
 | `@dskripchenko/ui`, `/icons`, `/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
-| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.1/dist/index.mjs` |
+| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.2/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
 | `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
 | `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.2/dist/…` |
