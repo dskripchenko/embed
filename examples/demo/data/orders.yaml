@@ -1,0 +1,144 @@
+openapi: 3.1.0
+info:
+  title: Orders API
+  version: 1.0.0
+  description: |
+    Orders of the demo shop: create an order from a cart, pay it, ship it.
+    Every step of the **order process** on this page is one of these operations.
+servers:
+  - url: https://api.example.com/v1
+tags:
+  - name: Orders
+    description: Creating and following orders.
+  - name: Payments
+    description: Charging an order.
+  - name: Shipping
+    description: Handing an order to the warehouse.
+paths:
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [Orders]
+      summary: List orders
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/OrderStatus' }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: A page of orders.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Order' } }
+                  next: { type: [string, 'null'], description: The cursor of the next page. }
+    post:
+      operationId: createOrder
+      tags: [Orders]
+      summary: Create an order
+      description: Turns the customer's cart into an order awaiting payment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NewOrder' }
+            example:
+              customerId: cus_42
+              items:
+                - { sku: TEE-BLK-M, quantity: 2 }
+                - { sku: MUG-WHT, quantity: 1 }
+      responses:
+        '201':
+          description: The order.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '422':
+          description: The cart is empty or an item is out of stock.
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [Orders]
+      summary: Get an order
+      parameters:
+        - { $ref: '#/components/parameters/OrderId' }
+      responses:
+        '200':
+          description: The order.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '404': { description: No such order. }
+  /orders/{id}/pay:
+    post:
+      operationId: payOrder
+      tags: [Payments]
+      summary: Pay an order
+      parameters:
+        - { $ref: '#/components/parameters/OrderId' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method]
+              properties:
+                method: { type: string, enum: [card, invoice] }
+                token: { type: string, description: The card token from the payment form. }
+      responses:
+        '200':
+          description: The order, paid.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '402': { description: The payment was declined. }
+  /orders/{id}/ship:
+    post:
+      operationId: shipOrder
+      tags: [Shipping]
+      summary: Ship an order
+      parameters:
+        - { $ref: '#/components/parameters/OrderId' }
+      responses:
+        '202': { description: Handed to the warehouse. }
+components:
+  parameters:
+    OrderId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, example: ord_1001 }
+  schemas:
+    OrderStatus:
+      type: string
+      enum: [awaiting_payment, paid, shipped, cancelled]
+    NewOrder:
+      type: object
+      required: [customerId, items]
+      properties:
+        customerId: { type: string }
+        items:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/Item' }
+    Item:
+      type: object
+      required: [sku, quantity]
+      properties:
+        sku: { type: string }
+        quantity: { type: integer, minimum: 1 }
+    Order:
+      type: object
+      required: [id, status, items, total]
+      properties:
+        id: { type: string, example: ord_1001 }
+        status: { $ref: '#/components/schemas/OrderStatus' }
+        items: { type: array, items: { $ref: '#/components/schemas/Item' } }
+        total: { type: number, format: decimal, example: 54.9 }
+        createdAt: { type: string, format: date-time }

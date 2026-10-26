@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "meta": { "title": "Shipping", "direction": "LR" },
+  "nodes": [
+    { "id": "s0", "type": "start", "label": "Paid" },
+    { "id": "pick", "type": "task", "label": "Pick items" },
+    { "id": "pack", "type": "task", "label": "Pack" },
+    { "id": "handover", "type": "task", "label": "Hand to courier" },
+    { "id": "s1", "type": "end", "label": "Shipped" }
+  ],
+  "edges": [
+    { "id": "t1", "from": "s0", "to": "pick" },
+    { "id": "t2", "from": "pick", "to": "pack" },
+    { "id": "t3", "from": "pack", "to": "handover" },
+    { "id": "t4", "from": "handover", "to": "s1" }
+  ]
+}

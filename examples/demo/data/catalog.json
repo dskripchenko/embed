@@ -1,0 +1,32 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Catalog API", "version": "2.3.0", "description": "Products the shop sells." },
+  "servers": [{ "url": "https://api.example.com/v1" }],
+  "paths": {
+    "/products": {
+      "get": {
+        "operationId": "listProducts",
+        "summary": "List products",
+        "parameters": [{ "name": "q", "in": "query", "schema": { "type": "string" }, "description": "Search text." }],
+        "responses": { "200": { "description": "Products.", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Product" } } } } } }
+      }
+    },
+    "/products/{sku}": {
+      "get": {
+        "operationId": "getProduct",
+        "summary": "Get a product",
+        "parameters": [{ "name": "sku", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "The product.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } } }, "404": { "description": "No such product." } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "required": ["sku", "name", "price"],
+        "properties": { "sku": { "type": "string" }, "name": { "type": "string" }, "price": { "type": "number" }, "stock": { "type": "integer" } }
+      }
+    }
+  }
+}

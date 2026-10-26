@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@dskripchenko/embed — demo</title>
+  <meta name="description" content="Video, audio, diagrams, OpenAPI, process flows, live markdown and a WYSIWYG editor on a plain HTML page, cooperating.">
+  <!-- The loader: a classic script, before any module script. It writes the import map and defines the elements. -->
+  <script src="{{EMBED_SRC}}"></script>
+  <style>
+    :root {
+      --page-bg: var(--uid-surface-base, #fafafa);
+      --page-card: var(--uid-surface-raised, #fff);
+      --page-text: var(--uid-text-primary, #18181b);
+      --page-muted: var(--uid-text-secondary, #71717a);
+      --page-border: var(--uid-border-subtle, #e4e4e7);
+      --page-accent: var(--uid-accent, #0d9488);
+      --page-radius: 14px;
+      color-scheme: light;
+    }
+    :root[data-theme='dark'] { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 15px/1.55 -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+      color: var(--page-text);
+      background: var(--page-bg);
+    }
+    a { color: var(--page-accent); }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .bar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      padding: 10px max(16px, calc((100vw - 1200px) / 2));
+      background: color-mix(in srgb, var(--page-bg) 86%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--page-border);
+    }
+    .brand { font-weight: 700; letter-spacing: -0.01em; margin-right: auto; display: flex; align-items: center; gap: 8px; }
+    .brand i { width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg, var(--page-accent), #6366f1); display: inline-block; }
+    .seg { display: inline-flex; border: 1px solid var(--page-border); border-radius: 9px; padding: 2px; background: var(--page-card); }
+    .seg button {
+      font: inherit; font-size: 13px; border: 0; background: none; color: var(--page-muted);
+      padding: 4px 10px; border-radius: 7px; cursor: pointer;
+    }
+    .seg button[aria-pressed='true'] { background: var(--page-accent); color: #fff; }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 0 16px 64px; }
+    .hero { padding: 48px 0 24px; }
+    .hero h1 { font-size: clamp(28px, 4.4vw, 46px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .hero p { color: var(--page-muted); max-width: 720px; margin: 0 0 20px; font-size: 17px; }
+    .snippets { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .snippet { background: var(--page-card); border: 1px solid var(--page-border); border-radius: var(--page-radius); padding: 12px 14px; min-width: 0; }
+    .snippet b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--page-muted); margin-bottom: 6px; }
+    .snippet pre { margin: 0; font-size: 12.5px; white-space: pre-wrap; word-break: break-all; }
+
+    section { margin-top: 44px; }
+    section > h2 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+    section > .lead { color: var(--page-muted); margin: 0 0 16px; max-width: 760px; }
+    .card { background: var(--page-card); border: 1px solid var(--page-border); border-radius: var(--page-radius); padding: 16px; min-width: 0; }
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+    .grid.even { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media (max-width: 900px) { .grid.two, .grid.even { grid-template-columns: minmax(0, 1fr); } }
+    .card h3 { margin: 0 0 10px; font-size: 15px; }
+    .hint { color: var(--page-muted); font-size: 13px; margin: 10px 0 0; }
+
+    .log { list-style: none; margin: 0; padding: 0; font-size: 12.5px; font-family: ui-monospace, Menlo, monospace; max-height: 260px; overflow: auto; }
+    .log li { padding: 5px 0; border-bottom: 1px dashed var(--page-border); display: flex; gap: 8px; min-width: 0; }
+    .log li:last-child { border-bottom: 0; }
+    .log .ev { color: var(--page-accent); flex: none; }
+    .log .d { color: var(--page-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .log:empty::before { content: attr(data-empty); color: var(--page-muted); font-family: inherit; }
+
+    .opcard { margin-top: 16px; }
+    /* Phones: a taller process box, so the flow lays out top to bottom. */
+    @media (max-width: 600px) { #process-flow { --dsk-flow-height: 560px; } #reference-el { --dsk-openapi-height: 560px; } }
+    .stack { display: grid; gap: 16px; align-content: start; min-width: 0; }
+    form .row { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+    form button {
+      font: inherit; border: 0; border-radius: 9px; padding: 8px 14px; cursor: pointer;
+      background: var(--page-accent); color: #fff;
+    }
+    .muted { color: var(--page-muted); font-size: 13px; }
+    #cms pre { background: var(--uid-color-bg-subtle, #f4f4f5); padding: 12px; border-radius: 10px; overflow: auto; }
+    footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--page-border); color: var(--page-muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <span class="brand"><i aria-hidden="true"></i> @dskripchenko/embed</span>
+    <span class="seg" role="group" aria-label="Theme" data-group="theme">
+      <button type="button" data-value="light" data-i18n="light">Light</button>
+      <button type="button" data-value="dark" data-i18n="dark">Dark</button>
+      <button type="button" data-value="system" data-i18n="system">System</button>
+    </span>
+    <span class="seg" role="group" aria-label="Language" data-group="locale">
+      <button type="button" data-value="en">EN</button>
+      <button type="button" data-value="ru">RU</button>
+    </span>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1 data-i18n="title">Live components for any page</h1>
+      <p data-i18n="subtitle">Players, diagrams, API references, process flows, live markdown and an editor — as HTML tags. One script from a CDN, one shared Vue, and the pieces talk to each other.</p>
+      <div class="snippets">
+        <div class="snippet"><b data-i18n="loader">Loader · ~9 KB, the rest on demand</b><pre>&lt;script src="https://cdn.jsdelivr.net/npm/@dskripchenko/embed@1/dist/embed.js"&gt;&lt;/script&gt;</pre></div>
+        <div class="snippet"><b data-i18n="bundle">Fat bundle · no import map</b><pre>&lt;script src="https://cdn.jsdelivr.net/npm/@dskripchenko/embed@1/dist/embed.bundle.js"&gt;&lt;/script&gt;</pre></div>
+      </div>
+    </div>
+
+    <section id="process">
+      <h2 data-i18n="s1">A process that drives the API and the video</h2>
+      <p class="lead" data-i18n="s1lead">Click a step. The flow emits <code>dsk:node</code>; the page opens that step's operation, and <code>media-target</code> plays the step's chapter. Monitoring comes from <code>poll-url</code>.</p>
+      <dsk-flow id="process-flow" src="{{BASE}}data/order-process.json" poll-url="{{BASE}}data/state.json" poll-interval="8000"
+                subgraph-url="{{BASE}}data/{ref}.json" media-target="#walkthrough" height="300" minimap="false" details="false"></dsk-flow>
+      <div class="grid two" style="margin-top:16px">
+        <dsk-video id="walkthrough" poster="{{BASE}}media/poster.jpg" label="Order walkthrough" aspect-ratio="16:9">
+          <source src="{{BASE}}media/walkthrough.webm" type="video/webm">
+          <source src="{{BASE}}media/walkthrough.mp4" type="video/mp4">
+          <track kind="chapters" src="{{BASE}}media/chapters.vtt" srclang="en" label="Chapters" default>
+          <track kind="subtitles" src="{{BASE}}media/captions-en.vtt" srclang="en" label="English">
+          <track kind="subtitles" src="{{BASE}}media/captions-ru.vtt" srclang="ru" label="Русский">
+        </dsk-video>
+        <div class="card">
+          <h3 data-i18n="events">Event bus</h3>
+          <ul class="log" id="log" data-empty="Click a step of the process…" aria-live="polite"></ul>
+          <p class="hint" data-i18n="bushint">Every element event is a bubbling dsk:* DOM event; DskEmbed.on() listens to them all.</p>
+        </div>
+      </div>
+      <div class="opcard">
+        <dsk-openapi id="op-card" src="{{BASE}}data/orders.yaml" operation="createOrder" try-it="false"></dsk-openapi>
+      </div>
+    </section>
+
+    <section id="reference">
+      <h2 data-i18n="s2">API reference, two specs</h2>
+      <p class="lead" data-i18n="s2lead">The full reference with a spec switcher, from <code>specs</code>. Loaded on first sight (<code>loading="lazy"</code>).</p>
+      <dsk-openapi id="reference-el" loading="lazy" height="640" hash-navigation="false"
+                   specs='[{"id":"orders","name":"Orders API","src":"{{BASE}}data/orders.yaml"},{"id":"catalog","name":"Catalog API","src":"{{BASE}}data/catalog.json"}]'></dsk-openapi>
+    </section>
+
+    <section id="markdown">
+      <h2 data-i18n="s3">Markdown with live blocks</h2>
+      <p class="lead" data-i18n="s3lead">Fenced <code>mermaid</code>, <code>openapi</code>, <code>flow</code> and <code>video</code> blocks become widgets — the same registry serves the editor below.</p>
+      <div class="card">
+        <dsk-markdown id="doc">
+          <script type="text/markdown">
+            ## How an order is paid
+
+            The shop calls the payment provider; the provider answers by webhook.
+
+            ```mermaid
+            sequenceDiagram
+              participant S as Shop
+              participant P as Payments
+              S->>P: charge(order, token)
+              P-->>S: pending
+              P->>S: webhook: paid
+              S->>S: mark order paid
+            ```
+
+            The request, live — try the constructor:
+
+            ```openapi
+            method: POST
+            url: https://api.example.com/v1/orders/{id}/pay
+            summary: Pay an order
+            params:
+              path: { id: string! The order }
+            body:
+              example: { method: card, token: tok_visa }
+            responses:
+              200: The order, paid
+              402: The payment was declined
+            ```
+
+            The order's states:
+
+            ```flow
+            stateDiagram-v2
+              [*] --> AwaitingPayment
+              AwaitingPayment --> Paid: pay
+              AwaitingPayment --> Cancelled: timeout
+              Paid --> Shipped: ship
+              Shipped --> [*]
+            ```
+
+            ```video
+            src: {{BASE}}media/walkthrough.webm
+            poster: {{BASE}}media/poster.jpg
+            title: Walkthrough
+            maxWidth: 520
+            ```
+          </script>
+        </dsk-markdown>
+      </div>
+    </section>
+
+    <section id="editor">
+      <h2 data-i18n="s4">An editor in a plain form</h2>
+      <p class="lead" data-i18n="s4lead">The WYSIWYG holds a live API block. <code>name="body"</code> keeps a hidden input in sync, so the form submits HTML without a line of script.</p>
+      <form id="post" class="card" action="#" method="post">
+        <dsk-editor id="body-editor" name="body" min-height="220px" placeholder="Write something…">
+          <template>
+            <h2>Release notes</h2>
+            <p>The order endpoint now accepts <strong>several items</strong> per request:</p>
+            <pre><code class="language-openapi">method: POST
+url: https://api.example.com/v1/orders
+summary: Create an order
+body:
+  example: { customerId: cus_42, items: [{ sku: TEE-BLK-M, quantity: 2 }] }
+responses:
+  201: The order
+  422: The cart is empty</code></pre>
+            <p>Questions? Reply to this post.</p>
+          </template>
+        </dsk-editor>
+        <div class="row">
+          <button type="submit" data-i18n="submit">Submit the form</button>
+          <span class="muted" id="form-out" data-i18n="formhint">The hidden input follows every edit.</span>
+        </div>
+      </form>
+    </section>
+
+    <section id="more">
+      <h2 data-i18n="s5">Audio, diagrams and HTML from a CMS</h2>
+      <p class="lead" data-i18n="s5lead">A playlist with a waveform, a diagram from inline source, and <code>DskEmbed.renderBlocks()</code> turning stored HTML into widgets.</p>
+      <div class="grid even">
+        <div class="stack">
+          <div class="card">
+            <h3 data-i18n="playlist">Playlist</h3>
+            <dsk-audio id="playlist" waveform show-playlist>
+              <source src="{{BASE}}media/track-1.mp3" data-title="Morning queue" data-artist="Shop radio">
+              <source src="{{BASE}}media/track-2.mp3" data-title="Packing hour" data-artist="Shop radio">
+            </dsk-audio>
+          </div>
+          <div class="card">
+            <h3 data-i18n="diagram">Architecture</h3>
+            <dsk-diagram label="Shop architecture">
+              flowchart LR
+                Browser([Browser]) --> CDN[(jsDelivr)]
+                Browser --> Shop[Shop backend]
+                Shop --> Orders[Orders API]
+                Shop --> Catalog[Catalog API]
+                Orders --> Pay{{Payments}}
+            </dsk-diagram>
+          </div>
+        </div>
+        <article class="card" id="cms">
+          <h3 data-i18n="cms">Stored HTML</h3>
+          <p data-i18n="cmstext">This block is plain HTML, as a CMS stores it. One call makes its code blocks live:</p>
+          <pre><code class="language-mermaid">pie title Orders by status
+  "Delivered" : 64
+  "Shipping" : 41
+  "Awaiting payment" : 17
+  "Cancelled" : 6</code></pre>
+          <pre><code class="language-js">// Not registered: stays code.
+DskEmbed.renderBlocks(document.querySelector('#cms'))</code></pre>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <span data-i18n="footer">Built from @dskripchenko/ui, wysiwyg, diagrams, openapi and flow — one Vue, one kit, pinned versions.</span>
+      <span id="runtime-info"></span>
+    </footer>
+  </main>
+
+  <script>
+    // Page script: the theme and language switchers, the event log, and the cooperation wiring.
+    const T = {
+      ru: {
+        light: 'Светлая', dark: 'Тёмная', system: 'Системная',
+        title: 'Живые компоненты для любой страницы',
+        subtitle: 'Плееры, диаграммы, справочник API, процессы, живой markdown и редактор — HTML-тегами. Один скрипт с CDN, один общий Vue, и части работают вместе.',
+        loader: 'Загрузчик · ~9 КБ, остальное по требованию', bundle: 'Толстый бандл · без import map',
+        s1: 'Процесс управляет API и видео', s1lead: 'Нажмите на шаг. Процесс шлёт dsk:node — страница открывает операцию шага, а media-target включает главу видео. Мониторинг идёт из poll-url.',
+        events: 'Шина событий', bushint: 'Каждое событие элемента — всплывающее DOM-событие dsk:*; DskEmbed.on() слушает их все.', s2: 'Справочник API, две спецификации', s2lead: 'Полный справочник с переключателем спецификаций из specs. Загружается при появлении (loading="lazy").',
+        s3: 'Markdown с живыми блоками', s3lead: 'Блоки mermaid, openapi, flow и video становятся виджетами — тот же реестр обслуживает редактор ниже.',
+        s4: 'Редактор в обычной форме', s4lead: 'В WYSIWYG — живой API-блок. name="body" держит скрытое поле в синхроне, и форма отправляет HTML без единой строчки скрипта.',
+        submit: 'Отправить форму', formhint: 'Скрытое поле следует за каждой правкой.',
+        s5: 'Аудио, диаграммы и HTML из CMS', s5lead: 'Плейлист с волной, диаграмма из встроенного кода и DskEmbed.renderBlocks(), превращающий сохранённый HTML в виджеты.',
+        playlist: 'Плейлист', diagram: 'Архитектура', cms: 'Сохранённый HTML', cmstext: 'Этот блок — обычный HTML, как его хранит CMS. Один вызов оживляет его блоки кода:',
+        footer: 'Собрано из @dskripchenko/ui, wysiwyg, diagrams, openapi и flow — один Vue, один кит, зафиксированные версии.',
+      },
+    }
+    const original = new Map()
+    function translate(locale) {
+      for (const el of document.querySelectorAll('[data-i18n]')) {
+        if (!original.has(el)) original.set(el, el.textContent)
+        const key = el.getAttribute('data-i18n')
+        el.textContent = (T[locale] && T[locale][key]) || original.get(el)
+      }
+      document.getElementById('log').dataset.empty = locale === 'ru' ? 'Нажмите на шаг процесса…' : 'Click a step of the process…'
+    }
+
+    function press(group, value) {
+      for (const b of document.querySelectorAll(`[data-group="${group}"] button`)) b.setAttribute('aria-pressed', String(b.dataset.value === value))
+    }
+    let theme = new URLSearchParams(location.search).get('theme') || 'light'
+    let locale = new URLSearchParams(location.search).get('lang') || 'en'
+    function apply() {
+      DskEmbed.configure({ theme, locale })
+      document.documentElement.lang = locale
+      press('theme', theme)
+      press('locale', locale)
+      translate(locale)
+    }
+    for (const b of document.querySelectorAll('.seg button')) {
+      b.addEventListener('click', () => {
+        if (b.closest('[data-group]').dataset.group === 'theme') theme = b.dataset.value
+        else locale = b.dataset.value
+        apply()
+      })
+    }
+    apply()
+
+    // The event log: every bus event the page cares about.
+    const log = document.getElementById('log')
+    function show(name, detail) {
+      const li = document.createElement('li')
+      const ev = document.createElement('span')
+      ev.className = 'ev'
+      ev.textContent = `dsk:${name}`
+      const d = document.createElement('span')
+      d.className = 'd'
+      d.textContent = detail
+      li.append(ev, d)
+      log.prepend(li)
+      while (log.children.length > 8) log.lastChild.remove()
+    }
+    DskEmbed.on('node', (detail) => show('node', `${detail.id}${detail.data.operation ? ` → ${detail.data.operation}` : ''}`))
+    DskEmbed.on('chapter', (detail) => show('chapter', `${detail.title} @ ${detail.start}s`))
+    DskEmbed.on('play', (_d, e) => show('play', e.target.id || e.target.tagName.toLowerCase()))
+    DskEmbed.on('toggle', (detail) => show('toggle', `${detail.id} → ${detail.enabled ? 'on' : 'off'}`))
+    DskEmbed.on('active', (detail) => show('active', detail.id))
+
+    // Cooperation through the bus: a step with an operation opens it in the card.
+    const card = document.getElementById('op-card')
+    DskEmbed.on('node', ({ data }) => {
+      if (data.operation) card.operation = data.operation
+    })
+
+    // Toggles, simulated here (a backend would take them at toggle-url).
+    const flow = document.getElementById('process-flow')
+    flow.onToggle = (change) => new Promise((resolve, reject) => setTimeout(() => (change.id === 'done' ? reject(new Error('The end state stays on')) : resolve()), 300))
+
+    // The form: what the hidden input carries.
+    document.getElementById('post').addEventListener('submit', (e) => {
+      e.preventDefault()
+      const body = new FormData(e.target).get('body') || ''
+      document.getElementById('form-out').textContent = `body = ${body.length} chars of HTML`
+    })
+
+    // Stored HTML → live blocks.
+    DskEmbed.renderBlocks(document.getElementById('cms'))
+
+    document.getElementById('runtime-info').textContent = ` · embed ${DskEmbed.version} (${DskEmbed.mode}) · vue ${DskEmbed.versions.vue}`
+  </script>
+</body>
+</html>

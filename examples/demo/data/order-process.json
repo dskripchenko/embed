@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "meta": { "title": "Order process" },
+  "nodes": [
+    { "id": "start", "type": "start", "label": "Cart ready" },
+    { "id": "create", "type": "task", "label": "Create order", "description": "POST /orders", "data": { "operation": "createOrder", "chapter": "Create order" } },
+    { "id": "pay", "type": "task", "label": "Pay", "description": "POST /orders/{id}/pay", "data": { "operation": "payOrder", "chapter": "Payment" } },
+    { "id": "paid", "type": "decision", "label": "Paid?" },
+    { "id": "ship", "type": "subprocess", "label": "Ship", "description": "Warehouse", "subgraph": "shipping", "data": { "operation": "shipOrder", "chapter": "Shipping" } },
+    { "id": "cancel", "type": "state", "label": "Cancelled" },
+    { "id": "done", "type": "end", "label": "Delivered" }
+  ],
+  "edges": [
+    { "id": "e1", "from": "start", "to": "create" },
+    { "id": "e2", "from": "create", "to": "pay" },
+    { "id": "e3", "from": "pay", "to": "paid" },
+    { "id": "e4", "from": "paid", "to": "ship", "label": "yes" },
+    { "id": "e5", "from": "paid", "to": "cancel", "label": "no" },
+    { "id": "e6", "from": "ship", "to": "done" }
+  ]
+}

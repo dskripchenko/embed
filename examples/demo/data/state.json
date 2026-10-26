@@ -1,0 +1,20 @@
+{
+  "nodes": {
+    "start": { "status": "done", "count": 128 },
+    "create": { "status": "done", "count": 128 },
+    "pay": { "status": "active", "count": 17, "message": "17 orders awaiting payment" },
+    "paid": { "status": "waiting", "count": 3 },
+    "ship": { "status": "active", "count": 41 },
+    "cancel": { "count": 6 },
+    "done": { "count": 64 }
+  },
+  "edges": {
+    "e1": { "count": 128, "traversed": true },
+    "e2": { "count": 128, "traversed": true },
+    "e3": { "count": 111, "traversed": true },
+    "e4": { "count": 105 },
+    "e5": { "count": 6 },
+    "e6": { "count": 64 }
+  },
+  "current": ["pay"]
+}
