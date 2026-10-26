@@ -45,10 +45,10 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      # A static ffmpeg from GitHub: the runners' apt mirrors stall now and then.
-      - uses: FedericoCarboni/setup-ffmpeg@v3
-        with:
-          github-token: ${{ github.token }}
+      # A static ffmpeg (x264, VP9, Opus) from npm, for the media fixtures: no apt.
+      - run: |
+          npm install --prefix /tmp/ffmpeg --no-audit --no-fund ffmpeg-static@5.3.0
+          echo "FFMPEG=/tmp/ffmpeg/node_modules/ffmpeg-static/ffmpeg" >> "$GITHUB_ENV"
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: node scripts/fixtures.mjs
