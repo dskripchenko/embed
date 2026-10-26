@@ -480,8 +480,8 @@ for (const browserName of Object.keys(browsers)) {
         await new Promise((r) => setTimeout(r, 2500))
         const v = el.querySelector('video')
         // Whether this browser build can decode the fixture at all (H.264 + AAC).
-        const h264 = typeof MediaSource !== 'undefined'
-          && MediaSource.isTypeSupported('video/mp4; codecs="avc1.42E01E, mp4a.40.2"')
+        const h264 = typeof window.MediaSource !== 'undefined'
+          && window.MediaSource.isTypeSupported('video/mp4; codecs="avc1.42E01E, mp4a.40.2"')
         return { t: v.currentTime, err: v.error?.code ?? null, alert: el.querySelector('[role=alert]')?.textContent ?? null, h264 }
       })
       const hlsOk = hls.t > 0.5 && !hls.err
