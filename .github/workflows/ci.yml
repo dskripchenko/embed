@@ -40,8 +40,10 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
-        timeout-minutes: 8
+      # A static ffmpeg from GitHub: the runners' apt mirrors stall now and then.
+      - uses: FedericoCarboni/setup-ffmpeg@v3
+        with:
+          github-token: ${{ github.token }}
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium webkit
       - run: pnpm build
