@@ -10,7 +10,6 @@ const VERSIONS = {
   '@dskripchenko/flow': '1.0.1',
 }
 const CDN = 'https://cdn.jsdelivr.net/npm/'
-const EMBED = 'https://cdn.jsdelivr.net/npm/@dskripchenko/embed@1.0.0/dist/'
 
 describe('import map', () => {
   beforeEach(() => {
@@ -18,18 +17,19 @@ describe('import map', () => {
   })
 
   it('pins every runtime specifier to an exact version on the CDN', () => {
-    const map = buildImportMap(CDN, VERSIONS, EMBED)
-    expect(Object.keys(map.imports).sort()).toEqual([...Object.keys(RUNTIME_FILES), 'lucide-vue-next'].sort())
+    const map = buildImportMap(CDN, VERSIONS)
+    expect(Object.keys(map.imports).sort()).toEqual(Object.keys(RUNTIME_FILES).sort())
     expect(map.imports.vue).toBe('https://cdn.jsdelivr.net/npm/vue@3.5.44/dist/vue.runtime.esm-browser.prod.js')
     expect(map.imports['@dskripchenko/flow/vue']).toBe('https://cdn.jsdelivr.net/npm/@dskripchenko/flow@1.0.1/dist/vue.mjs')
-    expect(map.imports['lucide-vue-next']).toBe(`${EMBED}vendor/lucide-vue-next.js`)
+    // The packages bundle their icons: no icon library in the map.
+    expect(Object.keys(map.imports).some((k) => k.includes('lucide') || k.endsWith('/icons'))).toBe(false)
     expect(styleUrl(CDN, VERSIONS, 'kit')).toBe('https://cdn.jsdelivr.net/npm/@dskripchenko/ui@1.15.1/dist/styles/index.css')
-    expect(() => buildImportMap(CDN, { vue: '3' }, EMBED)).toThrow(/no version pinned/)
+    expect(() => buildImportMap(CDN, { vue: '3' })).toThrow(/no version pinned/)
   })
 
   it('writes a map ahead of module scripts', () => {
     document.head.innerHTML = '<script type="module" src="/app.js"></script>'
-    const { added, conflicts } = installImportMap(buildImportMap(CDN, VERSIONS, EMBED))
+    const { added, conflicts } = installImportMap(buildImportMap(CDN, VERSIONS))
     expect(conflicts).toEqual([])
     expect(added).toContain('vue')
     const first = document.head.firstElementChild as HTMLScriptElement
@@ -38,7 +38,7 @@ describe('import map', () => {
   })
 
   it('composes with the page map: the page keeps its entries, differences are reported', () => {
-    const own = buildImportMap(CDN, VERSIONS, EMBED)
+    const own = buildImportMap(CDN, VERSIONS)
     document.head.innerHTML = `<script type="importmap">${JSON.stringify({ imports: { vue: own.imports.vue, '@dskripchenko/ui': 'https://other/ui.js', app: '/app.js' } })}</script>`
     const { added, conflicts, map } = installImportMap(own)
     expect(added).not.toContain('vue')

@@ -12,17 +12,17 @@ importers:
         specifier: 1.1.0
         version: 1.1.0
       '@dskripchenko/flow':
-        specifier: 1.1.0
-        version: 1.1.0(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
-      '@dskripchenko/openapi':
         specifier: 1.1.1
-        version: 1.1.1(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 1.1.1(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/openapi':
+        specifier: 1.1.2
+        version: 1.1.2(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/ui':
         specifier: 1.16.0
         version: 1.16.0(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/wysiwyg':
-        specifier: 0.5.2
-        version: 0.5.2(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: 0.5.3
+        version: 0.5.3(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.13.0)
@@ -141,8 +141,8 @@ packages:
     resolution: {integrity: sha512-Q07LPeEGlwT8xhb9RrnFlzbtAvRkvupT4RaUj70sJO4WTcZOgj0hZOHUgq3pRVsszGoB76rjK55JnZKbxv+iaw==}
     engines: {node: '>=20'}
 
-  '@dskripchenko/flow@1.1.0':
-    resolution: {integrity: sha512-tcEiX9VyU++/OTwEiC768WIuqgOO16GNMQsgo64ZM7+N+nrhLa7Jj35Grp+XcGa7TldZ22FnrI5cpxTO1YT7QA==}
+  '@dskripchenko/flow@1.1.1':
+    resolution: {integrity: sha512-9W8Q5+lxLkRFOAhpFAl3NI74hjedA1SJaz5+WNKDPC+jTnr6NLL5HpT27SSZ1OoZFdiujMJbmnI2STtPcOz8kw==}
     engines: {node: '>=20'}
     peerDependencies:
       '@dskripchenko/diagrams': ^1.1.0
@@ -156,8 +156,8 @@ packages:
       vue:
         optional: true
 
-  '@dskripchenko/openapi@1.1.1':
-    resolution: {integrity: sha512-slUOgaD0q4AvRE7q6PCQFnYDhKU+kostooNNn68RxjUQyEqCJYdbp8rx38OD6kEk+jyD9nD0HL+AvRBnTQyqxw==}
+  '@dskripchenko/openapi@1.1.2':
+    resolution: {integrity: sha512-8vSolsAGOyFDlOWhafossdy9ce85fKgMDpJk1/QxW6in0+Lzblo3a565qyFkAl8m2smfQ8z2WA2gvYIKNGtjUg==}
     engines: {node: '>=20'}
     peerDependencies:
       '@dskripchenko/ui': ^1.13.0
@@ -174,8 +174,8 @@ packages:
     peerDependencies:
       vue: ^3.4.0
 
-  '@dskripchenko/wysiwyg@0.5.2':
-    resolution: {integrity: sha512-Kx+aiVHj9SHukEZQ6zbr4qYfV2jFUWy/l1ud7lLE0RFx6A9RwaOCXPEQ+27v6zEelnGInZaJGXAJHag2R7hDmw==}
+  '@dskripchenko/wysiwyg@0.5.3':
+    resolution: {integrity: sha512-c/3VzslCs7YYiteCX8a84KkGAvQhcbwkVkcETu9tlzLh3ZDbFSOEeLvC6UkxXGMk7QZBgNbnMemlE372xx2Z4Q==}
     peerDependencies:
       '@dskripchenko/ui': ^1.0
       vue: ^3.4
@@ -1195,13 +1195,13 @@ snapshots:
 
   '@dskripchenko/diagrams@1.1.0': {}
 
-  '@dskripchenko/flow@1.1.0(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/flow@1.1.1(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
       '@dskripchenko/diagrams': 1.1.0
       '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/openapi@1.1.1(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/openapi@1.1.2(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
       '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
@@ -1211,7 +1211,7 @@ snapshots:
       lucide-vue-next: 0.460.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/wysiwyg@0.5.2(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/wysiwyg@0.5.3(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       vue: 3.5.44(typescript@6.0.3)
     optionalDependencies:

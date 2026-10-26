@@ -1,7 +1,6 @@
 // Builds dist/:
 //   embed.js              the loader (classic script, no Vue)
 //   plugins/*.js, chunks/ the plugin modules (ESM; vue and the packages external, via the import map)
-//   vendor/lucide-vue-next.js  one-file ESM of the icons the packages use
 //   embed.bundle.js       the fat bundle (classic script, everything inside)
 //   importmap.json        the runtime's import map on jsDelivr, for pages that write their own
 import { mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync, readdirSync, statSync } from 'node:fs'
@@ -52,57 +51,21 @@ const vueFlags = {
 rmSync(dist, { recursive: true, force: true })
 mkdirSync(dist, { recursive: true })
 
-// ---- 1. The icons: every name the packages import from lucide-vue-next ----
-// The kit's main entry bundles its own icons (ui 1.16+); openapi and flow import
-// theirs through `@dskripchenko/ui/icons` (which re-exports lucide-vue-next) and
-// the editor's toolbar through `import('lucide-vue-next')`: those names only.
-function iconNames() {
-  const names = new Set()
-  const files = [
-    ['@dskripchenko/ui', 'dist/index.mjs'],
-    ['@dskripchenko/openapi', 'dist/vue.mjs'],
-    ['@dskripchenko/flow', 'dist/vue.mjs'],
-    ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
-  ]
-  for (const [name, file] of files) {
-    const code = readFileSync(join(pkgDir(name), file), 'utf8')
-    for (const m of code.matchAll(/import\s*\{([^}]*)\}\s*from\s*"(?:lucide-vue-next|@dskripchenko\/ui\/icons)"/g)) {
-      for (const part of m[1].split(',')) {
-        const imported = part.trim().split(/\s+as\s+/)[0]
-        if (imported && imported !== 'UidIcon') names.add(imported)
-      }
-    }
-    // wysiwyg reads the icons off a dynamic import: `c.Bold`, `c.Italic`, …
-    for (const m of code.matchAll(/const (\w+) = await import\("lucide-vue-next"\);([\s\S]{0,4000}?)\}/g)) {
-      for (const n of m[2].matchAll(new RegExp(`\\b${m[1]}\\.([A-Z]\\w+)`, 'g'))) names.add(n[1])
-    }
+// ---- 1. No icon library at run time ----
+// Every package bundles its own icons (ui 1.16, openapi 1.1.2, flow 1.1.1,
+// wysiwyg 0.5.3): nothing may import `lucide-vue-next` or `@dskripchenko/ui/icons`
+// at run time, or a page would need them in its import map.
+for (const [name, file] of [
+  ['@dskripchenko/ui', 'dist/index.mjs'],
+  ['@dskripchenko/openapi', 'dist/vue.mjs'],
+  ['@dskripchenko/flow', 'dist/vue.mjs'],
+  ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
+]) {
+  const code = readFileSync(join(pkgDir(name), file), 'utf8')
+  if (/(?:from\s*|import\s*\(\s*)"(?:lucide-vue-next|@dskripchenko\/ui\/icons)"/.test(code)) {
+    throw new Error(`${name}/${file} imports icons at run time: bundle them in the package`)
   }
-  return [...names].sort()
 }
-
-const icons = iconNames()
-const lucideDir = pkgDir('lucide-vue-next')
-const lucideIndex = readFileSync(join(lucideDir, 'dist/esm/lucide-vue-next.js'), 'utf8')
-const missing = icons.filter((n) => !new RegExp(`\\bas ${n}\\b`).test(lucideIndex))
-if (missing.length) throw new Error(`icons not in lucide-vue-next: ${missing.join(', ')}`)
-const iconEntry = resolve(root, 'node_modules/.dsk-embed-icons.js')
-writeFileSync(
-  iconEntry,
-  `// Generated: the lucide-vue-next icons the embed's packages import.\nexport { createLucideIcon, ${icons.join(', ')} } from 'lucide-vue-next'\n`,
-)
-await build({
-  root,
-  configFile: false,
-  logLevel: 'warn',
-  build: {
-    emptyOutDir: false,
-    outDir: dist,
-    minify: true,
-    lib: { entry: iconEntry, formats: ['es'], fileName: () => 'vendor/lucide-vue-next.js' },
-    // Served as is from the CDN: minified in full (lib mode keeps ES output readable by default).
-    rollupOptions: { external: ['vue'], output: { minify: true } },
-  },
-})
 
 // ---- 2. The plugin modules ----
 const plugins = ['media', 'diagram', 'openapi', 'flow', 'markdown', 'editor']
@@ -123,7 +86,7 @@ await build({
       fileName: (_format, alias) => `${alias}.js`,
     },
     rollupOptions: {
-      external: ['vue', 'lucide-vue-next', /^@dskripchenko\//],
+      external: ['vue', /^@dskripchenko\//],
       output: { chunkFileNames: 'chunks/[name]-[hash].js', minify: true },
     },
   },
@@ -167,7 +130,6 @@ const cdn = 'https://cdn.jsdelivr.net/npm/'
 const files = {
   vue: ['vue', 'dist/vue.runtime.esm-browser.prod.js'],
   '@dskripchenko/ui': ['@dskripchenko/ui', 'dist/index.mjs'],
-  '@dskripchenko/ui/icons': ['@dskripchenko/ui', 'dist/icons/index.mjs'],
   '@dskripchenko/ui/hls': ['@dskripchenko/ui', 'dist/hls/index.mjs'],
   '@dskripchenko/wysiwyg': ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
   '@dskripchenko/diagrams': ['@dskripchenko/diagrams', 'dist/index.mjs'],
@@ -178,7 +140,6 @@ const files = {
   '@dskripchenko/flow/mermaid': ['@dskripchenko/flow', 'dist/mermaid.mjs'],
 }
 const imports = Object.fromEntries(Object.entries(files).map(([spec, [name, path]]) => [spec, `${cdn}${name}@${versions[name]}/${path}`]))
-imports['lucide-vue-next'] = `${cdn}@dskripchenko/embed@${pkg.version}/dist/vendor/lucide-vue-next.js`
 writeFileSync(resolve(dist, 'importmap.json'), JSON.stringify({ imports }, null, 2) + '\n')
 // Every runtime file the map names must exist in the installed packages.
 for (const [name, path] of Object.values(files)) statSync(join(pkgDir(name), path))
@@ -191,7 +152,7 @@ function walk(dir) {
   })
 }
 const kb = (n) => `${(n / 1024).toFixed(1)} KB`
-console.log(`\n@dskripchenko/embed ${pkg.version} — runtime: ${Object.entries(versions).map(([k, v]) => `${k}@${v}`).join(', ')}; ${icons.length} icons`)
+console.log(`\n@dskripchenko/embed ${pkg.version} — runtime: ${Object.entries(versions).map(([k, v]) => `${k}@${v}`).join(', ')}`)
 for (const file of walk(dist).sort()) {
   const buf = readFileSync(file)
   console.log(`  ${file.slice(dist.length + 1).padEnd(40)} ${kb(buf.length).padStart(10)}  gzip ${kb(gzipSync(buf, { level: 9 }).length).padStart(9)}`)

@@ -1,5 +1,16 @@
 # @dskripchenko/embed
 
+## 1.0.3 — 2026-10-26
+
+### Changed
+- **No icon library in the import map.** openapi 1.1.2, flow 1.1.1 and
+  wysiwyg 0.5.3 bundle their icons, as the kit does since 1.16: the loader no
+  longer maps `lucide-vue-next` (nor `@dskripchenko/ui/icons`) and the
+  `dist/vendor/lucide-vue-next.js` file is gone. The build fails if a package
+  imports icons at run time again.
+- openapi 1.1.2: PDF of an operation on iPhone/iPad prints the operation, not
+  the whole page; print margins hold when a dialog drops `@page`.
+
 ## 1.0.2 — 2026-10-26
 
 ### Changed

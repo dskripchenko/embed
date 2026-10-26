@@ -17,7 +17,6 @@
 export const RUNTIME_FILES: Readonly<Record<string, readonly [string, string]>> = {
   vue: ['vue', 'dist/vue.runtime.esm-browser.prod.js'],
   '@dskripchenko/ui': ['@dskripchenko/ui', 'dist/index.mjs'],
-  '@dskripchenko/ui/icons': ['@dskripchenko/ui', 'dist/icons/index.mjs'],
   '@dskripchenko/ui/hls': ['@dskripchenko/ui', 'dist/hls/index.mjs'],
   '@dskripchenko/wysiwyg': ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
   '@dskripchenko/diagrams': ['@dskripchenko/diagrams', 'dist/index.mjs'],
@@ -48,19 +47,14 @@ export function packageUrl(cdnBase: string, pkg: string, version: string, path: 
   return `${cdnBase}${pkg}@${version}/${path}`
 }
 
-/**
- * The runtime's import map. `lucide-vue-next` points at the embed's own
- * single-file build of the icons the packages use: the package's ESM build
- * is a module per icon, some 1 500 requests through a map.
- */
-export function buildImportMap(cdnBase: string, versions: Readonly<Record<string, string>>, embedBase: string): ImportMap {
+/** The runtime's import map. The packages bundle their own icons: no icon library in it. */
+export function buildImportMap(cdnBase: string, versions: Readonly<Record<string, string>>): ImportMap {
   const imports: Record<string, string> = {}
   for (const [specifier, [pkg, path]] of Object.entries(RUNTIME_FILES)) {
     const version = versions[pkg]
     if (!version) throw new Error(`no version pinned for ${pkg}`)
     imports[specifier] = packageUrl(cdnBase, pkg, version, path)
   }
-  imports['lucide-vue-next'] = `${embedBase}vendor/lucide-vue-next.js`
   return { imports }
 }
 

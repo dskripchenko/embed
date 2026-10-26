@@ -320,6 +320,12 @@ for (const browserName of Object.keys(browsers)) {
       await sleep(600)
       const enBar = await toolbar()
       check(`${tag}: editor toolbar RU → EN`, /Жирный/.test(ruBar) && /Bold/.test(enBar) && !/Жирный/.test(enBar), `${ruBar.slice(0, 40)} → ${enBar.slice(0, 40)}`)
+      // Every package bundles its icons: they draw, and no icon library is fetched.
+      const icons = await page.evaluate(() => ({
+        toolbar: document.querySelectorAll('#body-editor .dsk-wysiwyg-toolbar svg').length,
+        lucide: performance.getEntriesByType('resource').filter((e) => /lucide/.test(e.name)).map((e) => e.name),
+      }))
+      check(`${tag}: icons drawn (editor toolbar), no icon library fetched`, icons.toolbar > 10 && icons.lucide.length === 0, JSON.stringify(icons).slice(0, 160))
 
       check(`${tag}: no console errors`, errors.length === 0, errors.slice(0, 5).join(' | '))
     } catch (error) {

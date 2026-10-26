@@ -112,19 +112,14 @@ Die Map, die er schreibt (auch als `dist/importmap.json` veröffentlicht):
 | Specifier | Zeigt auf |
 |---|---|
 | `vue` | `vue@3.5.44/dist/vue.runtime.esm-browser.prod.js` |
-| `@dskripchenko/ui`, `/icons`, `/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
-| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.2/dist/index.mjs` |
+| `@dskripchenko/ui`, `/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
+| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.3/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
-| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
-| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.1.0/dist/…` |
-| `lucide-vue-next` | der eigene Ein-Datei-Build des Embeds mit den Icons, die openapi, flow und der Editor verwenden |
+| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.2/dist/…` |
+| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.1.1/dist/…` |
 
-Die Icons sind ein Sonderfall. Das Kit bündelt seine eigenen Icons; openapi und
-flow importieren ihre über `@dskripchenko/ui/icons`, das `lucide-vue-next`
-re-exportiert, und die Werkzeugleiste des Editors importiert `lucide-vue-next`
-selbst. Der ESM-Build dieses Pakets besteht aus einem Modul pro Icon — rund
-1 500 Requests über eine Map — daher liefert das Embed die 76 Icons, die diese
-Pakete importieren, als eine Datei aus (5 KB gzip-komprimiert).
+Eine Icon-Bibliothek ist nicht gemappt: Das Kit, openapi, flow und der
+Editor bündeln die Icons, die sie verwenden.
 
 **Eine Seite mit eigener Import Map.** Einträge, die die Seite selbst mappt,
 bleiben die der Seite; das Embed fügt eine zweite Map mit dem Rest hinzu, die
