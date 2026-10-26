@@ -116,7 +116,7 @@ Die Map, die er schreibt (auch als `dist/importmap.json` veröffentlicht):
 | `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.2/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
 | `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
-| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.2/dist/…` |
+| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.1.0/dist/…` |
 | `lucide-vue-next` | der eigene Ein-Datei-Build des Embeds mit den Icons, die openapi, flow und der Editor verwenden |
 
 Die Icons sind ein Sonderfall. Das Kit bündelt seine eigenen Icons; openapi und

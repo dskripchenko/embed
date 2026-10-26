@@ -1,5 +1,13 @@
 # @dskripchenko/embed
 
+## 1.0.2 — 2026-10-26
+
+### Changed
+- `<dsk-flow>` runs `@dskripchenko/flow` 1.1.0: the `parallel` (regions and
+  join), `timer`, `wait` and `any` node types, edge triggers (`trigger:
+  'timer' | 'event'`) and the `unknown` / `compensated` statuses. The loader's
+  import map, the fat bundle and the vendored icons follow.
+
 ## 1.0.1 — 2026-10-26
 
 ### Fixed
