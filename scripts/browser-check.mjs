@@ -479,11 +479,17 @@ for (const browserName of Object.keys(browsers)) {
         }
         await new Promise((r) => setTimeout(r, 2500))
         const v = el.querySelector('video')
-        return { t: v.currentTime, err: v.error?.code ?? null, alert: el.querySelector('[role=alert]')?.textContent ?? null }
+        // Whether this browser build can decode the fixture at all (H.264 + AAC).
+        const h264 = typeof MediaSource !== 'undefined'
+          && MediaSource.isTypeSupported('video/mp4; codecs="avc1.42E01E, mp4a.40.2"')
+        return { t: v.currentTime, err: v.error?.code ?? null, alert: el.querySelector('[role=alert]')?.textContent ?? null, h264 }
       })
       const hlsOk = hls.t > 0.5 && !hls.err
-      // Chromium (open-source build) has no H.264 decoder: the kit reports the format instead of failing silently.
-      check(`${tag}: HLS (fMP4) via @dskripchenko/ui/hls`, hlsOk || (browserName === 'chromium' && !!hls.alert), JSON.stringify(hls))
+      // Builds without an H.264 decoder — open-source Chromium, and Playwright's
+      // WebKit on Linux (CI) — cannot play the fixture: there the kit must
+      // report the format instead of failing silently. Where the decoder
+      // exists, the stream has to play.
+      check(`${tag}: HLS (fMP4) via @dskripchenko/ui/hls`, hlsOk || (!hls.h264 && !!hls.alert), JSON.stringify(hls))
 
       // renderBlocks is idempotent; dynamic elements upgrade.
       const again = await page.evaluate(async () => {
