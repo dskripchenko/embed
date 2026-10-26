@@ -108,19 +108,14 @@ Map, который он записывает (опубликован также
 | Спецификатор | Указывает на |
 |---|---|
 | `vue` | `vue@3.5.44/dist/vue.runtime.esm-browser.prod.js` |
-| `@dskripchenko/ui`, `/icons`, `/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
-| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.2/dist/index.mjs` |
+| `@dskripchenko/ui`, `/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
+| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.3/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
-| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
-| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.1.0/dist/…` |
-| `lucide-vue-next` | собственная однофайловая сборка embed с иконками, которые используют openapi, flow и редактор |
+| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.2/dist/…` |
+| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.1.1/dist/…` |
 
-Иконки — особый случай. Кит содержит собственные иконки; openapi и flow
-импортируют свои через `@dskripchenko/ui/icons`, который реэкспортирует
-`lucide-vue-next`, а панель инструментов редактора импортирует
-`lucide-vue-next` напрямую. ESM-сборка этого пакета — это по модулю на иконку,
-около 1 500 запросов через map, — поэтому embed поставляет 76 иконок, которые
-импортируют эти пакеты, одним файлом (5 КБ в gzip).
+Библиотеки иконок в карте нет: кит, openapi, flow и редактор встраивают
+свои иконки в собственные сборки.
 
 **Страница со своим import map.** Записи, которые страница описала сама,
 остаются за ней; embed добавляет второй map с остальными, а браузеры с

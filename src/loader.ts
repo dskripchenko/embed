@@ -50,7 +50,7 @@ function boot(): void {
   const cdnBase = normalizeCdnBase(config.cdnBase ?? cdnBaseOf(src) ?? DEFAULT_CDN)
   const versions = { ...VERSIONS, ...(config.versions ?? {}) }
 
-  const { map, conflicts } = installImportMap(buildImportMap(cdnBase, versions, embedBase))
+  const { map, conflicts } = installImportMap(buildImportMap(cdnBase, versions))
   for (const c of conflicts) {
     console.warn(`[dsk-embed] the page maps "${c.specifier}" to ${c.page}; the embed was built against ${c.embed}. A second copy of Vue or the kit breaks the elements — map both to the same file.`)
   }

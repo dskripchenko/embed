@@ -98,16 +98,12 @@ node scripts/mirror.mjs public/static     # → public/static/npm/<pkg>@<version
 |---|---|
 | `vue` | `vue@3.5.44/dist/vue.runtime.esm-browser.prod.js` |
 | `@dskripchenko/ui`、`/icons`、`/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
-| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.2/dist/index.mjs` |
+| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.3/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
-| `@dskripchenko/openapi`、`/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
-| `@dskripchenko/flow`、`/vue`、`/mermaid` | `@dskripchenko/flow@1.1.0/dist/…` |
-| `lucide-vue-next` | embed 自己构建的单文件版本，包含 openapi、flow 和编辑器用到的图标 |
+| `@dskripchenko/openapi`、`/vue` | `@dskripchenko/openapi@1.1.2/dist/…` |
+| `@dskripchenko/flow`、`/vue`、`/mermaid` | `@dskripchenko/flow@1.1.1/dist/…` |
 
-图标是个特例。组件库自带打包好的图标；openapi 和 flow 通过 `@dskripchenko/ui/icons` 导入各自的图标，
-后者重新导出 `lucide-vue-next`，而编辑器的工具栏直接导入 `lucide-vue-next`。该包的 ESM 构建
-每个图标一个模块——通过 map 加载大约要 1 500 个请求——因此 embed 把这些包导入的 76 个图标
-打成一个文件（gzip 后 5 KB）。
+映射中没有图标库：组件库、openapi、flow 和编辑器都把所用图标打包进各自的构建。
 
 **页面自带 import map。** 页面自己映射的条目仍归页面所有；embed 会再添加一个包含其余条目的
 map，支持多个 import map 的浏览器会将它们合并（Chromium 133 起；浏览器检查在当前的 Chromium
