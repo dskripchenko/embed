@@ -83,13 +83,16 @@ JSON-Attribut `tracks`; `kind` ist `subtitles`, `captions` oder `chapters`.
 
 Methoden: `play()`, `pause()`, `toggle()`, `seek(seconds)`,
 `playChapter(indexOrTitle)` (springt zu einem Kapitel der Kapitelspur — per
-Index, exaktem Titel oder einem Teil davon — und spielt ab), `loadChapters()`.
+Index, exaktem Titel oder einem Teil davon — und spielt ab), `loadChapters()`
+(wird aufgelöst, sobald das Kit die Kapitelspur gelesen hat).
 Getter: `state` (playing, currentTime, duration, volume, …), `media` (das
-`<video>`), `chapters` (`[{ index, title, start, end }]`, nach dem ersten
-`loadChapters()`/`playChapter()`).
+`<video>`), `chapters` (`[{ index, title, start, end }]`, so wie das Kit sie
+aus der Kapitelspur gelesen hat).
 
 Events: `dsk:play`, `dsk:pause`, `dsk:ended`, `dsk:timeupdate` — detail
-`{ currentTime, duration, src }`; `dsk:chapter` — das abgespielte Kapitel;
+`{ currentTime, duration, src }`; `dsk:chapter` — das Kapitel, das
+`playChapter()` abgespielt hat; `dsk:chapterchange` — `{ index, title, start, end }`
+(oder `null`), sobald die Wiedergabe in ein anderes Kapitel eintritt;
 `dsk:qualitychange` `{ label }`, `dsk:audiotrackchange` `{ label }`,
 `dsk:error` — der Fehler des Kits `{ kind, detail? }`.
 
@@ -207,14 +210,15 @@ einmal geholt.
 | `operation` | `operation` | Operationsmodus: die anzuzeigende Operation. |
 | `reference-url`, `spec-id` | camelCase | Operationsmodus: Link „In Referenz öffnen“ und die id der Spezifikation dort. |
 | `try-it` | `tryIt` | `try-it="false"` blendet Try-it aus (die Beispiele bleiben). |
+| `proxy` | `proxy` | Ein Endpunkt, der Try-it-Requests für die Seite ausführt — [der Proxy-Vertrag von openapi](https://github.com/dskripchenko/openapi/blob/main/docs/en/standalone.md#the-proxy) (der Request als JSON hinein, die Antwort als JSON heraus; das `csrf-token`-Meta von Laravel wird mitgesendet). Für APIs, die den Origin der Seite nicht zulassen. |
 | `base-url` | `baseUrl` | Basis für relative Server-URLs. |
 | `snippet-targets`, `default-snippet` | camelCase | Sprachen der Anfragebeispiele (`curl, js, python, …`) und die erste davon. |
 | `persist-credentials` | `persistCredentials` | `true`/`session`/`local`: API-Schlüssel zwischen Besuchen behalten. |
 | `hash-navigation` | `hashNavigation` | `false`: `location.hash` nicht schreiben. |
 | `heading` | `heading` | Der Titel im Kopf der Referenz. |
 | `editable` | `editable` | Blockmodus: Bearbeitungs-Tabs. |
-| `height` | `height` | Eine feste Höhe mit eigenem Scrollen (`720`, `80vh`); oder die CSS-Variable `--dsk-openapi-height` (pro Breakpoint). |
-| — | `send` | `(request) => Promise<response>` — Try-it über Ihren Proxy senden. |
+| `height` | `height` | Eine feste Höhe mit eigenem Scrollen (`720`, `80vh`); oder die CSS-Variable `--dsk-openapi-height` (pro Breakpoint). Die sticky Navigation der Referenz füllt dann die Box aus (`--oa-viewport-h` wird auf dieselbe Höhe gesetzt). |
+| — | `send` | `(request) => Promise<response>` — Try-it auf Ihre eigene Weise senden; hat Vorrang vor `proxy`. |
 | — | `labels` | Überschreibungen von Oberflächentexten. |
 
 Methoden: `go(target, { tryIt? })` — zu einer Operation (`createOrder`,
@@ -271,7 +275,7 @@ Requests sind Same-Origin-`fetch` mit den Cookies der Seite
 | `state` | `state` | JSON: ein erster Snapshot (z. B. vom Server gerendert); das Polling ersetzt ihn. |
 | `poll-url`, `poll-interval` | camelCase | Monitoring, wie oben. |
 | `toggle-url` | `toggleUrl` | Schalter, wie oben. |
-| — | `onToggle` | `(change) => Promise` — Schalter stattdessen selbst persistieren (nur per Script); ablehnen zum Zurücksetzen. |
+| — | `persistToggle` | `(change) => Promise` — Schalter stattdessen selbst persistieren (nur per Script); ablehnen zum Zurücksetzen. |
 | `subgraph-url` | `subgraphUrl` | Teilprozesse, wie oben. |
 | — | `loadSubgraph` | `(ref, node) => Promise<model>` — sie selbst laden (nur per Script). |
 | `editable` | `editable` | Der Editor (Palette, Verbinden, Rückgängig/Wiederholen, Eigenschaften, Mermaid-Import). |
@@ -293,7 +297,9 @@ betretenen Teilprozessebenen).
 
 Events: `dsk:node` `{ id, path, node, data }` — ein Knoten wurde angeklickt;
 `dsk:select` `{ kind, id, path, element }` oder `null`; `dsk:toggle`
-`{ kind, id, enabled, path }`; `dsk:toggle-error` `{ change, message }`;
+`{ kind, id, enabled, path, ok, rolledBack? }` — nachdem der Schalter
+persistiert (`ok: true`) oder abgelehnt wurde (`ok: false`, zurückgesetzt);
+`dsk:toggle-error` `{ change, message }`;
 `dsk:navigate` `{ path }`; `dsk:poll-error` `{ message }`; `dsk:load`
 `{ nodes, edges }`; Editor: `dsk:change` `{ graph, description, source }`,
 `dsk:validate` `{ issues }`.
@@ -350,8 +356,8 @@ url: /v1/orders</code></pre>
 </form>
 ```
 
-Der WYSIWYG-Editor (`@dskripchenko/wysiwyg`) — Werkzeugleiste,
-Markdown-Kürzel, Slash-Menü, Tabellen, Quelltextmodus — mit **jedem
+Der WYSIWYG-Editor (`@dskripchenko/wysiwyg`) — Werkzeugleiste (in der Locale
+des Elements), Markdown-Kürzel, Slash-Menü, Tabellen, Quelltextmodus — mit **jedem
 registrierten Block-Renderer live**: Ein Codeblock einer registrierten Sprache
 zeigt sein Widget, und ein Widget, das bearbeitet (der Konstruktor des
 API-Blocks), schreibt seinen Quelltext zurück ins HTML. Der Wert ist HTML;

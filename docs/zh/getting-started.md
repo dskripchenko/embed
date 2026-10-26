@@ -65,7 +65,7 @@ UI 组件库和一套块渲染器，彼此之间通过 DOM 事件通信。
 ```
 
 一个文件，内含 Vue、组件库、所有插件包和全部样式：无需 import map，也不会再发起其他请求。
-元素和 `DskEmbed` API 完全相同。它是一次性加载的整个运行时——约 2 MB，**gzip 后 558 KB**——
+元素和 `DskEmbed` API 完全相同。它是一次性加载的整个运行时——约 2 MB，**gzip 后 563 KB**——
 而加载器只获取页面实际用到的部分。在不支持 import map 的环境，或运行时不允许加载任何内容的
 场景下使用它。
 
@@ -97,15 +97,17 @@ node scripts/mirror.mjs public/static     # → public/static/npm/<pkg>@<version
 | 说明符 | 指向 |
 |---|---|
 | `vue` | `vue@3.5.44/dist/vue.runtime.esm-browser.prod.js` |
-| `@dskripchenko/ui`、`/icons`、`/hls` | `@dskripchenko/ui@1.15.1/dist/…` |
-| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.0/dist/index.mjs` |
+| `@dskripchenko/ui`、`/icons`、`/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
+| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.1/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
-| `@dskripchenko/openapi`、`/vue` | `@dskripchenko/openapi@1.1.0/dist/…` |
-| `@dskripchenko/flow`、`/vue`、`/mermaid` | `@dskripchenko/flow@1.0.1/dist/…` |
-| `lucide-vue-next` | embed 自己构建的单文件版本，包含各包用到的图标 |
+| `@dskripchenko/openapi`、`/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
+| `@dskripchenko/flow`、`/vue`、`/mermaid` | `@dskripchenko/flow@1.0.2/dist/…` |
+| `lucide-vue-next` | embed 自己构建的单文件版本，包含 openapi、flow 和编辑器用到的图标 |
 
-图标是个特例：`lucide-vue-next` 的 ESM 构建每个图标一个模块——通过 map 加载大约要 1 500 个
-请求——因此 embed 把其各包导入的 109 个图标打成一个文件（gzip 后 7 KB）。
+图标是个特例。组件库自带打包好的图标；openapi 和 flow 通过 `@dskripchenko/ui/icons` 导入各自的图标，
+后者重新导出 `lucide-vue-next`，而编辑器的工具栏直接导入 `lucide-vue-next`。该包的 ESM 构建
+每个图标一个模块——通过 map 加载大约要 1 500 个请求——因此 embed 把这些包导入的 76 个图标
+打成一个文件（gzip 后 5 KB）。
 
 **页面自带 import map。** 页面自己映射的条目仍归页面所有；embed 会再添加一个包含其余条目的
 map，支持多个 import map 的浏览器会将它们合并（Chromium 133 起；浏览器检查在当前的 Chromium

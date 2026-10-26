@@ -44,42 +44,20 @@ describe('video and audio props', () => {
   })
 })
 
-import { findChapter, parseTimestamp, parseVtt } from '../../src/core/vtt'
-import { dedupeToggle } from '../../src/plugins/flow'
+import { findChapter } from '../../src/core/chapters'
 
-describe('chapters (WebVTT)', () => {
-  const vtt = 'WEBVTT\n\nintro\n00:00.000 --> 00:04.000\nCart\n\n00:00:04.000 --> 00:00:08.500 align:start\n<b>Create</b> order\n\nNOTE x\n\n00:08.500 --> 00:12.000\nPayment\n'
-  it('parses cues', () => {
-    expect(parseTimestamp('01:02:03.5')).toBe(3723.5)
-    expect(parseVtt(vtt)).toEqual([
-      { index: 0, start: 0, end: 4, title: 'Cart' },
-      { index: 1, start: 4, end: 8.5, title: 'Create order' },
-      { index: 2, start: 8.5, end: 12, title: 'Payment' },
-    ])
-  })
+describe('chapters', () => {
+  // The shape UidVideo exposes (ui 1.16), indexed by the element.
+  const chapters = [
+    { index: 0, title: 'Cart', start: 0, end: 4 },
+    { index: 1, title: 'Create order', start: 4, end: 8.5 },
+    { index: 2, title: 'Payment', start: 8.5, end: 12 },
+  ]
   it('finds a chapter by index or title', () => {
-    const cues = parseVtt(vtt)
-    expect(findChapter(cues, 2)?.title).toBe('Payment')
-    expect(findChapter(cues, '1')?.title).toBe('Create order')
-    expect(findChapter(cues, 'payment')?.start).toBe(8.5)
-    expect(findChapter(cues, 'creat')?.index).toBe(1)
-    expect(findChapter(cues, 'nope')).toBeUndefined()
-  })
-})
-
-describe('flow toggle guard', () => {
-  it('a duplicated call (emit + prop) shares one request and keeps the emit copy quiet', async () => {
-    const persist = vi.fn(() => Promise.reject(new Error('refused')))
-    const guarded = dedupeToggle(persist)
-    const change = { id: 'a' }
-    const fromEmit = guarded(change)
-    const awaited = guarded(change)
-    await expect(fromEmit).resolves.toBeUndefined()
-    await expect(awaited).rejects.toThrow('refused')
-    expect(persist).toHaveBeenCalledOnce()
-  })
-  it('a single call keeps the rejection, so the switch rolls back', async () => {
-    const guarded = dedupeToggle(() => Promise.reject(new Error('refused')))
-    await expect(guarded({ id: 'b' })).rejects.toThrow('refused')
+    expect(findChapter(chapters, 2)?.title).toBe('Payment')
+    expect(findChapter(chapters, '1')?.title).toBe('Create order')
+    expect(findChapter(chapters, 'payment')?.start).toBe(8.5)
+    expect(findChapter(chapters, 'creat')?.index).toBe(1)
+    expect(findChapter(chapters, 'nope')).toBeUndefined()
   })
 })

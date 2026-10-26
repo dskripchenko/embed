@@ -40,7 +40,7 @@ fixes it; `configure({ locale: null })` returns to the page's. An element's
 own `locale` attribute wins for that element.
 
 The locale reaches the kit's components (player controls, dialogs, empty
-states), the OpenAPI widgets and the flow views.
+states), the OpenAPI widgets, the flow views and the editor's toolbar.
 
 ### Runtime location
 
@@ -78,7 +78,7 @@ elements the same way.
 | `dsk:error` | every element | `{ message, … }` |
 | `dsk:config` | `document` | `{ theme, resolvedTheme, locale }` on every change |
 | `dsk:play`, `dsk:pause`, `dsk:ended`, `dsk:timeupdate` | video, audio, media blocks | `{ currentTime, duration, src }` |
-| `dsk:chapter` | video | `{ index, title, start, end }` |
+| `dsk:chapter`, `dsk:chapterchange` | video | `{ index, title, start, end }` (`chapterchange`: or `null`) |
 | `dsk:trackchange` | audio | `{ index }` |
 | `dsk:qualitychange`, `dsk:audiotrackchange` | video | `{ label }` |
 | `dsk:render` | diagram | `{ type, width, height }` |
@@ -86,7 +86,7 @@ elements the same way.
 | `dsk:change` | openapi (block), flow (editor), editor | `{ source }`, `{ graph, description, source }`, `{ value }` |
 | `dsk:node` | flow, flow blocks | `{ id, path, node, data }` |
 | `dsk:select`, `dsk:navigate` | flow | `{ kind, id, path, element }`, `{ path }` |
-| `dsk:toggle`, `dsk:toggle-error` | flow | the change; `{ change, message }` |
+| `dsk:toggle`, `dsk:toggle-error` | flow | the change with `ok` (and `rolledBack` when refused); `{ change, message }` |
 | `dsk:poll-error`, `dsk:load`, `dsk:validate` | flow | `{ message }`, `{ nodes, edges }`, `{ issues }` |
 | `dsk:input`, `dsk:editor-ready` | editor | `{ value }`, `{ controller }` |
 | `dsk:embed-ready` | `document` | `{ version, mode }` — the API is defined |

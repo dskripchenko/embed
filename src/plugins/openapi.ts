@@ -8,7 +8,7 @@
  *   document — as the live widget, editable with `editable`.
  */
 import { h, shallowReactive } from 'vue'
-import { OpenApiBlock, OpenApiOperation, OpenApiReference } from '@dskripchenko/openapi/vue'
+import { OpenApiBlock, OpenApiOperation, OpenApiReference, proxySend } from '@dskripchenko/openapi/vue'
 import { cssLength } from '../core/attrs'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
 import { errorText, fetchText, instanceRef, mountElementView, mountView, setupRuntime, state, hc } from './runtime'
@@ -59,9 +59,23 @@ type Reference = { go(anchor: string, options?: { tryIt?: boolean }): Promise<vo
 
 const COMMON = ['tryIt', 'baseUrl', 'defaultSnippet', 'snippetTargets', 'persistCredentials', 'send', 'labels'] as const
 
+/** One `send` per proxy URL: a stable function, as the components compare it by identity. */
+const proxies = new Map<string, unknown>()
+
+function proxyFor(url: string): unknown {
+  let send = proxies.get(url)
+  if (!send) {
+    send = proxySend(url)
+    proxies.set(url, send)
+  }
+  return send
+}
+
 function common(props: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {}
   for (const key of COMMON) if (props[key] !== undefined) out[key] = props[key]
+  // `proxy="/api-proxy"`: try-it goes through the host's proxy (a `send` set from script wins).
+  if (out.send === undefined && typeof props.proxy === 'string' && props.proxy !== '') out.send = proxyFor(props.proxy)
   return out
 }
 
@@ -81,7 +95,11 @@ export function mountElement(ctx: ElementContext): ElementInstance {
     const locale = view.locale
     const height = cssLength(props.height)
     const wrap = (child: ReturnType<typeof h>) =>
-      h('div', { class: `dsk-openapi dsk-openapi--${String(mode)}`, style: height ? { height: `var(--dsk-openapi-height, ${height})`, overflow: 'auto' } : undefined }, [child])
+      hc('div', {
+        class: `dsk-openapi dsk-openapi--${String(mode)}`,
+        // In a fixed box the reference scrolls inside it; its sticky navigation fills the box (--oa-viewport-h).
+        style: height ? { height: `var(--dsk-openapi-height, ${height})`, overflow: 'auto', '--oa-viewport-h': `var(--dsk-openapi-height, ${height})` } : undefined,
+      }, [child])
 
     if (mode === 'block') {
       const source = blockText ?? view.source
@@ -169,7 +187,7 @@ export const renderers: Record<string, BlockRenderer> = {
       mount(el, ctx) {
         el.classList.add('dsk-openapi-block')
         const view = shallowReactive({ code: ctx.code })
-        const mounted = mountView(el, () => state.locale, () =>
+        const mounted = mountView(el, () =>
           hc(OpenApiBlock, {
             source: view.code,
             editable: ctx.editable,

@@ -71,7 +71,7 @@ Vue, кит и пакеты плагинов скачиваются из CDN в 
 
 Один файл, внутри которого Vue, кит, все пакеты плагинов и все стили: ни import
 map, ни дополнительных запросов. Те же элементы и тот же API `DskEmbed`. Это
-весь рантайм сразу — около 2 МБ, **558 КБ в gzip**, — тогда как загрузчик
+весь рантайм сразу — около 2 МБ, **563 КБ в gzip**, — тогда как загрузчик
 скачивает только то, что использует страница. Применяйте его там, где import
 maps недоступны или где во время выполнения ничего загружать нельзя.
 
@@ -108,16 +108,19 @@ Map, который он записывает (опубликован также
 | Спецификатор | Указывает на |
 |---|---|
 | `vue` | `vue@3.5.44/dist/vue.runtime.esm-browser.prod.js` |
-| `@dskripchenko/ui`, `/icons`, `/hls` | `@dskripchenko/ui@1.15.1/dist/…` |
-| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.0/dist/index.mjs` |
+| `@dskripchenko/ui`, `/icons`, `/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
+| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.1/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
-| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.0/dist/…` |
-| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.1/dist/…` |
-| `lucide-vue-next` | собственная однофайловая сборка embed с иконками, которые используют пакеты |
+| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
+| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.2/dist/…` |
+| `lucide-vue-next` | собственная однофайловая сборка embed с иконками, которые используют openapi, flow и редактор |
 
-Иконки — особый случай: ESM-сборка `lucide-vue-next` — это по модулю на
-иконку, около 1 500 запросов через map, — поэтому embed поставляет 109 иконок,
-которые импортируют его пакеты, одним файлом (7 КБ в gzip).
+Иконки — особый случай. Кит содержит собственные иконки; openapi и flow
+импортируют свои через `@dskripchenko/ui/icons`, который реэкспортирует
+`lucide-vue-next`, а панель инструментов редактора импортирует
+`lucide-vue-next` напрямую. ESM-сборка этого пакета — это по модулю на иконку,
+около 1 500 запросов через map, — поэтому embed поставляет 76 иконок, которые
+импортируют эти пакеты, одним файлом (5 КБ в gzip).
 
 **Страница со своим import map.** Записи, которые страница описала сама,
 остаются за ней; embed добавляет второй map с остальными, а браузеры с

@@ -137,11 +137,11 @@ give them the language with the block's "Additional CSS class" —
 
 `toggle-url` posts JSON with the page's cookies; for Laravel's CSRF check,
 either exclude the route from `VerifyCsrfToken`, or persist toggles yourself
-through the `onToggle` property with the `X-CSRF-TOKEN` header:
+through the `persistToggle` property with the `X-CSRF-TOKEN` header:
 
 ```html
 <script>
-  document.querySelector('dsk-flow').onToggle = (change) =>
+  document.querySelector('dsk-flow').persistToggle = (change) =>
     fetch('/processes/1/toggle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },

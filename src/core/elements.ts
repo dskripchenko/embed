@@ -29,7 +29,7 @@ export const ELEMENTS: Readonly<Record<string, ElementSpec>> = {
     plugin: 'flow',
     methods: ['fit', 'select', 'enter', 'back', 'refresh', 'undo', 'redo'],
     getters: ['stack'],
-    objects: ['graph', 'loadSubgraph', 'onToggle', 'labels', 'registry'],
+    objects: ['graph', 'loadSubgraph', 'persistToggle', 'labels', 'registry'],
   },
   'dsk-markdown': { plugin: 'markdown', methods: [], getters: ['value'], objects: [] },
   'dsk-editor': { plugin: 'editor', methods: ['focus'], getters: ['controller'], objects: [] },

@@ -95,6 +95,8 @@ export function mountElement(ctx: ElementContext): ElementInstance {
     return hc(DskWysiwyg, {
       ref: editor.set,
       modelValue: model.value,
+      // The toolbar's language (wysiwyg 0.5.1+): the element's, which is the kit's unless the element sets its own.
+      locale: view.locale,
       blockRenderers: state.renderers,
       ...(p.placeholder !== undefined ? { placeholder: p.placeholder } : {}),
       ...(p.readonly !== undefined ? { readonly: p.readonly } : {}),

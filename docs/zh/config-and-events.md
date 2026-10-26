@@ -35,7 +35,7 @@ document.documentElement.dataset.theme = 'dark'   // 所有元素随之切换
 随之变化。`configure({ locale })` 固定语言；`configure({ locale: null })` 恢复为跟随页面。
 元素自身的 `locale` 特性对该元素优先。
 
-语言会作用于组件库的组件（播放器控件、对话框、空状态）、OpenAPI 组件和流程视图。
+语言会作用于组件库的组件（播放器控件、对话框、空状态）、OpenAPI 组件、流程视图和编辑器的工具栏。
 
 ### 运行时位置
 
@@ -70,7 +70,7 @@ document.querySelector('#process').addEventListener('dsk:node', (e) => console.l
 | `dsk:error` | 所有元素 | `{ message, … }` |
 | `dsk:config` | `document` | 每次变化时为 `{ theme, resolvedTheme, locale }` |
 | `dsk:play`、`dsk:pause`、`dsk:ended`、`dsk:timeupdate` | video、audio、媒体块 | `{ currentTime, duration, src }` |
-| `dsk:chapter` | video | `{ index, title, start, end }` |
+| `dsk:chapter`、`dsk:chapterchange` | video | `{ index, title, start, end }`（`chapterchange`：也可能为 `null`） |
 | `dsk:trackchange` | audio | `{ index }` |
 | `dsk:qualitychange`、`dsk:audiotrackchange` | video | `{ label }` |
 | `dsk:render` | diagram | `{ type, width, height }` |
@@ -78,7 +78,7 @@ document.querySelector('#process').addEventListener('dsk:node', (e) => console.l
 | `dsk:change` | openapi（块）、flow（编辑器）、editor | `{ source }`、`{ graph, description, source }`、`{ value }` |
 | `dsk:node` | flow、flow 块 | `{ id, path, node, data }` |
 | `dsk:select`、`dsk:navigate` | flow | `{ kind, id, path, element }`、`{ path }` |
-| `dsk:toggle`、`dsk:toggle-error` | flow | 变更内容；`{ change, message }` |
+| `dsk:toggle`、`dsk:toggle-error` | flow | 带 `ok` 的变更内容（被拒绝时还带 `rolledBack`）；`{ change, message }` |
 | `dsk:poll-error`、`dsk:load`、`dsk:validate` | flow | `{ message }`、`{ nodes, edges }`、`{ issues }` |
 | `dsk:input`、`dsk:editor-ready` | editor | `{ value }`、`{ controller }` |
 | `dsk:embed-ready` | `document` | `{ version, mode }`——API 已定义 |

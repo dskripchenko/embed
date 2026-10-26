@@ -73,14 +73,14 @@
 | `hls-options` | `hlsOptions` | HLS 适配器的 JSON 选项。 |
 
 方法：`play()`、`pause()`、`toggle()`、`seek(seconds)`、`playChapter(indexOrTitle)`
-（跳转到章节轨道中的某一章——按索引、完整标题或标题的一部分——并播放）、`loadChapters()`。
+（跳转到章节轨道中的某一章——按索引、完整标题或标题的一部分——并播放）、`loadChapters()`（在组件库读取章节轨道后 resolve）。
 Getter：`state`（playing、currentTime、duration、volume 等）、`media`（`<video>`）、
-`chapters`（`[{ index, title, start, end }]`，在首次 `loadChapters()`/`playChapter()`
-之后可用）。
+`chapters`（`[{ index, title, start, end }]`，即组件库从章节轨道中读取到的章节）。
 
 事件：`dsk:play`、`dsk:pause`、`dsk:ended`、`dsk:timeupdate`——detail 为
-`{ currentTime, duration, src }`；`dsk:chapter`——播放的章节；`dsk:qualitychange`
-`{ label }`、`dsk:audiotrackchange` `{ label }`、`dsk:error`——组件库的错误
+`{ currentTime, duration, src }`；`dsk:chapter`——`playChapter()` 播放的章节；
+`dsk:chapterchange`——每当播放进入另一章节时触发，`{ index, title, start, end }`（或 `null`）；
+`dsk:qualitychange` `{ label }`、`dsk:audiotrackchange` `{ label }`、`dsk:error`——组件库的错误
 `{ kind, detail? }`。
 
 ## `<dsk-audio>`
@@ -190,14 +190,15 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 | `operation` | `operation` | 操作模式：要展示的操作。 |
 | `reference-url`、`spec-id` | camelCase | 操作模式：“在参考文档中打开”链接，以及该规范在其中的 id。 |
 | `try-it` | `tryIt` | `try-it="false"` 隐藏 try-it（示例保留）。 |
+| `proxy` | `proxy` | 替页面执行 try-it 请求的端点——[openapi 的代理约定](https://github.com/dskripchenko/openapi/blob/main/docs/en/standalone.md#the-proxy)（请求以 JSON 传入，响应以 JSON 返回；会一并发送 Laravel 的 `csrf-token` meta）。用于不允许页面来源（origin）访问的 API。 |
 | `base-url` | `baseUrl` | 相对服务器 URL 的基址。 |
 | `snippet-targets`、`default-snippet` | camelCase | 请求示例的语言（`curl, js, python, …`）以及默认显示的第一个。 |
 | `persist-credentials` | `persistCredentials` | `true`/`session`/`local`：在多次访问之间保留 API 密钥。 |
 | `hash-navigation` | `hashNavigation` | `false`：不写入 `location.hash`。 |
 | `heading` | `heading` | 参考文档页眉的标题。 |
 | `editable` | `editable` | 块模式：编辑标签页。 |
-| `height` | `height` | 带独立滚动的固定高度（`720`、`80vh`）；或使用 CSS 变量 `--dsk-openapi-height`（可按断点设置）。 |
-| — | `send` | `(request) => Promise<response>`——通过你的代理发送 try-it 请求。 |
+| `height` | `height` | 带独立滚动的固定高度（`720`、`80vh`）；或使用 CSS 变量 `--dsk-openapi-height`（可按断点设置）。此时参考文档的粘性导航会填满该区域（`--oa-viewport-h` 被设为同一高度）。 |
+| — | `send` | `(request) => Promise<response>`——以你自己的方式发送 try-it 请求；优先于 `proxy`。 |
 | — | `labels` | 覆盖界面文本。 |
 
 方法：`go(target, { tryIt? })`——滚动到某个操作（`createOrder`、
@@ -248,7 +249,7 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 | `state` | `state` | JSON：初始快照（例如由服务器渲染）；轮询会替换它。 |
 | `poll-url`、`poll-interval` | camelCase | 监控，见上文。 |
 | `toggle-url` | `toggleUrl` | 开关，见上文。 |
-| — | `onToggle` | `(change) => Promise`——改为自己持久化开关状态（仅限脚本）；reject 即回滚。 |
+| — | `persistToggle` | `(change) => Promise`——改为自己持久化开关状态（仅限脚本）；reject 即回滚。 |
 | `subgraph-url` | `subgraphUrl` | 子流程，见上文。 |
 | — | `loadSubgraph` | `(ref, node) => Promise<model>`——自己加载子流程（仅限脚本）。 |
 | `editable` | `editable` | 编辑器（面板、连线、撤销/重做、属性、Mermaid 导入）。 |
@@ -268,7 +269,8 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 `undo()`、`redo()`（编辑器）。Getter：`graph`、`stack`（已进入的子流程层级）。
 
 事件：`dsk:node` `{ id, path, node, data }`——某个节点被点击；`dsk:select`
-`{ kind, id, path, element }` 或 `null`；`dsk:toggle` `{ kind, id, enabled, path }`；
+`{ kind, id, path, element }` 或 `null`；`dsk:toggle`
+`{ kind, id, enabled, path, ok, rolledBack? }`——在开关已持久化（`ok: true`）或被拒绝（`ok: false`，已回滚）之后触发；
 `dsk:toggle-error` `{ change, message }`；`dsk:navigate` `{ path }`；`dsk:poll-error`
 `{ message }`；`dsk:load` `{ nodes, edges }`；编辑器：`dsk:change`
 `{ graph, description, source }`、`dsk:validate` `{ issues }`。
@@ -322,7 +324,7 @@ url: /v1/orders</code></pre>
 </form>
 ```
 
-WYSIWYG 编辑器（`@dskripchenko/wysiwyg`）——工具栏、markdown 快捷输入、斜杠菜单、表格、
+WYSIWYG 编辑器（`@dskripchenko/wysiwyg`）——工具栏（使用元素的语言）、markdown 快捷输入、斜杠菜单、表格、
 源码模式——并且**所有已注册的块渲染器都实时生效**：已注册语言的代码块显示为对应组件，而可编辑的
 组件（API 块的构造器）会把它的源写回 HTML。值是 HTML；代码块以
 `<pre><code class="language-…">` 形式存储，因此保存下来的 HTML 在任何页面上通过

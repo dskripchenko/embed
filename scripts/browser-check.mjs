@@ -113,6 +113,9 @@ async function clickAt(page, selector) {
 
 const shotsDir = process.env.EMBED_SHOTS_DIR
 async function shot(page, name, opts = {}) {
+  // A full-page capture of a scrolled page draws sticky headers mid-page.
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await sleep(300)
   const file = resolve(out, `${name}.png`)
   await page.screenshot({ path: file, fullPage: true, ...opts })
   if (shotsDir) {
@@ -135,6 +138,15 @@ for (const browserName of Object.keys(browsers)) {
       await page.waitForSelector('#reference-el .oa-reference', { timeout: 15000 })
       await page.waitForSelector('#reference-el .oa-op__doc', { timeout: 15000 }).catch(() => {})
       await page.evaluate(() => window.scrollTo(0, 0))
+
+      // Nothing on the page shows a rendering error on load: blocks, widgets, diagrams.
+      const blockErrors = await page.evaluate(() =>
+        [...document.querySelectorAll('.oa-bk__error, .uid-markdown__block-error, .dsk-wysiwyg__preview-error, .dsk-error, pre[data-dsk-failed], .fl-layout-error')]
+          .map((e) => `${e.closest('[id]')?.id ?? '?'}: ${e.textContent.trim().slice(0, 80)}`))
+      check(`${tag}: no block or widget shows an error on load`, blockErrors.length === 0, blockErrors.join(' | '))
+      // A spec of ≤ 40 operations renders all its cards at once (openapi 1.1.1).
+      const cards = await page.evaluate(() => document.querySelectorAll('#reference-el .oa-op__doc').length)
+      check(`${tag}: the two-spec reference is filled (all 5 operations rendered)`, cards >= 5, `${cards} cards`)
 
       const r = await page.evaluate(() => {
         const q = (s) => document.querySelector(s)
@@ -177,7 +189,9 @@ for (const browserName of Object.keys(browsers)) {
         el.addEventListener('dsk:active', (e) => seen.push(e.detail.id))
         await el.open('catalog')
         await new Promise((r) => setTimeout(r, 600))
-        return { seen, text: el.innerText.includes('List products') }
+        const text = el.innerText.includes('List products')
+        await el.open('orders')
+        return { seen, text }
       })
       check(`${tag}: reference switches specs (open('catalog'))`, specs.text, JSON.stringify(specs.seen))
 
@@ -276,6 +290,7 @@ for (const browserName of Object.keys(browsers)) {
       const before = {}
       const SUBJECTS = { video: '#walkthrough', audio: '#playlist', flow: '#process-flow', operation: '#op-card', reference: '#reference-el', markdown: '#doc', editor: '#body-editor' }
       for (const [k, sel] of Object.entries(SUBJECTS)) before[k] = await strings(page, sel)
+      check(`${tag}: editor toolbar is English on an English page`, /Bold/.test(before.editor) && !/Жирный/.test(before.editor))
       if (browserName === 'chromium' && variant === 'loader') await shot(page, 'demo-desktop-light')
       if (browserName === 'webkit' && variant === 'loader') await shot(page, 'demo-webkit-desktop-light')
       if (browserName === 'chromium' && variant === 'bundle') await shot(page, 'demo-bundle-desktop-light')
@@ -297,6 +312,14 @@ for (const browserName of Object.keys(browsers)) {
       const ru = await page.evaluate(() => document.querySelector('#walkthrough button[aria-label]')?.getAttribute('aria-label') ?? '')
       check(`${tag}: … the kit's player speaks Russian`, /[а-яё]/i.test(ru), ru)
       if (browserName === 'chromium' && variant === 'loader') await shot(page, 'demo-desktop-dark-ru')
+
+      // The editor's toolbar follows the locale (wysiwyg 0.5.1), and back.
+      const toolbar = () => page.evaluate(() => [...document.querySelectorAll('#body-editor [title], #body-editor [aria-label]')].map((e) => `${e.getAttribute('title') ?? ''} ${e.getAttribute('aria-label') ?? ''}`).join('|'))
+      const ruBar = await toolbar()
+      await clickAt(page, '[data-group="locale"] [data-value="en"]')
+      await sleep(600)
+      const enBar = await toolbar()
+      check(`${tag}: editor toolbar RU → EN`, /Жирный/.test(ruBar) && /Bold/.test(enBar) && !/Жирный/.test(enBar), `${ruBar.slice(0, 40)} → ${enBar.slice(0, 40)}`)
 
       check(`${tag}: no console errors`, errors.length === 0, errors.slice(0, 5).join(' | '))
     } catch (error) {
@@ -371,7 +394,7 @@ for (const browserName of Object.keys(browsers)) {
       serverLog.toggles = []
       const toggles = await page.evaluate(() => {
         window.__toggle = []
-        document.addEventListener('dsk:toggle', (e) => window.__toggle.push(['toggle', e.detail.id, e.detail.enabled]))
+        document.addEventListener('dsk:toggle', (e) => window.__toggle.push(['toggle', e.detail.id, e.detail.enabled, e.detail.ok]))
         document.addEventListener('dsk:toggle-error', (e) => window.__toggle.push(['error', e.detail.change.id]))
         return true
       })
@@ -399,7 +422,7 @@ for (const browserName of Object.keys(browsers)) {
       })
       check(`${tag}: openapi-target: a clicked node opens its operation in the reference`, target.scrolled > 0 && target.visible, JSON.stringify(target))
       check(`${tag}: each toggle is POSTed once`, serverLog.toggles.length === 2, `${serverLog.toggles.length} requests`)
-      check(`${tag}: toggle-url: accepted and refused toggles`, tg.some((t) => t[0] === 'toggle' && t[1] === 'create') && tg.some((t) => t[0] === 'error' && t[1] === 'done'), JSON.stringify(tg))
+      check(`${tag}: toggle-url: accepted (ok) and refused (rolled back) toggles`, tg.some((t) => t[0] === 'toggle' && t[1] === 'create' && t[3] === true) && tg.some((t) => t[0] === 'toggle' && t[1] === 'done' && t[3] === false) && tg.some((t) => t[0] === 'error' && t[1] === 'done'), JSON.stringify(tg))
 
       // Sub-process: drill into "ship" through subgraph-url; the poll gets the path.
       const nav = await page.evaluate(async () => {
@@ -433,6 +456,18 @@ for (const browserName of Object.keys(browsers)) {
       check(`${tag}: diagram error is shown with its position`, /line/.test(r.broken), r.broken)
       check(`${tag}: diagram from src`, r.fromSrc)
       check(`${tag}: renderBlocks: host renderer, video and flow blocks`, r.chart === '3 bars' && r.cmsVideo && r.cmsFlow === 2, JSON.stringify({ c: r.chart, v: r.cmsVideo, f: r.cmsFlow }))
+
+      // proxy: try-it goes through the host's endpoint (openapi's proxySend contract).
+      serverLog.proxied = []
+      try {
+        await page.locator('#proxied').scrollIntoViewIfNeeded()
+        await page.locator('#proxied button', { hasText: /^Send$/ }).first().click()
+        await page.waitForFunction(() => /200/.test(document.querySelector('#proxied').innerText), null, { timeout: 8000 })
+      } catch {
+        // reported below
+      }
+      const prox = serverLog.proxied ?? []
+      check(`${tag}: proxy attribute sends try-it through the endpoint`, prox.length === 1 && prox[0].method === 'GET' && /\/v1\/orders/.test(prox[0].url), JSON.stringify(prox.map((p) => `${p.method} ${p.url}`)))
 
       // HLS through the kit's adapter: plays and advances.
       const hls = await page.evaluate(async () => {
@@ -488,7 +523,13 @@ for (const browserName of Object.keys(browsers)) {
     const { page, errors, close } = await open(browserName, '/module.html')
     try {
       await settle(page)
-      const r = await page.evaluate(() => ({ svg: !!document.querySelector('#md svg'), audio: !!document.querySelector('#a .uid-audio'), maps: document.querySelectorAll('script[type=importmap]').length }))
+      const r = await page.evaluate(() => ({
+        svg: !!document.querySelector('#md svg'),
+        audio: !!document.querySelector('#a .uid-audio'),
+        maps: document.querySelectorAll('script[type=importmap]').length,
+        icons: performance.getEntriesByType('resource').some((e) => e.name.includes('lucide')),
+      }))
+      check(`${browserName}/module: a page with markdown and audio fetches no icons file`, !r.icons)
       check(`${browserName}/module: loader as <script type="module"> (multiple import maps)`, r.svg && r.audio, JSON.stringify(r))
       check(`${browserName}/module: no console errors`, errors.filter((e) => !/classic <script>/.test(e)).length === 0, errors.slice(0, 3).join(' | '))
     } catch (error) {

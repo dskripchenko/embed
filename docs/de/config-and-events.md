@@ -41,7 +41,8 @@ legt sie fest; `configure({ locale: null })` kehrt zu der der Seite zurück.
 Das eigene Attribut `locale` eines Elements hat für dieses Element Vorrang.
 
 Die Locale erreicht die Komponenten des Kits (Player-Bedienelemente, Dialoge,
-Leerzustände), die OpenAPI-Widgets und die Flow-Ansichten.
+Leerzustände), die OpenAPI-Widgets, die Flow-Ansichten und die Werkzeugleiste
+des Editors.
 
 ### Ort der Laufzeit
 
@@ -81,7 +82,7 @@ auf dieselbe Weise mit den Elementen koordinieren.
 | `dsk:error` | jedem Element | `{ message, … }` |
 | `dsk:config` | `document` | `{ theme, resolvedTheme, locale }` bei jeder Änderung |
 | `dsk:play`, `dsk:pause`, `dsk:ended`, `dsk:timeupdate` | video, audio, Medienblöcken | `{ currentTime, duration, src }` |
-| `dsk:chapter` | video | `{ index, title, start, end }` |
+| `dsk:chapter`, `dsk:chapterchange` | video | `{ index, title, start, end }` (`chapterchange`: oder `null`) |
 | `dsk:trackchange` | audio | `{ index }` |
 | `dsk:qualitychange`, `dsk:audiotrackchange` | video | `{ label }` |
 | `dsk:render` | diagram | `{ type, width, height }` |
@@ -89,7 +90,7 @@ auf dieselbe Weise mit den Elementen koordinieren.
 | `dsk:change` | openapi (Block), flow (Editor), editor | `{ source }`, `{ graph, description, source }`, `{ value }` |
 | `dsk:node` | flow, Flow-Blöcken | `{ id, path, node, data }` |
 | `dsk:select`, `dsk:navigate` | flow | `{ kind, id, path, element }`, `{ path }` |
-| `dsk:toggle`, `dsk:toggle-error` | flow | die Änderung; `{ change, message }` |
+| `dsk:toggle`, `dsk:toggle-error` | flow | die Änderung mit `ok` (und `rolledBack` bei Ablehnung); `{ change, message }` |
 | `dsk:poll-error`, `dsk:load`, `dsk:validate` | flow | `{ message }`, `{ nodes, edges }`, `{ issues }` |
 | `dsk:input`, `dsk:editor-ready` | editor | `{ value }`, `{ controller }` |
 | `dsk:embed-ready` | `document` | `{ version, mode }` — die API ist definiert |

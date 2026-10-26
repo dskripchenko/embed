@@ -12,6 +12,7 @@
     <dsk-flow id="api-flow" src="/data/order-process.json" poll-url="/api/state" poll-interval="600"
               toggle-url="/api/toggle" subgraph-url="/api/process/{ref}" height="360" openapi-target="#ref2"></dsk-flow>
     <dsk-openapi id="ref2" src="/data/orders.yaml" height="400" hash-navigation="false"></dsk-openapi>
+    <dsk-openapi id="proxied" src="/data/orders.yaml" operation="listOrders" proxy="/api/proxy"></dsk-openapi>
   </section>
   <section>
     <dsk-flow id="mermaid-flow" height="240">

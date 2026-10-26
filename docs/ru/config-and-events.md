@@ -41,7 +41,8 @@ document.documentElement.dataset.theme = 'dark'   // все элементы с�
 приоритетнее для этого элемента.
 
 Локаль доходит до компонентов кита (элементы управления плеера, диалоги,
-пустые состояния), виджетов OpenAPI и просмотров процессов.
+пустые состояния), виджетов OpenAPI, просмотров процессов и панели
+инструментов редактора.
 
 ### Расположение рантайма
 
@@ -79,7 +80,7 @@ document.querySelector('#process').addEventListener('dsk:node', (e) => console.l
 | `dsk:error` | все элементы | `{ message, … }` |
 | `dsk:config` | `document` | `{ theme, resolvedTheme, locale }` при каждом изменении |
 | `dsk:play`, `dsk:pause`, `dsk:ended`, `dsk:timeupdate` | video, audio, медиаблоки | `{ currentTime, duration, src }` |
-| `dsk:chapter` | video | `{ index, title, start, end }` |
+| `dsk:chapter`, `dsk:chapterchange` | video | `{ index, title, start, end }` (`chapterchange`: или `null`) |
 | `dsk:trackchange` | audio | `{ index }` |
 | `dsk:qualitychange`, `dsk:audiotrackchange` | video | `{ label }` |
 | `dsk:render` | diagram | `{ type, width, height }` |
@@ -87,7 +88,7 @@ document.querySelector('#process').addEventListener('dsk:node', (e) => console.l
 | `dsk:change` | openapi (блок), flow (редактор), editor | `{ source }`, `{ graph, description, source }`, `{ value }` |
 | `dsk:node` | flow, блоки flow | `{ id, path, node, data }` |
 | `dsk:select`, `dsk:navigate` | flow | `{ kind, id, path, element }`, `{ path }` |
-| `dsk:toggle`, `dsk:toggle-error` | flow | изменение; `{ change, message }` |
+| `dsk:toggle`, `dsk:toggle-error` | flow | изменение с `ok` (и `rolledBack` при отказе); `{ change, message }` |
 | `dsk:poll-error`, `dsk:load`, `dsk:validate` | flow | `{ message }`, `{ nodes, edges }`, `{ issues }` |
 | `dsk:input`, `dsk:editor-ready` | editor | `{ value }`, `{ controller }` |
 | `dsk:embed-ready` | `document` | `{ version, mode }` — API определён |

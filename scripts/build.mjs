@@ -53,6 +53,9 @@ rmSync(dist, { recursive: true, force: true })
 mkdirSync(dist, { recursive: true })
 
 // ---- 1. The icons: every name the packages import from lucide-vue-next ----
+// The kit's main entry bundles its own icons (ui 1.16+); openapi and flow import
+// theirs through `@dskripchenko/ui/icons` (which re-exports lucide-vue-next) and
+// the editor's toolbar through `import('lucide-vue-next')`: those names only.
 function iconNames() {
   const names = new Set()
   const files = [

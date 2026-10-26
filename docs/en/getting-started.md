@@ -70,7 +70,7 @@ the loader as `window.DskEmbedConfig = { theme, locale, cdnBase, versions }`.
 
 One file with Vue, the kit, every plugin package and all styles inside: no
 import map, no further requests. The same elements and the same `DskEmbed`
-API. It is the whole runtime at once — about 2 MB, **558 KB gzipped** —
+API. It is the whole runtime at once — about 2 MB, **563 KB gzipped** —
 where the loader fetches only what the page uses. Use it where import maps
 are not available, or where nothing may be loaded at run time.
 
@@ -106,16 +106,19 @@ The map it writes (also published as `dist/importmap.json`):
 | Specifier | Points at |
 |---|---|
 | `vue` | `vue@3.5.44/dist/vue.runtime.esm-browser.prod.js` |
-| `@dskripchenko/ui`, `/icons`, `/hls` | `@dskripchenko/ui@1.15.1/dist/…` |
-| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.0/dist/index.mjs` |
+| `@dskripchenko/ui`, `/icons`, `/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
+| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.1/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
-| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.0/dist/…` |
-| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.1/dist/…` |
-| `lucide-vue-next` | the embed's own one-file build of the icons the packages use |
+| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
+| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.2/dist/…` |
+| `lucide-vue-next` | the embed's own one-file build of the icons openapi, flow and the editor use |
 
-The icons are a special case: `lucide-vue-next`'s ESM build is one module per
-icon — some 1 500 requests through a map — so the embed ships the 109 icons
-its packages import as one file (7 KB gzipped).
+The icons are a special case. The kit bundles its own icons; openapi and flow
+import theirs through `@dskripchenko/ui/icons`, which re-exports
+`lucide-vue-next`, and the editor's toolbar imports `lucide-vue-next` itself.
+That package's ESM build is one module per icon — some 1 500 requests through
+a map — so the embed ships the 76 icons those packages import as one file
+(5 KB gzipped).
 
 **A page with its own import map.** Entries the page maps itself stay the
 page's; the embed adds a second map with the rest, which browsers with

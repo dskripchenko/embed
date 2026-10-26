@@ -140,12 +140,12 @@ geben Sie ihnen die Sprache über die „Zusätzliche(n) CSS-Klasse(n)“ des Bl
 
 `toggle-url` sendet JSON mit den Cookies der Seite; für die CSRF-Prüfung von
 Laravel nehmen Sie entweder die Route von `VerifyCsrfToken` aus, oder Sie
-persistieren Schalter selbst über die Property `onToggle` mit dem Header
+persistieren Schalter selbst über die Property `persistToggle` mit dem Header
 `X-CSRF-TOKEN`:
 
 ```html
 <script>
-  document.querySelector('dsk-flow').onToggle = (change) =>
+  document.querySelector('dsk-flow').persistToggle = (change) =>
     fetch('/processes/1/toggle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },

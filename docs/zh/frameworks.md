@@ -131,12 +131,12 @@ add_filter('script_loader_tag', function ($tag, $handle) {
 ```
 
 `toggle-url` 会携带页面的 cookie 发送 JSON；为通过 Laravel 的 CSRF 校验，要么把该路由从
-`VerifyCsrfToken` 中排除，要么通过 `onToggle` 属性自己持久化开关状态，并带上
+`VerifyCsrfToken` 中排除，要么通过 `persistToggle` 属性自己持久化开关状态，并带上
 `X-CSRF-TOKEN` 请求头：
 
 ```html
 <script>
-  document.querySelector('dsk-flow').onToggle = (change) =>
+  document.querySelector('dsk-flow').persistToggle = (change) =>
     fetch('/processes/1/toggle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },

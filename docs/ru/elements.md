@@ -84,12 +84,15 @@ JSON-атрибут `tracks`; `kind` — `subtitles`, `captions` или `chapter
 Методы: `play()`, `pause()`, `toggle()`, `seek(seconds)`,
 `playChapter(indexOrTitle)` (переходит к главе из дорожки глав — по индексу,
 точному названию или его части — и запускает воспроизведение),
-`loadChapters()`. Геттеры: `state` (playing, currentTime, duration, volume, …),
-`media` (`<video>`), `chapters` (`[{ index, title, start, end }]`, после первого
-`loadChapters()`/`playChapter()`).
+`loadChapters()` (завершается, когда кит прочитал дорожку глав). Геттеры:
+`state` (playing, currentTime, duration, volume, …), `media` (`<video>`),
+`chapters` (`[{ index, title, start, end }]` — в том виде, в каком кит прочитал
+их из дорожки глав).
 
 События: `dsk:play`, `dsk:pause`, `dsk:ended`, `dsk:timeupdate` — detail
-`{ currentTime, duration, src }`; `dsk:chapter` — воспроизводимая глава;
+`{ currentTime, duration, src }`; `dsk:chapter` — глава, которую запустил
+`playChapter()`; `dsk:chapterchange` — `{ index, title, start, end }`
+(или `null`) всякий раз, когда воспроизведение переходит в другую главу;
 `dsk:qualitychange` `{ label }`, `dsk:audiotrackchange` `{ label }`,
 `dsk:error` — ошибка кита `{ kind, detail? }`.
 
@@ -207,14 +210,15 @@ timeline, xychart, mindmap — рендерится в SVG через `@dskripch
 | `operation` | `operation` | Режим операции: какую операцию показать. |
 | `reference-url`, `spec-id` | camelCase | Режим операции: ссылка «Открыть в справочнике» и id спецификации там. |
 | `try-it` | `tryIt` | `try-it="false"` скрывает try-it (примеры остаются). |
+| `proxy` | `proxy` | Эндпоинт, который выполняет запросы try-it за страницу, — [контракт прокси openapi](https://github.com/dskripchenko/openapi/blob/main/docs/en/standalone.md#the-proxy) (запрос — JSON на входе, ответ — JSON на выходе; мета-тег Laravel `csrf-token` передаётся вместе с ним). Для API, которые не разрешают origin страницы. |
 | `base-url` | `baseUrl` | База для относительных URL серверов. |
 | `snippet-targets`, `default-snippet` | camelCase | Языки примеров запросов (`curl, js, python, …`) и первый из них. |
 | `persist-credentials` | `persistCredentials` | `true`/`session`/`local`: сохранять API-ключи между посещениями. |
 | `hash-navigation` | `hashNavigation` | `false`: не записывать `location.hash`. |
 | `heading` | `heading` | Заголовок в шапке справочника. |
 | `editable` | `editable` | Режим блока: вкладки редактирования. |
-| `height` | `height` | Фиксированная высота с собственной прокруткой (`720`, `80vh`); либо CSS-переменная `--dsk-openapi-height` (по брейкпоинтам). |
-| — | `send` | `(request) => Promise<response>` — отправлять try-it через ваш прокси. |
+| `height` | `height` | Фиксированная высота с собственной прокруткой (`720`, `80vh`); либо CSS-переменная `--dsk-openapi-height` (по брейкпоинтам). Липкая навигация справочника тогда заполняет этот блок (`--oa-viewport-h` получает ту же высоту). |
+| — | `send` | `(request) => Promise<response>` — отправлять try-it по-своему; приоритетнее `proxy`. |
 | — | `labels` | Переопределения строк интерфейса. |
 
 Методы: `go(target, { tryIt? })` — прокрутить к операции (`createOrder`,
@@ -269,7 +273,7 @@ timeline, xychart, mindmap — рендерится в SVG через `@dskripch
 | `state` | `state` | JSON: первый снимок (например, отрисованный сервером); опрос его заменяет. |
 | `poll-url`, `poll-interval` | camelCase | Мониторинг, как выше. |
 | `toggle-url` | `toggleUrl` | Переключатели, как выше. |
-| — | `onToggle` | `(change) => Promise` — сохранять переключения самостоятельно (только из скрипта); отклонение промиса откатывает изменение. |
+| — | `persistToggle` | `(change) => Promise` — сохранять переключения самостоятельно (только из скрипта); отклонение промиса откатывает изменение. |
 | `subgraph-url` | `subgraphUrl` | Подпроцессы, как выше. |
 | — | `loadSubgraph` | `(ref, node) => Promise<model>` — загружать их самостоятельно (только из скрипта). |
 | `editable` | `editable` | Редактор (палитра, соединение, undo/redo, свойства, импорт Mermaid). |
@@ -291,7 +295,9 @@ timeline, xychart, mindmap — рендерится в SVG через `@dskripch
 
 События: `dsk:node` `{ id, path, node, data }` — клик по узлу;
 `dsk:select` `{ kind, id, path, element }` или `null`; `dsk:toggle`
-`{ kind, id, enabled, path }`; `dsk:toggle-error` `{ change, message }`;
+`{ kind, id, enabled, path, ok, rolledBack? }` — после того как переключение
+сохранено (`ok: true`) или отклонено (`ok: false`, откачено);
+`dsk:toggle-error` `{ change, message }`;
 `dsk:navigate` `{ path }`; `dsk:poll-error` `{ message }`; `dsk:load`
 `{ nodes, edges }`; редактор: `dsk:change` `{ graph, description, source }`,
 `dsk:validate` `{ issues }`.
@@ -347,8 +353,8 @@ url: /v1/orders</code></pre>
 </form>
 ```
 
-WYSIWYG-редактор (`@dskripchenko/wysiwyg`) — панель инструментов,
-markdown-сокращения, slash-меню, таблицы, режим исходника — со **всеми
+WYSIWYG-редактор (`@dskripchenko/wysiwyg`) — панель инструментов (на локали
+элемента), markdown-сокращения, slash-меню, таблицы, режим исходника — со **всеми
 зарегистрированными рендерерами блоков в живом режиме**: блок кода на
 зарегистрированном языке показывает свой виджет, а виджет, который
 редактирует (конструктор API-блока), записывает свой исходник обратно в HTML.

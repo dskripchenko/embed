@@ -81,13 +81,16 @@ use. Tracks: `<track>` children or the `tracks` JSON attribute; `kind` is
 
 Methods: `play()`, `pause()`, `toggle()`, `seek(seconds)`,
 `playChapter(indexOrTitle)` (seeks to a chapter of the chapters track — by
-index, exact title, or a part of it — and plays), `loadChapters()`.
+index, exact title, or a part of it — and plays), `loadChapters()` (resolves
+once the kit has read the chapters track).
 Getters: `state` (playing, currentTime, duration, volume, …), `media` (the
-`<video>`), `chapters` (`[{ index, title, start, end }]`, after the first
-`loadChapters()`/`playChapter()`).
+`<video>`), `chapters` (`[{ index, title, start, end }]`, as the kit read
+them from the chapters track).
 
 Events: `dsk:play`, `dsk:pause`, `dsk:ended`, `dsk:timeupdate` — detail
-`{ currentTime, duration, src }`; `dsk:chapter` — the chapter played;
+`{ currentTime, duration, src }`; `dsk:chapter` — the chapter
+`playChapter()` played; `dsk:chapterchange` — `{ index, title, start, end }`
+(or `null`) whenever playback enters another chapter;
 `dsk:qualitychange` `{ label }`, `dsk:audiotrackchange` `{ label }`,
 `dsk:error` — the kit's error `{ kind, detail? }`.
 
@@ -204,14 +207,15 @@ or the content. Specs of the same URL are fetched once per page.
 | `operation` | `operation` | Operation mode: the operation to show. |
 | `reference-url`, `spec-id` | camelCase | Operation mode: "Open in reference" link and the spec's id there. |
 | `try-it` | `tryIt` | `try-it="false"` hides try-it (samples stay). |
+| `proxy` | `proxy` | An endpoint that performs try-it requests for the page — [openapi's proxy contract](https://github.com/dskripchenko/openapi/blob/main/docs/en/standalone.md#the-proxy) (the request as JSON in, the response as JSON out; Laravel's `csrf-token` meta is sent along). For APIs that do not allow the page's origin. |
 | `base-url` | `baseUrl` | Base for relative server URLs. |
 | `snippet-targets`, `default-snippet` | camelCase | Languages of request samples (`curl, js, python, …`) and the first one. |
 | `persist-credentials` | `persistCredentials` | `true`/`session`/`local`: keep API keys between visits. |
 | `hash-navigation` | `hashNavigation` | `false`: do not write `location.hash`. |
 | `heading` | `heading` | The reference header's title. |
 | `editable` | `editable` | Block mode: editing tabs. |
-| `height` | `height` | A fixed height with its own scroll (`720`, `80vh`); or the CSS variable `--dsk-openapi-height` (per breakpoint). |
-| — | `send` | `(request) => Promise<response>` — send try-it through your proxy. |
+| `height` | `height` | A fixed height with its own scroll (`720`, `80vh`); or the CSS variable `--dsk-openapi-height` (per breakpoint). The reference's sticky navigation then fills the box (`--oa-viewport-h` is set to the same height). |
+| — | `send` | `(request) => Promise<response>` — send try-it your own way; wins over `proxy`. |
 | — | `labels` | Overrides of interface strings. |
 
 Methods: `go(target, { tryIt? })` — scroll to an operation (`createOrder`,
@@ -266,7 +270,7 @@ Requests are same-origin `fetch` with the page's cookies
 | `state` | `state` | JSON: a first snapshot (e.g. rendered by the server); polling replaces it. |
 | `poll-url`, `poll-interval` | camelCase | Monitoring, as above. |
 | `toggle-url` | `toggleUrl` | Toggles, as above. |
-| — | `onToggle` | `(change) => Promise` — persist toggles yourself instead (script only); reject to roll back. |
+| — | `persistToggle` | `(change) => Promise` — persist toggles yourself instead (script only); reject to roll back. |
 | `subgraph-url` | `subgraphUrl` | Sub-processes, as above. |
 | — | `loadSubgraph` | `(ref, node) => Promise<model>` — load them yourself (script only). |
 | `editable` | `editable` | The editor (palette, connect, undo/redo, properties, Mermaid import). |
@@ -288,7 +292,9 @@ sub-process levels entered).
 
 Events: `dsk:node` `{ id, path, node, data }` — a node was clicked;
 `dsk:select` `{ kind, id, path, element }` or `null`; `dsk:toggle`
-`{ kind, id, enabled, path }`; `dsk:toggle-error` `{ change, message }`;
+`{ kind, id, enabled, path, ok, rolledBack? }` — after the toggle was
+persisted (`ok: true`) or refused (`ok: false`, rolled back);
+`dsk:toggle-error` `{ change, message }`;
 `dsk:navigate` `{ path }`; `dsk:poll-error` `{ message }`; `dsk:load`
 `{ nodes, edges }`; editor: `dsk:change` `{ graph, description, source }`,
 `dsk:validate` `{ issues }`.
@@ -343,7 +349,8 @@ url: /v1/orders</code></pre>
 </form>
 ```
 
-The WYSIWYG editor (`@dskripchenko/wysiwyg`) — toolbar, markdown shortcuts,
+The WYSIWYG editor (`@dskripchenko/wysiwyg`) — toolbar (in the element's
+locale), markdown shortcuts,
 slash menu, tables, source mode — with **every registered block renderer
 live**: a code block of a registered language shows its widget, and a widget
 that edits (the API block's constructor) writes its source back into the

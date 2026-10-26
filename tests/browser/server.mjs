@@ -120,6 +120,15 @@ function pageHandler(cdnOrigin) {
       if (change.id === 'done') return res.writeHead(409, { 'Content-Type': 'application/json' }).end('{"message":"The end state cannot be disabled"}')
       return res.writeHead(204).end()
     }
+    if (p === '/api/proxy' && req.method === 'POST') {
+      // The openapi proxy contract: the HttpRequest in, the HttpResponse out.
+      let body = ''
+      for await (const chunk of req) body += chunk
+      log.proxied = [...(log.proxied ?? []), JSON.parse(body || '{}')]
+      return res.writeHead(200, { 'Content-Type': 'application/json' }).end(
+        JSON.stringify({ status: 200, statusText: 'OK', headers: [['content-type', 'application/json']], body: '{"data":[{"id":"ord_1"}],"next":null}', duration: 3 }),
+      )
+    }
     const sub = /^\/api\/process\/([\w-]+)$/.exec(p)
     if (sub) return sendFile(req, res, resolve(root, `examples/demo/data/${sub[1]}.json`))
     if (p.startsWith('/fixtures/')) return sendFile(req, res, inside(resolve(root, 'tests/browser/fixtures'), p.slice('/fixtures/'.length)) ?? '')

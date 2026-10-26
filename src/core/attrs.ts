@@ -181,6 +181,7 @@ export const SCHEMAS: Readonly<Record<string, Schema>> = {
     { prop: 'referenceUrl', type: 'string' },
     { prop: 'specId', type: 'string' },
     { prop: 'tryIt', type: 'boolean' },
+    { prop: 'proxy', type: 'string' },
     { prop: 'baseUrl', type: 'string' },
     { prop: 'defaultSnippet', type: 'string' },
     { prop: 'snippetTargets', type: 'list' },

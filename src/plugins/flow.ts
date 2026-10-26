@@ -67,31 +67,6 @@ async function getJson(url: string, signal?: AbortSignal): Promise<unknown> {
   return r.json()
 }
 
-/**
- * FlowView (@dskripchenko/flow 1.0.1) takes the persisting function as the
- * prop `onToggle` and also emits `toggle`; Vue's emit calls the vnode's
- * `onToggle` too, so the function runs twice per switch — once from the
- * emit (its rejection reported as an unhandled error) and once awaited (its
- * rejection rolls the switch back). Both calls get the same change object,
- * synchronously one after the other: the second shares the first's request,
- * and the emit's copy stays quiet. With a single call (a fixed FlowView) the
- * request's own promise is returned, so a refusal still rolls back.
- */
-export function dedupeToggle(persist: (change: unknown) => Promise<unknown>): (change: unknown) => Promise<unknown> {
-  const inflight = new WeakMap<object, { promise: Promise<unknown>; duplicated: boolean }>()
-  return (change) => {
-    const key = change as object
-    const known = inflight.get(key)
-    if (known) {
-      known.duplicated = true
-      return known.promise
-    }
-    const entry = { promise: persist(change), duplicated: false }
-    inflight.set(key, entry)
-    return Promise.resolve().then(() => (entry.duplicated ? entry.promise.catch(() => undefined) : entry.promise))
-  }
-}
-
 const VIEW_PASS = ['direction', 'edgeStyle', 'wheel', 'minimap', 'controls', 'details', 'statusBar', 'labels', 'registry'] as const
 
 type FlowApi = {
@@ -212,7 +187,7 @@ export function mountElement(ctx: ElementContext): ElementInstance {
 
     const pollUrlProp = typeof props.pollUrl === 'string' && props.pollUrl !== '' ? props.pollUrl : null
     const toggleUrl = typeof props.toggleUrl === 'string' && props.toggleUrl !== '' ? props.toggleUrl : null
-    const customToggle = typeof props.onToggle === 'function' ? (props.onToggle as (c: unknown) => unknown) : null
+    const customToggle = typeof props.persistToggle === 'function' ? (props.persistToggle as (c: unknown) => unknown) : null
     const subUrl = typeof props.subgraphUrl === 'string' && props.subgraphUrl !== '' ? props.subgraphUrl : null
     const customSub = typeof props.loadSubgraph === 'function' ? props.loadSubgraph : null
 
@@ -235,8 +210,8 @@ export function mountElement(ctx: ElementContext): ElementInstance {
         ...(toggleUrl || customToggle
           ? {
               toggleable: true,
-              onToggle: dedupeToggle(async (change: unknown) => {
-                ctx.emit('toggle', change)
+              // Persists the switch; a rejection rolls it back (flow 1.0.2+).
+              persistToggle: async (change: unknown) => {
                 if (customToggle) return customToggle(change)
                 const r = await fetch(toggleUrl!, {
                   method: 'POST',
@@ -246,7 +221,10 @@ export function mountElement(ctx: ElementContext): ElementInstance {
                 })
                 if (!r.ok) throw new Error(`${r.status} ${r.statusText}`.trim())
                 return r
-              }),
+              },
+              // After the persist: whether it was accepted.
+              onToggle: (change: Record<string, unknown>, result: { ok: boolean; rolledBack?: boolean }) =>
+                ctx.emit('toggle', { ...change, ok: result.ok, ...(result.ok ? {} : { rolledBack: result.rolledBack }) }),
             }
           : {}),
         ...(customSub
@@ -319,7 +297,7 @@ export const renderers: Record<string, BlockRenderer> = {
         el.classList.add('dsk-flow-frame')
         el.style.height = '420px'
         const view = shallowReactive({ graph })
-        const mounted = mountView(el, () => state.locale, () =>
+        const mounted = mountView(el, () =>
           hc(FlowView, {
             graph: view.graph,
             locale: state.locale,

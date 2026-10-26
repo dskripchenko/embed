@@ -75,7 +75,7 @@ setzen.
 Eine Datei mit Vue, dem Kit, jedem Plugin-Paket und allen Styles darin: keine
 Import Map, keine weiteren Requests. Dieselben Elemente und dieselbe
 `DskEmbed`-API. Es ist die ganze Laufzeit auf einmal — etwa 2 MB,
-**558 KB gzip-komprimiert** — während der Loader nur holt, was die Seite
+**563 KB gzip-komprimiert** — während der Loader nur holt, was die Seite
 verwendet. Nutzen Sie es dort, wo Import Maps nicht verfügbar sind oder wo
 zur Laufzeit nichts nachgeladen werden darf.
 
@@ -112,17 +112,19 @@ Die Map, die er schreibt (auch als `dist/importmap.json` veröffentlicht):
 | Specifier | Zeigt auf |
 |---|---|
 | `vue` | `vue@3.5.44/dist/vue.runtime.esm-browser.prod.js` |
-| `@dskripchenko/ui`, `/icons`, `/hls` | `@dskripchenko/ui@1.15.1/dist/…` |
-| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.0/dist/index.mjs` |
+| `@dskripchenko/ui`, `/icons`, `/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
+| `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.1/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
-| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.0/dist/…` |
-| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.1/dist/…` |
-| `lucide-vue-next` | der eigene Ein-Datei-Build des Embeds mit den Icons, die die Pakete verwenden |
+| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
+| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.2/dist/…` |
+| `lucide-vue-next` | der eigene Ein-Datei-Build des Embeds mit den Icons, die openapi, flow und der Editor verwenden |
 
-Die Icons sind ein Sonderfall: Der ESM-Build von `lucide-vue-next` besteht aus
-einem Modul pro Icon — rund 1 500 Requests über eine Map — daher liefert das
-Embed die 109 Icons, die seine Pakete importieren, als eine Datei aus
-(7 KB gzip-komprimiert).
+Die Icons sind ein Sonderfall. Das Kit bündelt seine eigenen Icons; openapi und
+flow importieren ihre über `@dskripchenko/ui/icons`, das `lucide-vue-next`
+re-exportiert, und die Werkzeugleiste des Editors importiert `lucide-vue-next`
+selbst. Der ESM-Build dieses Pakets besteht aus einem Modul pro Icon — rund
+1 500 Requests über eine Map — daher liefert das Embed die 76 Icons, die diese
+Pakete importieren, als eine Datei aus (5 KB gzip-komprimiert).
 
 **Eine Seite mit eigener Import Map.** Einträge, die die Seite selbst mappt,
 bleiben die der Seite; das Embed fügt eine zweite Map mit dem Rest hinzu, die

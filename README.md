@@ -73,20 +73,23 @@ light DOM (your CSS applies). → [Elements](docs/en/elements.md)
 | | gzipped | |
 |---|---|---|
 | `dist/embed.js` — the loader | **9.1 KB** | Classic script; elements, API, import map. Everything else on demand. |
-| `dist/embed.bundle.js` — the fat bundle | **558 KB** (2.0 MB) | Everything inside; no import map, no further requests. |
+| `dist/embed.bundle.js` — the fat bundle | **563 KB** (2.0 MB) | Everything inside; no import map, no further requests. |
 
 What the loader fetches on demand (gzip -9 of the published files; jsDelivr
 serves Brotli, a little smaller):
 
 | First element of… | Fetches | |
 |---|---|---|
-| any Vue element | Vue runtime 41.5 KB, `@dskripchenko/ui` 98.6 KB + CSS 30.1 KB, icons 7.2 KB | once per page |
-| `<dsk-video>` / `<dsk-audio>` | plugin 3.8 KB; the HLS adapter 14.6 KB only for `.m3u8` | |
-| `<dsk-diagram>` | plugin 0.8 KB, `@dskripchenko/diagrams` 99.7 KB, kit tokens 2.5 KB | no Vue, no kit components |
-| `<dsk-openapi>` | plugin 1.4 KB, `@dskripchenko/openapi` 178.7 KB + CSS 9.6 KB | |
-| `<dsk-flow>` | plugin 2.5 KB, `@dskripchenko/flow` 79.7 KB + CSS 4.6 KB; the Mermaid import (2.4 KB + diagrams) only for Mermaid sources and the editor | |
+| any Vue element | Vue runtime 41.5 KB, `@dskripchenko/ui` 102.6 KB (its icons inside) + CSS 30.1 KB | once per page |
+| `<dsk-video>` / `<dsk-audio>` | plugin 3.5 KB; the HLS adapter 14.6 KB only for `.m3u8` | |
+| `<dsk-diagram>` | plugin 0.8 KB, `@dskripchenko/diagrams` 99.7 KB, kit tokens 2.4 KB | no Vue, no kit components |
+| `<dsk-openapi>` | plugin 1.4 KB, `@dskripchenko/openapi` 180.5 KB + CSS 10.5 KB, icons 5.2 KB | |
+| `<dsk-flow>` | plugin 2.5 KB, `@dskripchenko/flow` 79.9 KB + CSS 4.6 KB, icons 5.2 KB; the Mermaid import (2.4 KB + diagrams) only for Mermaid sources and the editor | |
 | `<dsk-markdown>` | plugin 0.5 KB | blocks load their own plugins |
-| `<dsk-editor>` | plugin 1.1 KB, `@dskripchenko/wysiwyg` 16.9 KB + CSS 2.3 KB | |
+| `<dsk-editor>` | plugin 1.1 KB, `@dskripchenko/wysiwyg` 18.2 KB + CSS 2.3 KB, icons 5.2 KB | |
+
+The icons file (76 icons, one file) is shared: fetched once, by the first of
+openapi, flow and the editor.
 
 → [Getting started](docs/en/getting-started.md): snippets, self-hosting,
 composing with your own import map, CSP, versioning.
@@ -101,12 +104,6 @@ both themes, both languages, desktop and phone.
 
 - **The theme is page-wide** (`<html data-theme>`): the kit's themes are
   defined on `:root`, and its menus and dialogs live in `<body>`.
-- **The editor's toolbar speaks Russian** whatever the locale:
-  `@dskripchenko/wysiwyg` 0.5 has fixed strings. Its live blocks follow the
-  locale.
-- **The OpenAPI reference** sizes its header by the viewport, not by its box:
-  embedded in a narrow column its title can be cut short, and on a phone a
-  multi-spec reference is wider than the screen (it scrolls inside its box).
 
 ## Development
 

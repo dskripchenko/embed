@@ -20,7 +20,7 @@ import {
   type VNode,
   type VNodeChild,
 } from 'vue'
-import { en, markdownBlockRenderersKey, provideLocale, ru } from '@dskripchenko/ui'
+import { en, markdownBlockRenderersKey, provideAppLocale, provideLocale, ru } from '@dskripchenko/ui'
 import type { BlockRenderer, ElementContext, Host, Locale, ResolvedTheme } from '../core/types'
 
 export interface RuntimeState {
@@ -46,6 +46,8 @@ export function setupRuntime(h: Host): void {
     console.error(`[dsk-embed] ${info}:`, error)
   }
   app.provide(markdownBlockRenderersKey, providedRenderers)
+  // The kit's locale for every mount, from the global configuration.
+  provideAppLocale(app, () => kitLocale(state.locale))
 
   const syncConfig = (): void => {
     const c = h.config()
@@ -74,14 +76,30 @@ export function runtimeApp(): App | null {
   return app
 }
 
-const EmbedRoot = defineComponent({
-  name: 'DskEmbedRoot',
+function kitLocale(locale: Locale) {
+  return locale === 'ru' ? ru : en
+}
+
+/**
+ * An element with its own `locale` attribute: the kit's locale for its
+ * subtree differs from the app's, so its content gets a root that provides it.
+ */
+const LocaleRoot = defineComponent({
+  name: 'DskEmbedLocale',
   props: {
     locale: { type: Function as PropType<() => Locale>, required: true },
     content: { type: Function as PropType<() => VNodeChild>, required: true },
   },
   setup(props) {
-    provideLocale(computed(() => (props.locale() === 'ru' ? ru : en)))
+    provideLocale(computed(() => kitLocale(props.locale())))
+    return () => props.content()
+  },
+})
+
+const Content = defineComponent({
+  name: 'DskEmbedContent',
+  props: { content: { type: Function as PropType<() => VNodeChild>, required: true } },
+  setup(props) {
     return () => props.content()
   },
 })
@@ -90,10 +108,14 @@ export interface Mounted {
   unmount(): void
 }
 
-/** Renders `content` into `container` in the shared app context, under the kit's locale. */
-export function mountView(container: HTMLElement, locale: () => Locale, content: () => VNodeChild): Mounted {
+/**
+ * Renders `content` into `container` in the shared app context. `ownLocale`
+ * is given for an element with its own `locale`; otherwise the app's locale
+ * (provideAppLocale) applies.
+ */
+export function mountView(container: HTMLElement, content: () => VNodeChild, ownLocale?: () => Locale): Mounted {
   if (!app) throw new Error('the embed runtime is not set up')
-  const vnode = createVNode(EmbedRoot, { locale, content })
+  const vnode = ownLocale ? createVNode(LocaleRoot, { locale: ownLocale, content }) : createVNode(Content, { content })
   vnode.appContext = app._context
   render(vnode, container)
   return {
@@ -122,7 +144,9 @@ export function mountElementView(ctx: ElementContext, content: (view: ElementVie
   const off = ctx.host.onConfig(() => {
     view.locale = ctx.locale()
   })
-  const mounted = mountView(ctx.container, () => view.locale, () => content(view))
+  // An element's own `locale` (read when it connects) gets its own kit locale.
+  const own = ctx.el.hasAttribute('locale') || typeof (ctx.props().locale) === 'string'
+  const mounted = mountView(ctx.container, () => content(view), own ? () => view.locale : undefined)
   return {
     view,
     refresh() {

@@ -6,10 +6,10 @@ First release.
 
 - **Loader** `dist/embed.js` (≈ 9 KB gzipped): a classic script that writes
   the import map of the shared runtime — Vue 3.5.44, `@dskripchenko/ui`
-  1.15.1, `wysiwyg` 0.5.0, `diagrams` 1.1.0, `openapi` 1.1.0, `flow` 1.0.1,
+  1.16.0, `wysiwyg` 0.5.1, `diagrams` 1.1.0, `openapi` 1.1.1, `flow` 1.0.2,
   pinned — composes with a page's own import map, defines the elements and
   `window.DskEmbed`, and fetches each plugin when its first element appears.
-- **Fat bundle** `dist/embed.bundle.js` (≈ 558 KB gzipped): the same elements
+- **Fat bundle** `dist/embed.bundle.js` (≈ 563 KB gzipped): the same elements
   and API with everything inside, no import map.
 - **Elements**: `<dsk-video>`, `<dsk-audio>`, `<dsk-diagram>`,
   `<dsk-openapi>` (reference, operation, block), `<dsk-flow>` (view with
@@ -26,5 +26,15 @@ First release.
 - **Events**: bubbling `dsk:*` DOM events and `DskEmbed.on/once/off/emit`;
   `openapi-target` and `media-target` wire a process to an API reference and
   a video declaratively.
+- The kit's locale is provided app-wide (`provideAppLocale`); the editor's
+  toolbar follows it. Video chapters come from the kit (`chapters`,
+  `seekToChapter`), with `playChapter()` and `dsk:chapter` /
+  `dsk:chapterchange` on top. Flow toggles persist through `persistToggle`
+  and report `{ ok }` in `dsk:toggle`. `<dsk-openapi proxy>` sends try-it
+  through the host (`proxySend`); a fixed `height` also sizes the
+  reference's sticky navigation (`--oa-viewport-h`).
+- The icons the packages import from `lucide-vue-next` (76, now only
+  openapi, flow and the editor's toolbar) are served as one file; pages
+  with players or markdown alone no longer fetch them.
 - `scripts/mirror.mjs` for self-hosting in the CDN's layout;
   `dist/importmap.json` for pages that write their own map.

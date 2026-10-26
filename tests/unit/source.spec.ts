@@ -30,3 +30,22 @@ describe('editor template markup', () => {
     expect(tidyMarkup(html)).toBe('<h2>Title</h2><p>Some <b>bold</b> text</p><pre><code>a:\n  b: 1\n</code></pre><p>end</p>')
   })
 })
+
+describe('template sources keep the YAML of code blocks', () => {
+  it('a code block indented with its markup comes out at column 0', () => {
+    const el = document.createElement('div')
+    el.innerHTML = `
+          <template>
+            <p>Notes</p>
+            <pre><code class="language-openapi">method: POST
+            url: /v1/orders
+            body:
+              example:
+                items:
+                  - sku: A
+                    quantity: 2</code></pre>
+          </template>`
+    const html = tidyMarkup(readSource(el))
+    expect(html).toBe('<p>Notes</p><pre><code class="language-openapi">method: POST\nurl: /v1/orders\nbody:\n  example:\n    items:\n      - sku: A\n        quantity: 2</code></pre>')
+  })
+})

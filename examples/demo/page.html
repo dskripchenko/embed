@@ -204,17 +204,22 @@
       <p class="lead" data-i18n="s4lead">The WYSIWYG holds a live API block. <code>name="body"</code> keeps a hidden input in sync, so the form submits HTML without a line of script.</p>
       <form id="post" class="card" action="#" method="post">
         <dsk-editor id="body-editor" name="body" min-height="220px" placeholder="Write something…">
+          <!-- The template's common indentation is removed, the code block's included: keep its lines indented with the markup. -->
           <template>
             <h2>Release notes</h2>
             <p>The order endpoint now accepts <strong>several items</strong> per request:</p>
             <pre><code class="language-openapi">method: POST
-url: https://api.example.com/v1/orders
-summary: Create an order
-body:
-  example: { customerId: cus_42, items: [{ sku: TEE-BLK-M, quantity: 2 }] }
-responses:
-  201: The order
-  422: The cart is empty</code></pre>
+            url: https://api.example.com/v1/orders
+            summary: Create an order
+            body:
+              example:
+                customerId: cus_42
+                items:
+                  - sku: TEE-BLK-M
+                    quantity: 2
+            responses:
+              201: The order
+              422: The cart is empty</code></pre>
             <p>Questions? Reply to this post.</p>
           </template>
         </dsk-editor>
@@ -346,7 +351,7 @@ DskEmbed.renderBlocks(document.querySelector('#cms'))</code></pre>
 
     // Toggles, simulated here (a backend would take them at toggle-url).
     const flow = document.getElementById('process-flow')
-    flow.onToggle = (change) => new Promise((resolve, reject) => setTimeout(() => (change.id === 'done' ? reject(new Error('The end state stays on')) : resolve()), 300))
+    flow.persistToggle = (change) => new Promise((resolve, reject) => setTimeout(() => (change.id === 'done' ? reject(new Error('The end state stays on')) : resolve()), 300))
 
     // The form: what the hidden input carries.
     document.getElementById('post').addEventListener('submit', (e) => {

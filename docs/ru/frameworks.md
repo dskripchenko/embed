@@ -138,11 +138,11 @@ add_filter('script_loader_tag', function ($tag, $handle) {
 
 `toggle-url` отправляет JSON с cookies страницы; для CSRF-проверки Laravel
 либо исключите маршрут из `VerifyCsrfToken`, либо сохраняйте переключения
-сами через свойство `onToggle` с заголовком `X-CSRF-TOKEN`:
+сами через свойство `persistToggle` с заголовком `X-CSRF-TOKEN`:
 
 ```html
 <script>
-  document.querySelector('dsk-flow').onToggle = (change) =>
+  document.querySelector('dsk-flow').persistToggle = (change) =>
     fetch('/processes/1/toggle', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },

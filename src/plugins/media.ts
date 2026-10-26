@@ -7,36 +7,13 @@ import { shallowReactive, watch } from 'vue'
 import { UidAudio, UidVideo } from '@dskripchenko/ui'
 import { audioProps, videoProps } from '../core/media'
 import { cssLength } from '../core/attrs'
-import { findChapter, parseVtt, type Cue } from '../core/vtt'
+import { findChapter, type Chapter } from '../core/chapters'
 import { MediaBlockError, audioBlockProps, videoBlockProps } from '../core/mediaBlock'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
-import { instanceRef, mountElementView, mountView, runtimeHost, setupRuntime, state, hc } from './runtime'
+import { instanceRef, mountElementView, mountView, runtimeHost, setupRuntime, hc } from './runtime'
 
 export function setup(host: Host): void {
   setupRuntime(host)
-}
-
-export type { Cue as Chapter } from '../core/vtt'
-
-const vttCache = new Map<string, Promise<Cue[]>>()
-
-/** The chapters of a video: its `kind: chapters` track, fetched once per URL. */
-function loadChapters(tracks: unknown): Promise<Cue[]> {
-  const list = Array.isArray(tracks) ? (tracks as { kind?: string; src?: string }[]) : []
-  const url = list.find((t) => t.kind === 'chapters')?.src
-  if (!url) return Promise.resolve([])
-  let p = vttCache.get(url)
-  if (!p) {
-    p = fetch(url, { credentials: 'same-origin' })
-      .then((r) => {
-        if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`)
-        return r.text()
-      })
-      .then(parseVtt)
-    p.catch(() => vttCache.delete(url))
-    vttCache.set(url, p)
-  }
-  return p
 }
 
 type Player = {
@@ -48,7 +25,13 @@ type Player = {
   prev?(): void
   state: Record<string, unknown>
   media: HTMLMediaElement | null
+  /** UidVideo (ui 1.16): the chapters track, read by the kit. */
+  chapters?: { start: number; end: number; title: string }[]
+  chapterIndex?: number
+  seekToChapter?(target: number | string): boolean
 }
+
+export type { Chapter }
 
 function whenMetadata(media: HTMLMediaElement): Promise<void> {
   if (media.readyState >= 1) return Promise.resolve()
@@ -62,8 +45,7 @@ function detailOf(player: Player | null): Record<string, unknown> {
 }
 
 /** Events, methods and getters of one player, shared by the elements and the blocks. */
-function playerBindings(emit: (name: string, detail?: unknown) => void, tracks: () => unknown = () => []) {
-  let chapters: Cue[] = []
+function playerBindings(emit: (name: string, detail?: unknown) => void) {
   const player = instanceRef<Player>()
   let media: HTMLMediaElement | null = null
   const onTime = (): void => emit('timeupdate', detailOf(player.ref.value))
@@ -84,6 +66,8 @@ function playerBindings(emit: (name: string, detail?: unknown) => void, tracks: 
     onQualitychange: (label: string) => emit('qualitychange', { label }),
     onAudiotrackchange: (label: string) => emit('audiotrackchange', { label }),
     onTrackchange: (index: number) => emit('trackchange', { index }),
+    onChapterchange: (chapter: { start: number; end: number; title: string } | null, index: number) =>
+      emit('chapterchange', chapter ? { index, title: chapter.title, start: chapter.start, end: chapter.end } : null),
   }
   const p = (): Player => {
     const v = player.ref.value
@@ -107,21 +91,26 @@ function playerBindings(emit: (name: string, detail?: unknown) => void, tracks: 
     get media() {
       return player.ref.value?.media ?? null
     },
-    /** The chapters loaded so far (after the first `playChapter` or `loadChapters`). */
-    get chapters() {
-      return chapters
+    /** The video's chapters, as the kit read them from its chapters track. */
+    get chapters(): Chapter[] {
+      return (player.ref.value?.chapters ?? []).map((c, index) => ({ index, title: c.title, start: c.start, end: c.end }))
     },
-    async loadChapters() {
-      chapters = await loadChapters(tracks())
-      return chapters
+    /** Resolves with the chapters once the kit has read the track (empty without one, or after `timeout` ms). */
+    async loadChapters(timeout = 4000): Promise<Chapter[]> {
+      const started = Date.now()
+      while (api.chapters.length === 0 && Date.now() - started < timeout) {
+        await new Promise((r) => setTimeout(r, 50))
+      }
+      return api.chapters
     },
-    /** Seeks to a chapter (its index or title) and plays. */
+    /** Seeks to a chapter — its index, title, or a part of the title — and plays. */
     async playChapter(which: number | string) {
-      chapters = await loadChapters(tracks())
-      const chapter = findChapter(chapters, which)
+      const chapter = findChapter(await api.loadChapters(), which)
       if (!chapter) throw new Error(`no chapter "${String(which)}"`)
-      await api.seek(chapter.start)
-      await p().play()
+      const v = p()
+      if (v.seekToChapter) v.seekToChapter(chapter.index)
+      else await api.seek(chapter.start)
+      await v.play()
       emit('chapter', chapter)
       return chapter
     },
@@ -140,11 +129,9 @@ function mediaKey(props: Record<string, unknown>): string {
 
 export function mountElement(ctx: ElementContext): ElementInstance {
   const isVideo = ctx.tag === 'dsk-video'
-  let current: Record<string, unknown> = {}
-  const { handlers, api } = playerBindings(ctx.emit, () => current.tracks)
+  const { handlers, api } = playerBindings(ctx.emit)
   const v = mountElementView(ctx, (view) => {
     const props = isVideo ? videoProps(view.props, view.children) : audioProps(view.props, view.children)
-    current = props
     return hc(isVideo ? UidVideo : UidAudio, {
       ...props,
       key: mediaKey(props),
@@ -181,10 +168,10 @@ function blockRenderer(kind: 'video' | 'audio'): BlockRenderer {
         el.classList.add('dsk-media', `dsk-media--${kind}`)
         const view = shallowReactive({ props: initial })
         const host = runtimeHost()
-        const { handlers, api } = playerBindings((name, detail) => host.emit(name, detail, el), () => (kind === 'video' ? videoProps(view.props).tracks : []))
+        const { handlers, api } = playerBindings((name, detail) => host.emit(name, detail, el))
         // The block answers the same calls as the element: el.dskPlayer.play().
         ;(el as HTMLElement & { dskPlayer?: unknown }).dskPlayer = api
-        const mounted = mountView(el, () => state.locale, () => {
+        const mounted = mountView(el, () => {
           // A block's width cap: `maxWidth: 520` (pixels) or any CSS length.
           el.style.maxWidth = cssLength(view.props.maxWidth) ?? ''
           const props = kind === 'video' ? videoProps(view.props) : audioProps(view.props)
