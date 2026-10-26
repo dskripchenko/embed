@@ -12,8 +12,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0
       '@dskripchenko/flow':
-        specifier: 1.0.2
-        version: 1.0.2(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: 1.1.0
+        version: 1.1.0(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/openapi':
         specifier: 1.1.1
         version: 1.1.1(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
@@ -141,8 +141,8 @@ packages:
     resolution: {integrity: sha512-Q07LPeEGlwT8xhb9RrnFlzbtAvRkvupT4RaUj70sJO4WTcZOgj0hZOHUgq3pRVsszGoB76rjK55JnZKbxv+iaw==}
     engines: {node: '>=20'}
 
-  '@dskripchenko/flow@1.0.2':
-    resolution: {integrity: sha512-Eq9VNb4+2/2fTWUNJ0iAQunGczNrkisss0c1d5x+hgmYtoFifpO4vFsUwsDE85RaXDBlglEZsRJpsXPSGj2ZSw==}
+  '@dskripchenko/flow@1.1.0':
+    resolution: {integrity: sha512-tcEiX9VyU++/OTwEiC768WIuqgOO16GNMQsgo64ZM7+N+nrhLa7Jj35Grp+XcGa7TldZ22FnrI5cpxTO1YT7QA==}
     engines: {node: '>=20'}
     peerDependencies:
       '@dskripchenko/diagrams': ^1.1.0
@@ -1195,7 +1195,7 @@ snapshots:
 
   '@dskripchenko/diagrams@1.1.0': {}
 
-  '@dskripchenko/flow@1.0.2(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/flow@1.1.0(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
       '@dskripchenko/diagrams': 1.1.0
       '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))

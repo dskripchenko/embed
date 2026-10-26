@@ -110,7 +110,7 @@ The map it writes (also published as `dist/importmap.json`):
 | `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.2/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
 | `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
-| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.2/dist/…` |
+| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.1.0/dist/…` |
 | `lucide-vue-next` | the embed's own one-file build of the icons openapi, flow and the editor use |
 
 The icons are a special case. The kit bundles its own icons; openapi and flow

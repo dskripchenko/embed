@@ -101,7 +101,7 @@ node scripts/mirror.mjs public/static     # → public/static/npm/<pkg>@<version
 | `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.2/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
 | `@dskripchenko/openapi`、`/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
-| `@dskripchenko/flow`、`/vue`、`/mermaid` | `@dskripchenko/flow@1.0.2/dist/…` |
+| `@dskripchenko/flow`、`/vue`、`/mermaid` | `@dskripchenko/flow@1.1.0/dist/…` |
 | `lucide-vue-next` | embed 自己构建的单文件版本，包含 openapi、flow 和编辑器用到的图标 |
 
 图标是个特例。组件库自带打包好的图标；openapi 和 flow 通过 `@dskripchenko/ui/icons` 导入各自的图标，

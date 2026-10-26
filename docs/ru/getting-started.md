@@ -112,7 +112,7 @@ Map, который он записывает (опубликован также
 | `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.2/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
 | `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.1/dist/…` |
-| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.0.2/dist/…` |
+| `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.1.0/dist/…` |
 | `lucide-vue-next` | собственная однофайловая сборка embed с иконками, которые используют openapi, flow и редактор |
 
 Иконки — особый случай. Кит содержит собственные иконки; openapi и flow
