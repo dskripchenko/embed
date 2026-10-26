@@ -485,11 +485,13 @@ for (const browserName of Object.keys(browsers)) {
         return { t: v.currentTime, err: v.error?.code ?? null, alert: el.querySelector('[role=alert]')?.textContent ?? null, h264 }
       })
       const hlsOk = hls.t > 0.5 && !hls.err
-      // Builds without an H.264 decoder — open-source Chromium, and Playwright's
-      // WebKit on Linux (CI) — cannot play the fixture: there the kit must
-      // report the format instead of failing silently. Where the decoder
-      // exists, the stream has to play.
-      check(`${tag}: HLS (fMP4) via @dskripchenko/ui/hls`, hlsOk || (!hls.h264 && !!hls.alert), JSON.stringify(hls))
+      // Builds without an H.264 decoder cannot play the fixture: open-source
+      // Chromium (it says so through isTypeSupported) and Playwright's WebKit on
+      // Linux, whose GStreamer lacks the decoder although isTypeSupported says
+      // yes. There the kit must report the format instead of failing silently;
+      // everywhere else the stream has to play.
+      const noDecoder = !hls.h264 || (browserName === 'webkit' && process.platform === 'linux')
+      check(`${tag}: HLS (fMP4) via @dskripchenko/ui/hls`, hlsOk || (noDecoder && !!hls.alert), JSON.stringify(hls))
 
       // renderBlocks is idempotent; dynamic elements upgrade.
       const again = await page.evaluate(async () => {
