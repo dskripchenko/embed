@@ -1,5 +1,13 @@
 # @dskripchenko/embed
 
+## 1.0.1 — 2026-10-26
+
+### Fixed
+- `<dsk-editor>`: typing after a slash item chosen with Enter (or a block
+  change from the toolbar) goes into the new block, not the previous
+  paragraph — the loader's import map and the fat bundle now carry
+  `@dskripchenko/wysiwyg` 0.5.2.
+
 ## 1.0.0 — 2026-10-26
 
 First release.
