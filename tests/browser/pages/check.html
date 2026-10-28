@@ -35,6 +35,21 @@
     </dsk-video>
   </section>
   <section>
+    <dsk-openapi id="editor-mode" mode="editor" height="520">
+      <script type="text/yaml">
+        openapi: 3.1.0
+        info:
+          title: Editor check
+          version: 1.0.0
+        paths:
+          /orders:
+            get:
+              summary: List orders
+              responses:
+                '200':
+                  description: OK
+      </script>
+    </dsk-openapi>
     <dsk-openapi id="block-mode" mode="block" editable>
       <script type="text/yaml">
         method: GET

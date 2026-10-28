@@ -157,7 +157,7 @@ message, with the position, in place of the diagram.
 
 ## `<dsk-openapi>`
 
-Three modes.
+Four modes.
 
 **Reference** (default) — the whole reference: navigation, search,
 operations with try-it, request samples in 13 languages, TypeScript types,
@@ -194,12 +194,24 @@ as the live widget; `editable` adds the Source and Constructor tabs.
 </dsk-openapi>
 ```
 
+**Editor** — `mode="editor"`: the whole spec in the visual editor — a tree
+of the document (info, servers, tags, security, paths and operations,
+schemas) and a form for the chosen part, with Source and Preview views.
+Edits come out as `dsk:change` `{ source }`, in the format of the text.
+
+```html
+<dsk-openapi mode="editor" height="640" view="visual">
+  <script type="text/yaml">openapi: 3.1.0 …</script>
+</dsk-openapi>
+```
+
 The spec comes from `src`, `specs`, the `spec` property (text or an object),
 or the content. Specs of the same URL are fetched once per page.
 
 | Attribute | Property | |
 |---|---|---|
-| `mode` | `mode` | `reference`, `operation`, `block`. Default: `operation` when `operation` is set, else `reference`. |
+| `mode` | `mode` | `reference`, `operation`, `block`, `editor`. Default: `operation` when `operation` is set, else `reference`. |
+| `view` | `view` | Editor mode: the view to open with — `visual` (default), `source`, `preview`. |
 | `src` | `src` | The spec's URL (YAML or JSON). |
 | `specs` | `specs` | JSON: `[{ "id", "name"?, "src" \| "content" }]` — several specs with a switcher. |
 | — | `spec` | The spec as text or an object (script only). |
@@ -221,11 +233,11 @@ or the content. Specs of the same URL are fetched once per page.
 Methods: `go(target, { tryIt? })` — scroll to an operation (`createOrder`,
 `operation/createOrder`), a schema (`schema/Order`) or a tag; `open(id)` —
 switch to a spec of `specs`; `print()`. Getters: `loaded` (the loaded
-spec), `value` (block mode: the current text).
+spec), `value` (block and editor modes: the current text).
 
 Events: `dsk:loaded` `{ id, title }`, `dsk:error` `{ id, message }`,
 `dsk:active` `{ id }` (spec switched), `dsk:change` `{ source }` (block
-mode, after an edit).
+and editor modes, after an edit).
 
 ## `<dsk-flow>`
 

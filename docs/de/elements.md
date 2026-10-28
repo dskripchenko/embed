@@ -160,7 +160,7 @@ mitsamt Position außerdem anstelle des Diagramms an.
 
 ## `<dsk-openapi>`
 
-Drei Modi.
+Vier Modi.
 
 **Referenz** (Standard) — die ganze Referenz: Navigation, Suche, Operationen
 mit Try-it, Anfragebeispiele in 13 Sprachen, TypeScript-Typen, Downloads.
@@ -196,13 +196,26 @@ als lebendiges Widget; `editable` fügt die Tabs Quelltext und Konstruktor hinzu
 </dsk-openapi>
 ```
 
+**Editor** — `mode="editor"`: die ganze Spezifikation im visuellen Editor —
+ein Baum des Dokuments (info, Server, Tags, Sicherheit, Pfade und
+Operationen, Schemas) und ein Formular für den gewählten Teil, dazu die
+Ansichten Quelltext und Vorschau. Änderungen kommen als `dsk:change`
+`{ source }`, im Format des Textes.
+
+```html
+<dsk-openapi mode="editor" height="640" view="visual">
+  <script type="text/yaml">openapi: 3.1.0 …</script>
+</dsk-openapi>
+```
+
 Die Spezifikation kommt aus `src`, `specs`, der Property `spec` (Text oder ein
 Objekt) oder dem Inhalt. Spezifikationen mit derselben URL werden pro Seite
 einmal geholt.
 
 | Attribut | Property | |
 |---|---|---|
-| `mode` | `mode` | `reference`, `operation`, `block`. Standard: `operation`, wenn `operation` gesetzt ist, sonst `reference`. |
+| `mode` | `mode` | `reference`, `operation`, `block`, `editor`. Standard: `operation`, wenn `operation` gesetzt ist, sonst `reference`. |
+| `view` | `view` | Editor-Modus: die Ansicht beim Öffnen — `visual` (Standard), `source`, `preview`. |
 | `src` | `src` | Die URL der Spezifikation (YAML oder JSON). |
 | `specs` | `specs` | JSON: `[{ "id", "name"?, "src" \| "content" }]` — mehrere Spezifikationen mit Umschalter. |
 | — | `spec` | Die Spezifikation als Text oder Objekt (nur per Script). |
@@ -224,12 +237,12 @@ einmal geholt.
 Methoden: `go(target, { tryIt? })` — zu einer Operation (`createOrder`,
 `operation/createOrder`), einem Schema (`schema/Order`) oder einem Tag
 scrollen; `open(id)` — zu einer Spezifikation aus `specs` wechseln; `print()`.
-Getter: `loaded` (die geladene Spezifikation), `value` (Blockmodus: der
+Getter: `loaded` (die geladene Spezifikation), `value` (Block- und Editor-Modus: der
 aktuelle Text).
 
 Events: `dsk:loaded` `{ id, title }`, `dsk:error` `{ id, message }`,
 `dsk:active` `{ id }` (Spezifikation gewechselt), `dsk:change` `{ source }`
-(Blockmodus, nach einer Bearbeitung).
+(Block- und Editor-Modus, nach einer Bearbeitung).
 
 ## `<dsk-flow>`
 

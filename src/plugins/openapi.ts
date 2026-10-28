@@ -5,10 +5,12 @@
  *   a switcher;
  * - operation mode (`operation="createOrder"`): one operation as a card;
  * - block mode: the YAML/JSON of an ```openapi block — a request or a whole
- *   document — as the live widget, editable with `editable`.
+ *   document — as the live widget, editable with `editable`;
+ * - editor mode: the whole spec in the visual editor (a tree of the document
+ *   and a form for each part), with its source and preview views.
  */
 import { h, shallowReactive } from 'vue'
-import { OpenApiBlock, OpenApiOperation, OpenApiReference, proxySend } from '@dskripchenko/openapi/vue'
+import { OpenApiBlock, OpenApiEditor, OpenApiOperation, OpenApiReference, proxySend } from '@dskripchenko/openapi/vue'
 import { cssLength } from '../core/attrs'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
 import { errorText, fetchText, instanceRef, mountElementView, mountView, setupRuntime, state, hc } from './runtime'
@@ -86,7 +88,7 @@ function titleOf(spec: unknown): string | undefined {
 
 export function mountElement(ctx: ElementContext): ElementInstance {
   const comp = instanceRef<Reference>()
-  // Block mode: the text as edited in the widget.
+  // Block and editor modes: the text as edited in the widget.
   let blockText: string | null = null
 
   const v = mountElementView(ctx, (view) => {
@@ -113,6 +115,23 @@ export function mountElement(ctx: ElementContext): ElementInstance {
             blockText = text
             ctx.emit('change', { source: text })
           },
+        }),
+      )
+    }
+
+    if (mode === 'editor') {
+      return wrap(
+        hc(OpenApiEditor, {
+          modelValue: blockText ?? view.source,
+          ...(props.view ? { view: props.view } : {}),
+          locale,
+          ...(props.baseUrl ? { baseUrl: props.baseUrl } : {}),
+          ...(props.labels ? { labels: props.labels } : {}),
+          'onUpdate:modelValue': (text: string) => {
+            blockText = text
+            ctx.emit('change', { source: text })
+          },
+          onIssues: (issues: unknown[]) => ctx.emit('issues', { issues }),
         }),
       )
     }
@@ -174,6 +193,7 @@ export function mountElement(ctx: ElementContext): ElementInstance {
       get loaded() {
         return comp.ref.value?.spec ?? null
       },
+      /** Block and editor modes: the current text. */
       get value() {
         return blockText ?? ctx.source()
       },
