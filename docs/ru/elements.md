@@ -160,7 +160,7 @@ timeline, xychart, mindmap — рендерится в SVG через `@dskripch
 
 ## `<dsk-openapi>`
 
-Три режима.
+Четыре режима.
 
 **Справочник** (по умолчанию) — справочник целиком: навигация, поиск,
 операции с try-it, примеры запросов на 13 языках, типы TypeScript, загрузки.
@@ -196,13 +196,25 @@ timeline, xychart, mindmap — рендерится в SVG через `@dskripch
 </dsk-openapi>
 ```
 
+**Редактор** — `mode="editor"`: вся спецификация в визуальном редакторе —
+дерево документа (info, серверы, теги, безопасность, пути и операции, схемы)
+и форма выбранной части, плюс виды «Исходник» и «Просмотр». Правки приходят
+событием `dsk:change` `{ source }`, в формате текста.
+
+```html
+<dsk-openapi mode="editor" height="640" view="visual">
+  <script type="text/yaml">openapi: 3.1.0 …</script>
+</dsk-openapi>
+```
+
 Спецификация берётся из `src`, `specs`, свойства `spec` (текст или объект)
 или содержимого. Спецификации с одним и тем же URL скачиваются один раз на
 страницу.
 
 | Атрибут | Свойство | |
 |---|---|---|
-| `mode` | `mode` | `reference`, `operation`, `block`. По умолчанию — `operation`, если задан `operation`, иначе `reference`. |
+| `mode` | `mode` | `reference`, `operation`, `block`, `editor`. По умолчанию — `operation`, если задан `operation`, иначе `reference`. |
+| `view` | `view` | Режим редактора: вид при открытии — `visual` (по умолчанию), `source`, `preview`. |
 | `src` | `src` | URL спецификации (YAML или JSON). |
 | `specs` | `specs` | JSON: `[{ "id", "name"?, "src" \| "content" }]` — несколько спецификаций с переключателем. |
 | — | `spec` | Спецификация текстом или объектом (только из скрипта). |
@@ -224,11 +236,11 @@ timeline, xychart, mindmap — рендерится в SVG через `@dskripch
 Методы: `go(target, { tryIt? })` — прокрутить к операции (`createOrder`,
 `operation/createOrder`), схеме (`schema/Order`) или тегу; `open(id)` —
 переключиться на спецификацию из `specs`; `print()`. Геттеры: `loaded`
-(загруженная спецификация), `value` (режим блока: текущий текст).
+(загруженная спецификация), `value` (режимы блока и редактора: текущий текст).
 
 События: `dsk:loaded` `{ id, title }`, `dsk:error` `{ id, message }`,
 `dsk:active` `{ id }` (спецификация переключена), `dsk:change` `{ source }`
-(режим блока, после правки).
+(режимы блока и редактора, после правки).
 
 ## `<dsk-flow>`
 

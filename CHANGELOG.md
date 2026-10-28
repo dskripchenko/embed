@@ -1,5 +1,15 @@
 # @dskripchenko/embed
 
+## 1.0.6 — 2026-10-28
+
+### Added
+- **`<dsk-openapi mode="editor">`** — the whole spec in openapi's visual
+  editor: a tree of the document (info, servers, tags, security, paths and
+  operations, schemas) and a form for the chosen part, with Source and
+  Preview views; `view` picks the one to open with. Edits come out as
+  `dsk:change` `{ source }` and through `value`. Block mode's constructor
+  builds compact requests only; this is the constructor for a whole document.
+
 ## 1.0.5 — 2026-10-28
 
 ### Fixed

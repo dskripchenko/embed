@@ -173,7 +173,8 @@ export const SCHEMAS: Readonly<Record<string, Schema>> = {
   'dsk-diagram': [...COMMON, { prop: 'src', type: 'string' }, { prop: 'label', type: 'string' }],
   'dsk-openapi': [
     ...COMMON,
-    { prop: 'mode', type: 'enum', values: ['reference', 'operation', 'block'] },
+    { prop: 'mode', type: 'enum', values: ['reference', 'operation', 'block', 'editor'] },
+    { prop: 'view', type: 'enum', values: ['visual', 'source', 'preview'] },
     { prop: 'src', type: 'string' },
     { prop: 'specs', type: 'json' },
     { prop: 'active', type: 'string' },

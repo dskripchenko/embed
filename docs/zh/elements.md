@@ -141,7 +141,7 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 
 ## `<dsk-openapi>`
 
-三种模式。
+四种模式。
 
 **参考文档**（默认）——完整的参考文档：导航、搜索、带 try-it（在线调试）的操作、13 种语言的
 请求示例、TypeScript 类型、下载。
@@ -177,12 +177,23 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 </dsk-openapi>
 ```
 
+**编辑器**——`mode="editor"`：在可视化编辑器中编辑整个规范——文档树（info、服务器、
+标签、安全、路径与操作、schema）和所选部分的表单，另有“源码”和“预览”视图。修改以
+`dsk:change` `{ source }` 发出，保持文本原有格式。
+
+```html
+<dsk-openapi mode="editor" height="640" view="visual">
+  <script type="text/yaml">openapi: 3.1.0 …</script>
+</dsk-openapi>
+```
+
 规范来自 `src`、`specs`、`spec` 属性（文本或对象）或元素内容。同一 URL 的规范在每个页面上
 只获取一次。
 
 | 特性 | 属性 | |
 |---|---|---|
-| `mode` | `mode` | `reference`、`operation`、`block`。默认：设置了 `operation` 时为 `operation`，否则为 `reference`。 |
+| `mode` | `mode` | `reference`、`operation`、`block`、`editor`。默认：设置了 `operation` 时为 `operation`，否则为 `reference`。 |
+| `view` | `view` | 编辑器模式：打开时的视图——`visual`（默认）、`source`、`preview`。 |
 | `src` | `src` | 规范的 URL（YAML 或 JSON）。 |
 | `specs` | `specs` | JSON：`[{ "id", "name"?, "src" \| "content" }]`——带切换器的多个规范。 |
 | — | `spec` | 以文本或对象形式提供的规范（仅限脚本）。 |
@@ -203,10 +214,10 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 
 方法：`go(target, { tryIt? })`——滚动到某个操作（`createOrder`、
 `operation/createOrder`）、schema（`schema/Order`）或 tag；`open(id)`——切换到 `specs`
-中的某个规范；`print()`。Getter：`loaded`（已加载的规范）、`value`（块模式：当前文本）。
+中的某个规范；`print()`。Getter：`loaded`（已加载的规范）、`value`（块模式和编辑器模式：当前文本）。
 
 事件：`dsk:loaded` `{ id, title }`、`dsk:error` `{ id, message }`、`dsk:active`
-`{ id }`（规范已切换）、`dsk:change` `{ source }`（块模式，编辑之后）。
+`{ id }`（规范已切换）、`dsk:change` `{ source }`（块模式和编辑器模式，编辑之后）。
 
 ## `<dsk-flow>`
 

@@ -459,6 +459,26 @@ for (const browserName of Object.keys(browsers)) {
       check(`${tag}: flow from Mermaid source`, r.mermaidFlow >= 3, `${r.mermaidFlow} nodes`)
       check(`${tag}: editable flow → FlowEditor with a form input`, r.editorFlow && r.editorInput.includes('"nodes"'))
       check(`${tag}: openapi block mode (editable)`, r.block)
+
+      // Editor mode: the visual editor over the whole spec; an edit comes out as dsk:change.
+      const ed = await page.evaluate(async () => {
+        const el = document.querySelector('#editor-mode')
+        el.scrollIntoView()
+        const changes = []
+        el.addEventListener('dsk:change', (e) => changes.push(e.detail.source))
+        const visual = !!el.querySelector('.oa-editor') && el.innerText.includes('List orders')
+        const source = [...el.querySelectorAll('.oa-editor__bar button, .oa-editor__bar [role=tab]')].find((b) => /source|исходник/i.test(b.textContent))
+        source?.click()
+        await new Promise((r) => setTimeout(r, 300))
+        const area = el.querySelector('textarea')
+        if (area) {
+          area.value = area.value.replace('Editor check', 'Edited title')
+          area.dispatchEvent(new Event('input', { bubbles: true }))
+        }
+        await new Promise((r) => setTimeout(r, 600))
+        return { visual, area: !!area, changed: changes.some((t) => t.includes('Edited title')), value: el.value?.includes('Edited title') }
+      })
+      check(`${tag}: openapi editor mode: the visual editor, edits as dsk:change and value`, ed.visual && ed.area && ed.changed && ed.value, JSON.stringify(ed))
       check(`${tag}: diagram error is shown with its position`, /line/.test(r.broken), r.broken)
       check(`${tag}: diagram from src`, r.fromSrc)
       check(`${tag}: renderBlocks: host renderer, video and flow blocks`, r.chart === '3 bars' && r.cmsVideo && r.cmsFlow === 2, JSON.stringify({ c: r.chart, v: r.cmsVideo, f: r.cmsFlow }))
