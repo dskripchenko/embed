@@ -100,7 +100,7 @@ node scripts/mirror.mjs public/static     # → public/static/npm/<pkg>@<version
 | `@dskripchenko/ui`、`/icons`、`/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
 | `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.3/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
-| `@dskripchenko/openapi`、`/vue` | `@dskripchenko/openapi@1.1.2/dist/…` |
+| `@dskripchenko/openapi`、`/vue` | `@dskripchenko/openapi@1.1.3/dist/…` |
 | `@dskripchenko/flow`、`/vue`、`/mermaid` | `@dskripchenko/flow@1.1.1/dist/…` |
 
 映射中没有图标库：组件库、openapi、flow 和编辑器都把所用图标打包进各自的构建。

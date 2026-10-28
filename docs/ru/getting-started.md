@@ -111,7 +111,7 @@ Map, который он записывает (опубликован также
 | `@dskripchenko/ui`, `/hls` | `@dskripchenko/ui@1.16.0/dist/…` |
 | `@dskripchenko/wysiwyg` | `@dskripchenko/wysiwyg@0.5.3/dist/index.mjs` |
 | `@dskripchenko/diagrams` | `@dskripchenko/diagrams@1.1.0/dist/index.mjs` |
-| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.2/dist/…` |
+| `@dskripchenko/openapi`, `/vue` | `@dskripchenko/openapi@1.1.3/dist/…` |
 | `@dskripchenko/flow`, `/vue`, `/mermaid` | `@dskripchenko/flow@1.1.1/dist/…` |
 
 Библиотеки иконок в карте нет: кит, openapi, flow и редактор встраивают

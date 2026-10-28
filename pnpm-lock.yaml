@@ -15,8 +15,8 @@ importers:
         specifier: 1.1.1
         version: 1.1.1(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/openapi':
-        specifier: 1.1.2
-        version: 1.1.2(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: 1.1.3
+        version: 1.1.3(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/ui':
         specifier: 1.16.0
         version: 1.16.0(vue@3.5.44(typescript@6.0.3))
@@ -156,8 +156,8 @@ packages:
       vue:
         optional: true
 
-  '@dskripchenko/openapi@1.1.2':
-    resolution: {integrity: sha512-8vSolsAGOyFDlOWhafossdy9ce85fKgMDpJk1/QxW6in0+Lzblo3a565qyFkAl8m2smfQ8z2WA2gvYIKNGtjUg==}
+  '@dskripchenko/openapi@1.1.3':
+    resolution: {integrity: sha512-SZainjPUlMlhfedYAc/8//mTg8KFuDa5SYMgD9oaopYKpP/Tb4emr/Iiul3uRnAa2GBIPAmCnuPhWSSetOuKNQ==}
     engines: {node: '>=20'}
     peerDependencies:
       '@dskripchenko/ui': ^1.13.0
@@ -1201,7 +1201,7 @@ snapshots:
       '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/openapi@1.1.2(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/openapi@1.1.3(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
       '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
