@@ -11,6 +11,7 @@ import {
   createApp,
   createVNode,
   defineComponent,
+  getCurrentInstance,
   h,
   render,
   shallowReactive,
@@ -81,6 +82,19 @@ function kitLocale(locale: Locale) {
 }
 
 /**
+ * Every element is a root of its own in the one app, and useId() numbers from
+ * zero in each root: two elements would share ids — two flow canvases one
+ * grid pattern (`url(#…-grid)` resolves to the first in the document), forms
+ * their `for` / `aria-*` links. Each root's ids get a prefix of their own
+ * (the root's `ids` array is shared by its whole subtree).
+ */
+let rootSequence = 0
+function uniqueIds(): void {
+  const instance = getCurrentInstance() as { ids?: [string, number, number] } | null
+  if (instance?.ids) instance.ids[0] = `e${++rootSequence}-`
+}
+
+/**
  * An element with its own `locale` attribute: the kit's locale for its
  * subtree differs from the app's, so its content gets a root that provides it.
  */
@@ -91,6 +105,7 @@ const LocaleRoot = defineComponent({
     content: { type: Function as PropType<() => VNodeChild>, required: true },
   },
   setup(props) {
+    uniqueIds()
     provideLocale(computed(() => kitLocale(props.locale())))
     return () => props.content()
   },
@@ -100,6 +115,7 @@ const Content = defineComponent({
   name: 'DskEmbedContent',
   props: { content: { type: Function as PropType<() => VNodeChild>, required: true } },
   setup(props) {
+    uniqueIds()
     return () => props.content()
   },
 })

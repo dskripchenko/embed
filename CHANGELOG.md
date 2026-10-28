@@ -1,5 +1,15 @@
 # @dskripchenko/embed
 
+## 1.0.5 — 2026-10-28
+
+### Fixed
+- **Ids of their own in every element.** Each element renders as its own Vue
+  root, and `useId()` numbered from zero in each: two `<dsk-flow>` on a page
+  shared one grid pattern id, so the second canvas drew the first one's grid
+  and panning one moved the dots of both; arrow markers and form labels
+  (`for` / `aria-*`) collided the same way. Each element's ids now carry a
+  prefix of their own.
+
 ## 1.0.4 — 2026-10-28
 
 ### Fixed
