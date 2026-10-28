@@ -1,5 +1,14 @@
 # @dskripchenko/embed
 
+## 1.0.4 — 2026-10-28
+
+### Fixed
+- **An embedded OpenAPI reference no longer pulls the page while it scrolls**
+  (openapi 1.1.3). In a box on a longer page whose top had scrolled past the
+  window, the reference's navigation followed each section by scrolling the
+  page back to its link, and scrolling jerked back and forth. The navigation
+  and the search hits now scroll only their own list.
+
 ## 1.0.3 — 2026-10-26
 
 ### Changed
