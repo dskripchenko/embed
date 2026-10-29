@@ -317,6 +317,55 @@ persistiert (`ok: true`) oder abgelehnt wurde (`ok: false`, zurückgesetzt);
 `{ nodes, edges }`; Editor: `dsk:change` `{ graph, description, source }`,
 `dsk:validate` `{ issues }`.
 
+## `<dsk-board>`
+
+Ein unendliches Whiteboard ([`@dskripchenko/board`](https://github.com/dskripchenko/board)):
+Formen, Haftnotizen, Rahmen, Überschriften und Text, Verbinder, Emoji, Stift
+und Marker. Standardmäßig eine schreibgeschützte Ansicht; `editable` schaltet
+den Editor ein; `board-url` macht daraus ein gemeinsames Board, das mehrere
+Personen gleichzeitig bearbeiten.
+
+```html
+<!-- A board from a file, read-only -->
+<dsk-board src="/boards/retro.json" height="560"></dsk-board>
+
+<!-- An editor in a form: the board's JSON goes in a hidden input -->
+<form method="post">
+  <dsk-board editable name="board"></dsk-board>
+</form>
+
+<!-- A shared board: real-time editing through the server -->
+<dsk-board board-url="/api/boards/42" user-name="Anna" user-color="#ec4899"></dsk-board>
+```
+
+**Das gemeinsame Board** spricht mit `board-url` über
+[den HTTP-Vertrag des Boards](https://github.com/dskripchenko/board/blob/main/docs/en/collaboration.md#the-http-contract):
+`GET {base}/snapshot`, `POST {base}/batches`, `GET {base}/batches?after=N&wait=S`
+(Long Polling), `POST {base}/presence`. Der `BoardServer` des Pakets ist die
+Referenz-Serverlogik. Requests tragen die Cookies der Seite.
+
+| Attribut | Property | |
+|---|---|---|
+| `src` | `src` | Die URL des Boards (JSON). Der Text des Elements (JSON in einem `<script type="application/json">`) funktioniert ebenfalls. |
+| — | `board` | Das Board als Objekt (nur per Script); hat Vorrang vor `src` und Inhalt. |
+| `board-url` | `boardUrl` | Die Basis-URL des gemeinsamen Boards: Zusammenarbeit. |
+| `poll-interval` | `pollInterval` | Gemeinsames Board: alle N ms (mindestens 250) nach Änderungen fragen statt Long Polling — für Server, die eine Anfrage nicht offen halten können. |
+| — | `provider` | Jeder andere Transport (nur per Script): ein `BoardProvider` — ein WebSocket, ein `MemoryHub`. |
+| `editable` | `editable` | Der Editor (für ein Board aus `src` oder Inhalt). |
+| `readonly` | `readonly` | Gemeinsames Board: nur ansehen. |
+| `lockable` | `lockable` | Darf das Board für alle sperren und entsperren (Standard `true`); `false` für Personen, die das nicht dürfen. |
+| `user-name`, `user-color`, `user-id` | camelCase | Wer bearbeitet: wird den anderen auf einem gemeinsamen Board angezeigt. |
+| `name` | `name` | Hält ein verstecktes `<input name>` mit dem JSON des Boards im Element — ein einfaches Formular sendet es mit. |
+| `minimap` | `minimap` | Die Minimap (standardmäßig an). |
+| `height` | `height` | Standard 560; oder die CSS-Variable `--dsk-board-height`. |
+| — | `labels` | Oberflächentexte (nur per Script). |
+
+Methoden: `fit()`, `select(ids)`, `toPng()` (ein `Blob`), `toSvg()`
+(`{ svg, width, height }`), `undo()`, `redo()`. Getter: `value` (das Board).
+
+Events: `dsk:change` `{ board, ops, origin }`; `dsk:select` `{ ids }`;
+`dsk:load` `{ objects }`.
+
 ## `<dsk-markdown>`
 
 ```html

@@ -1,5 +1,19 @@
 # @dskripchenko/embed
 
+## 1.1.0 — 2026-10-29
+
+### Added
+- **`<dsk-board>`** — an infinite whiteboard from
+  [`@dskripchenko/board`](https://github.com/dskripchenko/board): a
+  read-only view (`src`, the element's JSON, or the `board` property), an
+  editor (`editable`, with a form input through `name`), or a shared board
+  several people edit at once (`board-url`, the board's HTTP contract;
+  `provider` for any other transport) with cursors, names and the board
+  lock (`lockable`); `poll-interval` polls instead of long polling. Methods `fit`, `select`, `toPng`, `toSvg`, `undo`,
+  `redo`; events `dsk:change`, `dsk:select`, `dsk:load`.
+- **```board blocks** in markdown, the editor and `renderBlocks`: a
+  read-only board from its JSON.
+
 ## 1.0.6 — 2026-10-28
 
 ### Added

@@ -59,7 +59,7 @@ export type BlockRenderer = (code: string, ctx: { language: string; index: numbe
 export type BlockRendererInput = BlockRenderer | BlockResult
 
 /** Names of the lazily loaded plugin modules. */
-export type PluginName = 'media' | 'diagram' | 'openapi' | 'flow' | 'markdown' | 'editor'
+export type PluginName = 'media' | 'diagram' | 'openapi' | 'flow' | 'markdown' | 'editor' | 'board'
 
 /** What an element gives its plugin. */
 export interface ElementContext {

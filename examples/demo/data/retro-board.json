@@ -1,0 +1,356 @@
+{
+ "version": 1,
+ "meta": {
+  "title": "Ретро спринта 42"
+ },
+ "objects": {
+  "t1": {
+   "id": "t1",
+   "type": "text",
+   "variant": "title",
+   "text": "Ретро спринта 42",
+   "x": 0,
+   "y": -120,
+   "w": 520,
+   "h": 48,
+   "z": "a0"
+  },
+  "t2": {
+   "id": "t2",
+   "type": "text",
+   "variant": "body",
+   "text": "Команда Payments · 14–28 октября",
+   "x": 0,
+   "y": -66,
+   "w": 420,
+   "h": 22,
+   "z": "a1"
+  },
+  "f1": {
+   "id": "f1",
+   "type": "frame",
+   "title": "Что было хорошо",
+   "x": 0,
+   "y": 0,
+   "w": 520,
+   "h": 500,
+   "z": "b0",
+   "fill": "#eefbf3"
+  },
+  "f2": {
+   "id": "f2",
+   "type": "frame",
+   "title": "Что мешало",
+   "x": 560,
+   "y": 0,
+   "w": 520,
+   "h": 500,
+   "z": "b1",
+   "fill": "#fff4ec"
+  },
+  "f3": {
+   "id": "f3",
+   "type": "frame",
+   "title": "Что меняем",
+   "x": 1120,
+   "y": 0,
+   "w": 520,
+   "h": 500,
+   "z": "b2",
+   "fill": "#eef4ff"
+  },
+  "s1": {
+   "id": "s1",
+   "type": "sticky",
+   "color": "green",
+   "text": "Релиз 3.0 вышел в срок",
+   "x": 24,
+   "y": 48,
+   "w": 220,
+   "h": 200,
+   "z": "c0",
+   "parent": "f1"
+  },
+  "s2": {
+   "id": "s2",
+   "type": "sticky",
+   "color": "green",
+   "text": "Нагрузочное: 5 000 rps без деградации",
+   "x": 272,
+   "y": 48,
+   "w": 220,
+   "h": 200,
+   "z": "c1",
+   "parent": "f1",
+   "rotation": 2
+  },
+  "s3": {
+   "id": "s3",
+   "type": "sticky",
+   "color": "yellow",
+   "text": "Парное ревью ускорило мёрж вдвое",
+   "x": 24,
+   "y": 268,
+   "w": 220,
+   "h": 200,
+   "z": "c2",
+   "parent": "f1"
+  },
+  "e1": {
+   "id": "e1",
+   "type": "emoji",
+   "char": "🎉",
+   "x": 420,
+   "y": 400,
+   "w": 72,
+   "h": 72,
+   "z": "c3",
+   "parent": "f1"
+  },
+  "s4": {
+   "id": "s4",
+   "type": "sticky",
+   "color": "orange",
+   "text": "Песочница эквайера падала 3 раза",
+   "x": 584,
+   "y": 48,
+   "w": 220,
+   "h": 200,
+   "z": "c4",
+   "parent": "f2"
+  },
+  "s5": {
+   "id": "s5",
+   "type": "sticky",
+   "color": "pink",
+   "text": "Долгие согласования ТЗ с рисками",
+   "x": 832,
+   "y": 48,
+   "w": 220,
+   "h": 200,
+   "z": "c5",
+   "parent": "f2",
+   "rotation": -2
+  },
+  "s6": {
+   "id": "s6",
+   "type": "sticky",
+   "color": "orange",
+   "text": "Флейки e2e на CI",
+   "x": 584,
+   "y": 268,
+   "w": 220,
+   "h": 200,
+   "z": "c6",
+   "parent": "f2"
+  },
+  "e2": {
+   "id": "e2",
+   "type": "emoji",
+   "char": "🐛",
+   "x": 960,
+   "y": 400,
+   "w": 64,
+   "h": 64,
+   "z": "c7",
+   "parent": "f2"
+  },
+  "s7": {
+   "id": "s7",
+   "type": "sticky",
+   "color": "blue",
+   "text": "Мок эквайера в стенде",
+   "x": 1144,
+   "y": 48,
+   "w": 220,
+   "h": 200,
+   "z": "c8",
+   "parent": "f3"
+  },
+  "s8": {
+   "id": "s8",
+   "type": "sticky",
+   "color": "violet",
+   "text": "Риски — в планирование, а не после",
+   "x": 1392,
+   "y": 48,
+   "w": 220,
+   "h": 200,
+   "z": "c9",
+   "parent": "f3"
+  },
+  "s9": {
+   "id": "s9",
+   "type": "sticky",
+   "color": "cyan",
+   "text": "Карантин для флейки-тестов",
+   "x": 1144,
+   "y": 268,
+   "w": 220,
+   "h": 200,
+   "z": "ca",
+   "parent": "f3"
+  },
+  "t3": {
+   "id": "t3",
+   "type": "text",
+   "variant": "h2",
+   "text": "Процесс разбора флейки-теста",
+   "x": 0,
+   "y": 580,
+   "w": 520,
+   "h": 32,
+   "z": "d0"
+  },
+  "p1": {
+   "id": "p1",
+   "type": "shape",
+   "kind": "ellipse",
+   "text": "Тест упал",
+   "x": 0,
+   "y": 640,
+   "w": 160,
+   "h": 80,
+   "z": "d1",
+   "fill": "#fde68a"
+  },
+  "p2": {
+   "id": "p2",
+   "type": "shape",
+   "kind": "diamond",
+   "text": "Повторяется?",
+   "x": 240,
+   "y": 630,
+   "w": 180,
+   "h": 100,
+   "z": "d2"
+  },
+  "p3": {
+   "id": "p3",
+   "type": "shape",
+   "kind": "rounded",
+   "text": "Баг в тикет",
+   "x": 500,
+   "y": 640,
+   "w": 170,
+   "h": 80,
+   "z": "d3",
+   "fill": "#bfdbfe"
+  },
+  "p4": {
+   "id": "p4",
+   "type": "shape",
+   "kind": "rounded",
+   "text": "В карантин",
+   "x": 240,
+   "y": 800,
+   "w": 180,
+   "h": 80,
+   "z": "d4",
+   "fill": "#bbf7d0",
+   "strokeStyle": "dashed"
+  },
+  "p5": {
+   "id": "p5",
+   "type": "shape",
+   "kind": "hexagon",
+   "text": "Разбор на ретро",
+   "x": 500,
+   "y": 800,
+   "w": 170,
+   "h": 80,
+   "z": "d5"
+  },
+  "c1": {
+   "id": "c1",
+   "type": "connector",
+   "from": {
+    "id": "p1"
+   },
+   "to": {
+    "id": "p2"
+   },
+   "route": "elbow",
+   "endArrow": "arrow",
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0,
+   "z": "e0"
+  },
+  "c2": {
+   "id": "c2",
+   "type": "connector",
+   "from": {
+    "id": "p2"
+   },
+   "to": {
+    "id": "p3"
+   },
+   "route": "elbow",
+   "endArrow": "arrow",
+   "label": "да",
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0,
+   "z": "e1"
+  },
+  "c3": {
+   "id": "c3",
+   "type": "connector",
+   "from": {
+    "id": "p2",
+    "side": "bottom"
+   },
+   "to": {
+    "id": "p4",
+    "side": "top"
+   },
+   "route": "elbow",
+   "endArrow": "arrow",
+   "label": "нет",
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0,
+   "z": "e2"
+  },
+  "c4": {
+   "id": "c4",
+   "type": "connector",
+   "from": {
+    "id": "p4"
+   },
+   "to": {
+    "id": "p5"
+   },
+   "route": "curve",
+   "endArrow": "triangle",
+   "strokeStyle": "dashed",
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0,
+   "z": "e3"
+  },
+  "c5": {
+   "id": "c5",
+   "type": "connector",
+   "from": {
+    "id": "s6"
+   },
+   "to": {
+    "id": "s9"
+   },
+   "route": "curve",
+   "endArrow": "arrow",
+   "stroke": "#8b5cf6",
+   "x": 0,
+   "y": 0,
+   "w": 0,
+   "h": 0,
+   "z": "e4"
+  }
+ }
+}

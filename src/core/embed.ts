@@ -17,6 +17,7 @@ export const BUILTIN_BLOCKS: Readonly<Record<string, PluginName>> = {
   mermaid: 'diagram',
   openapi: 'openapi',
   flow: 'flow',
+  board: 'board',
   video: 'media',
   audio: 'media',
 }

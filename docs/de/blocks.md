@@ -17,6 +17,7 @@ seitenweite Registry bedient jede Stelle, an der Blöcke vorkommen:
 | `mermaid` | SVG-Diagramm | diagrams |
 | `openapi` | das lebendige API-Widget: eine Anfrage, mehrere oder ein ganzes Dokument | openapi |
 | `flow` | eine Prozessansicht, aus JSON oder Mermaid-Quelltext (state/flowchart) | flow |
+| `board` | ein schreibgeschütztes Whiteboard, aus dem JSON des Boards | board |
 | `video` | der Videoplayer des Kits | kit |
 | `audio` | der Audioplayer oder die Playlist des Kits | kit |
 

@@ -8,6 +8,7 @@ const VERSIONS = {
   '@dskripchenko/diagrams': '1.1.0',
   '@dskripchenko/openapi': '1.1.0',
   '@dskripchenko/flow': '1.0.1',
+  '@dskripchenko/board': '0.2.0',
 }
 const CDN = 'https://cdn.jsdelivr.net/npm/'
 

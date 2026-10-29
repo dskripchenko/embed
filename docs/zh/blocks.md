@@ -16,6 +16,7 @@
 | `mermaid` | SVG 图表 | diagrams |
 | `openapi` | 实时 API 组件：一个请求、多个请求或整个文档 | openapi |
 | `flow` | 流程视图，源为 JSON 或 Mermaid state/flowchart | flow |
+| `board` | 只读白板，源为白板的 JSON | board |
 | `video` | 组件库的视频播放器 | 组件库 |
 | `audio` | 组件库的音频播放器或播放列表 | 组件库 |
 

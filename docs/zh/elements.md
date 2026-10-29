@@ -286,6 +286,53 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 `{ message }`；`dsk:load` `{ nodes, edges }`；编辑器：`dsk:change`
 `{ graph, description, source }`、`dsk:validate` `{ issues }`。
 
+## `<dsk-board>`
+
+无限白板（[`@dskripchenko/board`](https://github.com/dskripchenko/board)）：
+图形、便签、框架、标题和文本、连接线、表情、画笔和记号笔。默认是只读视图；
+`editable` 开启编辑器；`board-url` 使其成为多人同时编辑的共享白板。
+
+```html
+<!-- A board from a file, read-only -->
+<dsk-board src="/boards/retro.json" height="560"></dsk-board>
+
+<!-- An editor in a form: the board's JSON goes in a hidden input -->
+<form method="post">
+  <dsk-board editable name="board"></dsk-board>
+</form>
+
+<!-- A shared board: real-time editing through the server -->
+<dsk-board board-url="/api/boards/42" user-name="Anna" user-color="#ec4899"></dsk-board>
+```
+
+**共享白板**按照
+[白板的 HTTP 约定](https://github.com/dskripchenko/board/blob/main/docs/en/collaboration.md#the-http-contract)
+与 `board-url` 通信：`GET {base}/snapshot`、`POST {base}/batches`、
+`GET {base}/batches?after=N&wait=S`（长轮询）、`POST {base}/presence`。包中的
+`BoardServer` 是参考服务端逻辑。请求会带上页面的 cookie。
+
+| 特性 | 属性 | |
+|---|---|---|
+| `src` | `src` | 白板的 URL（JSON）。也可以使用元素的文本（`<script type="application/json">` 中的 JSON）。 |
+| — | `board` | 以对象形式提供的白板（仅限脚本）；优先于 `src` 和元素内容。 |
+| `board-url` | `boardUrl` | 共享白板的基础 URL：协作。 |
+| `poll-interval` | `pollInterval` | 共享白板：每 N 毫秒（至少 250）请求一次更改，而不是长轮询——适用于无法保持请求打开的服务器。 |
+| — | `provider` | 任何其他传输方式（仅限脚本）：一个 `BoardProvider`——WebSocket、`MemoryHub`。 |
+| `editable` | `editable` | 编辑器（用于来自 `src` 或元素内容的白板）。 |
+| `readonly` | `readonly` | 共享白板：仅查看。 |
+| `lockable` | `lockable` | 可以为所有人锁定和解锁白板（默认 `true`）；对不应拥有此权限的人设为 `false`。 |
+| `user-name`、`user-color`、`user-id` | camelCase | 编辑者：在共享白板上向其他人显示。 |
+| `name` | `name` | 在元素内部维护一个包含白板 JSON 的隐藏 `<input name>`——普通表单即可提交它。 |
+| `minimap` | `minimap` | 小地图（默认开启）。 |
+| `height` | `height` | 默认 560；或使用 CSS 变量 `--dsk-board-height`。 |
+| — | `labels` | 界面文本（仅限脚本）。 |
+
+方法：`fit()`、`select(ids)`、`toPng()`（一个 `Blob`）、`toSvg()`
+（`{ svg, width, height }`）、`undo()`、`redo()`。Getter：`value`（白板）。
+
+事件：`dsk:change` `{ board, ops, origin }`；`dsk:select` `{ ids }`；
+`dsk:load` `{ objects }`。
+
 ## `<dsk-markdown>`
 
 ```html
