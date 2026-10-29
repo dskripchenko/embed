@@ -5,14 +5,14 @@
  * our tags, so the host page's own CSS wins.
  */
 
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor) {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor) {
   display: block;
   min-width: 0;
   position: relative;
 }
 
 /* Before the upgrade: the raw source is not shown. */
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor):not([data-dsk-state]) {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor):not([data-dsk-state]) {
   visibility: hidden;
   min-height: 2rem;
   overflow: hidden;
@@ -56,16 +56,16 @@
  * and images must stay as they are. Overlays (menus, drawers, tooltips) are
  * teleported to <body>, hence the uid-* match.
  */
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']),
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *,
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::before,
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::after {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']),
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *,
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::before,
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::after {
   box-sizing: border-box;
 }
 :where(dsk-video, dsk-audio, dsk-openapi, dsk-flow, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) :where(button, input, textarea, select) {
   font: inherit;
 }
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-markdown, dsk-editor, .dsk-block, body > [class^='uid-'], body > [class*=' uid-']) {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, body > [class^='uid-'], body > [class*=' uid-']) {
   font-family: var(--uid-font-family-sans);
   line-height: var(--uid-line-height-normal);
   color: var(--uid-text-primary);
@@ -149,7 +149,7 @@
 }
 :where(.dsk-block--mermaid) { overflow-x: auto; }
 :where(.dsk-block--mermaid) svg { display: block; max-width: 100%; height: auto; margin-inline: auto; }
-:where(.dsk-flow-frame) {
+:where(.dsk-flow-frame, .dsk-board-frame) {
   position: relative;
   border: 1px solid var(--uid-border-subtle);
   border-radius: var(--uid-radius-md);

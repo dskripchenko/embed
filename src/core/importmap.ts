@@ -25,6 +25,8 @@ export const RUNTIME_FILES: Readonly<Record<string, readonly [string, string]>> 
   '@dskripchenko/flow': ['@dskripchenko/flow', 'dist/index.mjs'],
   '@dskripchenko/flow/vue': ['@dskripchenko/flow', 'dist/vue.mjs'],
   '@dskripchenko/flow/mermaid': ['@dskripchenko/flow', 'dist/mermaid.mjs'],
+  '@dskripchenko/board': ['@dskripchenko/board', 'dist/index.mjs'],
+  '@dskripchenko/board/vue': ['@dskripchenko/board', 'dist/vue.mjs'],
 }
 
 /** Stylesheets of the runtime packages: [package, path]. */
@@ -34,6 +36,7 @@ export const RUNTIME_STYLES: Readonly<Record<string, readonly [string, string]>>
   kit: ['@dskripchenko/ui', 'dist/styles/index.css'],
   openapi: ['@dskripchenko/openapi', 'dist/style.css'],
   flow: ['@dskripchenko/flow', 'dist/style.css'],
+  board: ['@dskripchenko/board', 'dist/style.css'],
   editor: ['@dskripchenko/wysiwyg', 'dist/style.css'],
 }
 

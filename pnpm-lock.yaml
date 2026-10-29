@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@dskripchenko/board':
+        specifier: 0.2.0
+        version: 0.2.0(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/diagrams':
         specifier: 1.1.0
         version: 1.1.0
@@ -136,6 +139,18 @@ packages:
   '@csstools/css-tokenizer@4.0.2':
     resolution: {integrity: sha512-OoKoR0f76dCY666JlcbhmVTs2drYj1GUXZTYTcbUgJjh9Nv41aFfZ21bPQTERm5+L5cBDo466NltB2lplS5GBw==}
     engines: {node: '>=20.19.0'}
+
+  '@dskripchenko/board@0.2.0':
+    resolution: {integrity: sha512-mAO6QxR3X4SnnWt3JZbE7GZywX+PP2E5T+t2d2a6igUNtu3ldiEuVBB9KKEcQf4kTqa3IdhASRRzYQYmyxv4rw==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@dskripchenko/ui': ^1.17.0
+      vue: ^3.4.0
+    peerDependenciesMeta:
+      '@dskripchenko/ui':
+        optional: true
+      vue:
+        optional: true
 
   '@dskripchenko/diagrams@1.1.0':
     resolution: {integrity: sha512-Q07LPeEGlwT8xhb9RrnFlzbtAvRkvupT4RaUj70sJO4WTcZOgj0hZOHUgq3pRVsszGoB76rjK55JnZKbxv+iaw==}
@@ -1192,6 +1207,11 @@ snapshots:
       css-tree: 3.2.1
 
   '@csstools/css-tokenizer@4.0.2': {}
+
+  '@dskripchenko/board@0.2.0(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+    optionalDependencies:
+      '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))
+      vue: 3.5.44(typescript@6.0.3)
 
   '@dskripchenko/diagrams@1.1.0': {}
 

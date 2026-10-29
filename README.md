@@ -46,7 +46,8 @@ video; the markdown's diagram is live; the editor submits HTML with the form.
 | `<dsk-diagram>` | Mermaid → SVG, 11 diagram types, no Vue loaded | [`@dskripchenko/diagrams`](https://github.com/dskripchenko/diagrams) |
 | `<dsk-openapi>` | full reference (several specs), one operation, or a live API block | [`@dskripchenko/openapi`](https://github.com/dskripchenko/openapi) |
 | `<dsk-flow>` | process view with monitoring, toggles and sub-processes over plain HTTP — or the editor | [`@dskripchenko/flow`](https://github.com/dskripchenko/flow) |
-| `<dsk-markdown>` | markdown with live `mermaid` / `openapi` / `flow` / `video` / `audio` blocks | `@dskripchenko/ui` |
+| `<dsk-board>` | infinite whiteboard: shapes, stickies, frames, connectors, pen — a view, an editor, or a shared board edited in real time | [`@dskripchenko/board`](https://github.com/dskripchenko/board) |
+| `<dsk-markdown>` | markdown with live `mermaid` / `openapi` / `flow` / `board` / `video` / `audio` blocks | `@dskripchenko/ui` |
 | `<dsk-editor>` | WYSIWYG with the same live blocks; a form field | [`@dskripchenko/wysiwyg`](https://github.com/dskripchenko/wysiwyg) |
 
 All of them: attributes ↔ properties, `dsk:*` events, `ready`, `loading="lazy"`,
@@ -85,6 +86,7 @@ serves Brotli, a little smaller):
 | `<dsk-diagram>` | plugin 0.8 KB, `@dskripchenko/diagrams` 99.7 KB, kit tokens 2.4 KB | no Vue, no kit components |
 | `<dsk-openapi>` | plugin 1.4 KB, `@dskripchenko/openapi` 180.5 KB + CSS 10.5 KB, icons 5.2 KB | |
 | `<dsk-flow>` | plugin 2.5 KB, `@dskripchenko/flow` 79.9 KB + CSS 4.6 KB, icons 5.2 KB; the Mermaid import (2.4 KB + diagrams) only for Mermaid sources and the editor | |
+| `<dsk-board>` | plugin 1.3 KB, `@dskripchenko/board` 46.4 KB (its icons inside) + CSS 1.9 KB | |
 | `<dsk-markdown>` | plugin 0.5 KB | blocks load their own plugins |
 | `<dsk-editor>` | plugin 1.1 KB, `@dskripchenko/wysiwyg` 18.2 KB + CSS 2.3 KB, icons 5.2 KB | |
 

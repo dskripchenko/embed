@@ -87,6 +87,60 @@ function cdnHandler(req, res) {
   return file ? sendFile(req, res, file, cors) : res.writeHead(404, cors).end()
 }
 
+/** A shared board for <dsk-board board-url>: the reference server of @dskripchenko/board behind its HTTP contract. */
+const { BoardServer } = await import(realpathSync(resolve(root, 'node_modules/@dskripchenko/board/dist/index.mjs')))
+let board = new BoardServer()
+const boardWaiters = new Set()
+
+function readJson(req) {
+  return new Promise((done) => {
+    let raw = ''
+    req.on('data', (c) => (raw += c))
+    req.on('end', () => done(raw ? JSON.parse(raw) : {}))
+  })
+}
+
+async function boardApi(req, res, url) {
+  const send = (body, status = 200) => res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end(JSON.stringify(body))
+  const sub = url.pathname.slice('/api/board'.length)
+  if (sub === '/snapshot') return send(board.snapshot())
+  if (sub === '/reset' && req.method === 'POST') {
+    board = new BoardServer()
+    return send({ ok: true })
+  }
+  if (sub === '/batches' && req.method === 'POST') {
+    const { batch, fresh } = board.receive(await readJson(req))
+    if (fresh) for (const w of boardWaiters) w()
+    return send({ seq: batch.seq })
+  }
+  if (sub === '/batches') {
+    const after = Number(url.searchParams.get('after') ?? 0)
+    const wait = Math.min(Number(url.searchParams.get('wait') ?? 0), 25) * 1000
+    const answer = () => {
+      const batches = board.since(after)
+      if (batches === null) return send({ error: 'too old' }, 410)
+      send({ batches })
+    }
+    if ((board.since(after) ?? [1]).length > 0 || wait === 0) return answer()
+    // Long polling: answer when a batch arrives, or after the wait.
+    let timer
+    const wake = () => {
+      clearTimeout(timer)
+      boardWaiters.delete(wake)
+      answer()
+    }
+    boardWaiters.add(wake)
+    timer = setTimeout(wake, wait)
+    req.on('close', () => {
+      clearTimeout(timer)
+      boardWaiters.delete(wake)
+    })
+    return
+  }
+  if (sub === '/presence' && req.method === 'POST') return send({ presence: board.touch(await readJson(req)) })
+  send({ error: 'not found' }, 404)
+}
+
 /** The fake monitoring endpoint: the active step moves on every poll. */
 let tick = 0
 const STEPS = ['create', 'pay', 'paid', 'ship']
@@ -95,6 +149,7 @@ function pageHandler(cdnOrigin) {
   return async (req, res) => {
     const url = new URL(req.url, 'http://x')
     const p = decodeURIComponent(url.pathname)
+    if (p.startsWith('/api/board/')) return boardApi(req, res, url)
     if (p === '/api/state') {
       const path = url.searchParams.get('path') ?? ''
       log.polls = [...(log.polls ?? []), path]

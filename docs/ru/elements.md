@@ -314,6 +314,54 @@ timeline, xychart, mindmap — рендерится в SVG через `@dskripch
 `{ nodes, edges }`; редактор: `dsk:change` `{ graph, description, source }`,
 `dsk:validate` `{ issues }`.
 
+## `<dsk-board>`
+
+Бесконечная доска ([`@dskripchenko/board`](https://github.com/dskripchenko/board)):
+фигуры, стикеры, блоки, заголовки и текст, связи, эмодзи, карандаш и
+маркер. По умолчанию — просмотр только для чтения; `editable` включает
+редактор; `board-url` делает её совместной доской, которую одновременно
+правят несколько человек.
+
+```html
+<!-- A board from a file, read-only -->
+<dsk-board src="/boards/retro.json" height="560"></dsk-board>
+
+<!-- An editor in a form: the board's JSON goes in a hidden input -->
+<form method="post">
+  <dsk-board editable name="board"></dsk-board>
+</form>
+
+<!-- A shared board: real-time editing through the server -->
+<dsk-board board-url="/api/boards/42" user-name="Anna" user-color="#ec4899"></dsk-board>
+```
+
+**Совместная доска** общается с `board-url` по
+[HTTP-соглашению доски](https://github.com/dskripchenko/board/blob/main/docs/en/collaboration.md#the-http-contract):
+`GET {base}/snapshot`, `POST {base}/batches`, `GET {base}/batches?after=N&wait=S`
+(long polling), `POST {base}/presence`. Эталонная серверная логика — `BoardServer`
+из пакета. Запросы несут cookies страницы.
+
+| Атрибут | Свойство | |
+|---|---|---|
+| `src` | `src` | URL доски (JSON). Подходит и текст элемента (JSON в `<script type="application/json">`). |
+| — | `board` | Доска объектом (только из скрипта); приоритетнее `src` и содержимого. |
+| `board-url` | `boardUrl` | Базовый URL совместной доски: совместная работа. |
+| — | `provider` | Любой другой транспорт (только из скрипта): `BoardProvider` — WebSocket, `MemoryHub`. |
+| `editable` | `editable` | Редактор (для доски из `src` или содержимого). |
+| `readonly` | `readonly` | Совместная доска: только просмотр. |
+| `lockable` | `lockable` | Может блокировать и разблокировать доску для всех (по умолчанию `true`); `false` — для тех, кому нельзя. |
+| `user-name`, `user-color`, `user-id` | camelCase | Кто правит: виден остальным на совместной доске. |
+| `name` | `name` | Держит внутри элемента скрытый `<input name>` с JSON доски — обычная форма его отправит. |
+| `minimap` | `minimap` | Миникарта (по умолчанию включена). |
+| `height` | `height` | По умолчанию 560; либо CSS-переменная `--dsk-board-height`. |
+| — | `labels` | Строки интерфейса (только из скрипта). |
+
+Методы: `fit()`, `select(ids)`, `toPng()` (`Blob`), `toSvg()`
+(`{ svg, width, height }`), `undo()`, `redo()`. Геттер: `value` (доска).
+
+События: `dsk:change` `{ board, ops, origin }`; `dsk:select` `{ ids }`;
+`dsk:load` `{ objects }`.
+
 ## `<dsk-markdown>`
 
 ```html

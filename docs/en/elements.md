@@ -311,6 +311,53 @@ persisted (`ok: true`) or refused (`ok: false`, rolled back);
 `{ nodes, edges }`; editor: `dsk:change` `{ graph, description, source }`,
 `dsk:validate` `{ issues }`.
 
+## `<dsk-board>`
+
+An infinite whiteboard ([`@dskripchenko/board`](https://github.com/dskripchenko/board)):
+shapes, sticky notes, frames, titles and text, connectors, emoji, pen and
+marker. A read-only view by default; `editable` turns on the editor;
+`board-url` makes it a shared board several people edit at once.
+
+```html
+<!-- A board from a file, read-only -->
+<dsk-board src="/boards/retro.json" height="560"></dsk-board>
+
+<!-- An editor in a form: the board's JSON goes in a hidden input -->
+<form method="post">
+  <dsk-board editable name="board"></dsk-board>
+</form>
+
+<!-- A shared board: real-time editing through the server -->
+<dsk-board board-url="/api/boards/42" user-name="Anna" user-color="#ec4899"></dsk-board>
+```
+
+**The shared board** talks to `board-url` by
+[the HTTP contract of the board](https://github.com/dskripchenko/board/blob/main/docs/en/collaboration.md#the-http-contract):
+`GET {base}/snapshot`, `POST {base}/batches`, `GET {base}/batches?after=N&wait=S`
+(long polling), `POST {base}/presence`. The package's `BoardServer` is the
+reference server logic. Requests carry the page's cookies.
+
+| Attribute | Property | |
+|---|---|---|
+| `src` | `src` | The board's URL (JSON). The element's text (JSON in a `<script type="application/json">`) works too. |
+| — | `board` | The board as an object (script only); wins over `src` and content. |
+| `board-url` | `boardUrl` | The shared board's base URL: collaboration. |
+| — | `provider` | Any other transport (script only): a `BoardProvider` — a WebSocket, a `MemoryHub`. |
+| `editable` | `editable` | The editor (for a board from `src` or content). |
+| `readonly` | `readonly` | Shared board: view only. |
+| `lockable` | `lockable` | May lock and unlock the board for everyone (default `true`); set `false` for people who must not. |
+| `user-name`, `user-color`, `user-id` | camelCase | Who edits: shown to the others on a shared board. |
+| `name` | `name` | Keeps a hidden `<input name>` with the board's JSON inside the element — a plain form submits it. |
+| `minimap` | `minimap` | The minimap (default on). |
+| `height` | `height` | Default 560; or the CSS variable `--dsk-board-height`. |
+| — | `labels` | Interface strings (script only). |
+
+Methods: `fit()`, `select(ids)`, `toPng()` (a `Blob`), `toSvg()`
+(`{ svg, width, height }`), `undo()`, `redo()`. Getter: `value` (the board).
+
+Events: `dsk:change` `{ board, ops, origin }`; `dsk:select` `{ ids }`;
+`dsk:load` `{ objects }`.
+
 ## `<dsk-markdown>`
 
 ```html

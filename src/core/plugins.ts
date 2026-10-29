@@ -11,4 +11,5 @@ export const PLUGIN_STYLES: Readonly<Record<PluginName, readonly StyleName[]>> =
   openapi: ['tokens', 'themes', 'kit', 'openapi'],
   flow: ['tokens', 'themes', 'kit', 'flow'],
   editor: ['tokens', 'themes', 'kit', 'editor'],
+  board: ['tokens', 'themes', 'kit', 'board'],
 }

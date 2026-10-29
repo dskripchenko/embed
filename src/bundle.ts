@@ -14,6 +14,7 @@ import kitComponents from '@dskripchenko/ui/styles/index.css?inline'
 import openapiCss from '@dskripchenko/openapi/style.css?inline'
 import flowCss from '@dskripchenko/flow/style.css?inline'
 import editorCss from '@dskripchenko/wysiwyg/style.css?inline'
+import boardCss from '@dskripchenko/board/style.css?inline'
 import { BASE_CSS } from './core/baseCss'
 import { autoRenderBlocks, createEmbed, pageConfig, type DskEmbedApi } from './core/embed'
 import { injectStyle } from './core/styles'
@@ -24,6 +25,7 @@ import * as openapi from './plugins/openapi'
 import * as flow from './plugins/flow'
 import * as markdown from './plugins/markdown'
 import * as editor from './plugins/editor'
+import * as board from './plugins/board'
 
 declare global {
   interface Window {
@@ -31,7 +33,7 @@ declare global {
   }
 }
 
-const PLUGINS: Record<PluginName, PluginModule> = { media, diagram, openapi, flow, markdown, editor }
+const PLUGINS: Record<PluginName, PluginModule> = { media, diagram, openapi, flow, markdown, editor, board }
 
 function boot(): void {
   if (window.DskEmbed) {
@@ -39,7 +41,7 @@ function boot(): void {
     return
   }
   const script = document.currentScript instanceof HTMLScriptElement ? document.currentScript : null
-  injectStyle('kit', [kitTokens, kitThemes, kitComponents, openapiCss, flowCss, editorCss].join('\n'))
+  injectStyle('kit', [kitTokens, kitThemes, kitComponents, openapiCss, flowCss, editorCss, boardCss].join('\n'))
   injectStyle('base', BASE_CSS)
   const api = createEmbed({
     mode: 'bundle',

@@ -32,6 +32,7 @@ export const ELEMENTS: Readonly<Record<string, ElementSpec>> = {
     objects: ['graph', 'loadSubgraph', 'persistToggle', 'labels', 'registry'],
   },
   'dsk-markdown': { plugin: 'markdown', methods: [], getters: ['value'], objects: [] },
+  'dsk-board': { plugin: 'board', methods: ['fit', 'select', 'toPng', 'toSvg', 'undo', 'redo'], getters: ['value'], objects: ['board', 'provider', 'labels'] },
   'dsk-editor': { plugin: 'editor', methods: ['focus'], getters: ['controller'], objects: [] },
 }
 

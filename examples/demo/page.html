@@ -230,6 +230,14 @@
       </form>
     </section>
 
+    <section id="board">
+      <h2 data-i18n="s6">A whiteboard</h2>
+      <p class="lead" data-i18n="s6lead">Stickies, shapes, frames, connectors, emoji, pen and marker. <code>editable</code> turns on the editor; <code>board-url</code> would make it a shared board edited in real time.</p>
+      <div class="card">
+        <dsk-board id="retro" src="data/retro-board.json" editable height="560"></dsk-board>
+      </div>
+    </section>
+
     <section id="more">
       <h2 data-i18n="s5">Audio, diagrams and HTML from a CMS</h2>
       <p class="lead" data-i18n="s5lead">A playlist with a waveform, a diagram from inline source, and <code>DskEmbed.renderBlocks()</code> turning stored HTML into widgets.</p>
@@ -287,6 +295,7 @@ DskEmbed.renderBlocks(document.querySelector('#cms'))</code></pre>
         s3: 'Markdown с живыми блоками', s3lead: 'Блоки mermaid, openapi, flow и video становятся виджетами — тот же реестр обслуживает редактор ниже.',
         s4: 'Редактор в обычной форме', s4lead: 'В WYSIWYG — живой API-блок. name="body" держит скрытое поле в синхроне, и форма отправляет HTML без единой строчки скрипта.',
         submit: 'Отправить форму', formhint: 'Скрытое поле следует за каждой правкой.',
+        s6: 'Доска', s6lead: 'Стикеры, фигуры, блоки, связи, эмодзи, карандаш и маркер. editable включает редактор; board-url сделал бы её совместной доской с правкой в реальном времени.',
         s5: 'Аудио, диаграммы и HTML из CMS', s5lead: 'Плейлист с волной, диаграмма из встроенного кода и DskEmbed.renderBlocks(), превращающий сохранённый HTML в виджеты.',
         playlist: 'Плейлист', diagram: 'Архитектура', cms: 'Сохранённый HTML', cmstext: 'Этот блок — обычный HTML, как его хранит CMS. Один вызов оживляет его блоки кода:',
         footer: 'Собрано из @dskripchenko/ui, wysiwyg, diagrams, openapi и flow — один Vue, один кит, зафиксированные версии.',

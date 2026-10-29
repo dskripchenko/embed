@@ -71,7 +71,7 @@ async function open(browserName, path, { viewport = DESKTOP, phone = false } = {
 /** Waits until every element on the page is ready (or failed). */
 async function settle(page, timeout = 20000) {
   await page.waitForFunction(
-    () => [...document.querySelectorAll('dsk-video,dsk-audio,dsk-diagram,dsk-openapi,dsk-flow,dsk-markdown,dsk-editor')]
+    () => [...document.querySelectorAll('dsk-video,dsk-audio,dsk-diagram,dsk-openapi,dsk-flow,dsk-board,dsk-markdown,dsk-editor')]
       .filter((e) => e.getAttribute('loading') !== 'lazy' || e.hasAttribute('data-dsk-state'))
       .every((e) => ['ready', 'error'].includes(e.getAttribute('data-dsk-state'))),
     null,
@@ -387,6 +387,8 @@ for (const browserName of Object.keys(browsers)) {
   for (const variant of ['loader', 'bundle']) {
     const tag = `${browserName}/${variant}/check`
     if (!wants(tag)) continue
+    // Each run starts with an empty shared board.
+    await fetch(`${BASE}/api/board/reset`, { method: 'POST' })
     const { page, errors, close } = await open(browserName, `/check.html?embed=${variant}`)
     try {
       await settle(page)
@@ -443,6 +445,37 @@ for (const browserName of Object.keys(browsers)) {
       })
       check(`${tag}: inside a sub-process the poll carries path=ship`, (serverLog.polls ?? []).includes('ship'), JSON.stringify([...new Set(serverLog.polls)]))
       check(`${tag}: subgraph-url loads a referenced sub-process`, nav.nodes.includes('pack') && nav.seen.some((p) => p.join() === 'ship'), JSON.stringify(nav))
+
+      // <dsk-board>: a view, an editor with a form input, a shared board and a markdown block.
+      const bd = await page.evaluate(() => ({
+        view: document.querySelectorAll('#view-board .bd-sticky, #view-board .bd-shape').length,
+        viewTools: !!document.querySelector('#view-board .bd-tools'),
+        editTools: !!document.querySelector('#edit-board .bd-tools'),
+        block: document.querySelectorAll('#md-board .bd-sticky').length,
+      }))
+      check(`${tag}: <dsk-board> renders a board read-only`, bd.view === 2 && !bd.viewTools, JSON.stringify(bd))
+      check(`${tag}: <dsk-board editable> has the tools`, bd.editTools)
+      check(`${tag}: a \`\`\`board block in markdown`, bd.block === 1, JSON.stringify(bd))
+      const eb = await page.locator('#edit-board .bd-canvas').boundingBox()
+      await page.locator('#edit-board').scrollIntoViewIfNeeded()
+      const eb2 = await page.locator('#edit-board .bd-canvas').boundingBox()
+      await page.mouse.dblclick(eb2.x + eb2.width / 2, eb2.y + eb2.height / 2)
+      await page.keyboard.type('Typed in embed')
+      await page.keyboard.press('Escape')
+      await sleep(300)
+      const input = await page.evaluate(() => document.querySelector('#edit-board input[name=board]')?.value ?? '')
+      check(`${tag}: editing a board fills its form input`, input.includes('Typed in embed'), input.slice(0, 80))
+      void eb
+      // Shared: a sticky made in A appears in B through board-url (on a fresh board).
+      await page.locator('#shared-a').scrollIntoViewIfNeeded()
+      const sa = await page.locator('#shared-a .bd-canvas').boundingBox()
+      const before = await page.locator('#shared-b .bd-sticky').count()
+      await page.mouse.dblclick(sa.x + sa.width / 2, sa.y + sa.height / 2)
+      await page.keyboard.type('Shared')
+      await page.keyboard.press('Escape')
+      await page.waitForFunction((n) => document.querySelectorAll('#shared-b .bd-sticky').length > n, before, { timeout: 8000 }).catch(() => {})
+      const shared = await page.evaluate(() => ({ b: document.querySelectorAll('#shared-b .bd-sticky').length, text: document.querySelector('#shared-b .bd-sticky text')?.textContent ?? '' }))
+      check(`${tag}: board-url: a sticky made in one element appears in the other`, shared.b === before + 1, JSON.stringify(shared))
 
       const r = await page.evaluate(() => ({
         mermaidFlow: document.querySelectorAll('#mermaid-flow [data-node-id]').length,
