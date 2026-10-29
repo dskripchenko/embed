@@ -51,7 +51,7 @@
     "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
-    "@dskripchenko/board": "0.2.0",
+    "@dskripchenko/board": "0.2.1",
     "@dskripchenko/diagrams": "1.1.0",
     "@dskripchenko/flow": "1.1.1",
     "@dskripchenko/openapi": "1.1.3",
