@@ -219,6 +219,7 @@ export const SCHEMAS: Readonly<Record<string, Schema>> = {
     ...COMMON,
     { prop: 'src', type: 'string' },
     { prop: 'boardUrl', type: 'string' },
+    { prop: 'pollInterval', type: 'number' },
     { prop: 'editable', type: 'boolean' },
     { prop: 'readonly', type: 'boolean' },
     { prop: 'lockable', type: 'boolean' },

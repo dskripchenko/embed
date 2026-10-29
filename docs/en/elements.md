@@ -342,6 +342,7 @@ reference server logic. Requests carry the page's cookies.
 | `src` | `src` | The board's URL (JSON). The element's text (JSON in a `<script type="application/json">`) works too. |
 | — | `board` | The board as an object (script only); wins over `src` and content. |
 | `board-url` | `boardUrl` | The shared board's base URL: collaboration. |
+| `poll-interval` | `pollInterval` | Shared board: ask for changes every N ms (at least 250) instead of long polling — for servers that cannot hold a request open. |
 | — | `provider` | Any other transport (script only): a `BoardProvider` — a WebSocket, a `MemoryHub`. |
 | `editable` | `editable` | The editor (for a board from `src` or content). |
 | `readonly` | `readonly` | Shared board: view only. |

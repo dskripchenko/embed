@@ -57,11 +57,15 @@ export function mountElement(ctx: ElementContext): ElementInstance {
   }
 
   /** The shared board: one provider per `board-url`, replaced when it changes. */
-  function providerFor(base: string): BoardProvider {
-    if (provider && providerBase === base) return provider
+  function providerFor(base: string, interval: unknown): BoardProvider {
+    // poll-interval: plain polling every N ms instead of long polling (for
+    // servers that cannot hold a request open).
+    const every = typeof interval === 'number' && interval > 0 ? Math.max(250, interval) : 0
+    const key = `${base}|${every}`
+    if (provider && providerBase === key) return provider
     provider?.close?.()
-    provider = httpProvider({ base })
-    providerBase = base
+    provider = httpProvider(every ? { base, wait: 0, interval: every } : { base })
+    providerBase = key
     return provider
   }
 
@@ -102,7 +106,7 @@ export function mountElement(ctx: ElementContext): ElementInstance {
         minimap: props.minimap !== false,
         ...(props.labels && typeof props.labels === 'object' ? { labels: props.labels } : {}),
         ...(shared
-          ? { provider: props.provider && typeof props.provider === 'object' ? props.provider : providerFor(props.boardUrl as string), user }
+          ? { provider: props.provider && typeof props.provider === 'object' ? props.provider : providerFor(props.boardUrl as string, props.pollInterval), user }
           : { modelValue: model.value }),
         style: { height: '100%' },
         'onUpdate:modelValue': (board: Board) => {

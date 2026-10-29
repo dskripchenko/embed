@@ -9,7 +9,7 @@
   editor (`editable`, with a form input through `name`), or a shared board
   several people edit at once (`board-url`, the board's HTTP contract;
   `provider` for any other transport) with cursors, names and the board
-  lock (`lockable`). Methods `fit`, `select`, `toPng`, `toSvg`, `undo`,
+  lock (`lockable`); `poll-interval` polls instead of long polling. Methods `fit`, `select`, `toPng`, `toSvg`, `undo`,
   `redo`; events `dsk:change`, `dsk:select`, `dsk:load`.
 - **```board blocks** in markdown, the editor and `renderBlocks`: a
   read-only board from its JSON.

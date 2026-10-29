@@ -316,6 +316,7 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 | `src` | `src` | 白板的 URL（JSON）。也可以使用元素的文本（`<script type="application/json">` 中的 JSON）。 |
 | — | `board` | 以对象形式提供的白板（仅限脚本）；优先于 `src` 和元素内容。 |
 | `board-url` | `boardUrl` | 共享白板的基础 URL：协作。 |
+| `poll-interval` | `pollInterval` | 共享白板：每 N 毫秒（至少 250）请求一次更改，而不是长轮询——适用于无法保持请求打开的服务器。 |
 | — | `provider` | 任何其他传输方式（仅限脚本）：一个 `BoardProvider`——WebSocket、`MemoryHub`。 |
 | `editable` | `editable` | 编辑器（用于来自 `src` 或元素内容的白板）。 |
 | `readonly` | `readonly` | 共享白板：仅查看。 |

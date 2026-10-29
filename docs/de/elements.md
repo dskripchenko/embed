@@ -349,6 +349,7 @@ Referenz-Serverlogik. Requests tragen die Cookies der Seite.
 | `src` | `src` | Die URL des Boards (JSON). Der Text des Elements (JSON in einem `<script type="application/json">`) funktioniert ebenfalls. |
 | — | `board` | Das Board als Objekt (nur per Script); hat Vorrang vor `src` und Inhalt. |
 | `board-url` | `boardUrl` | Die Basis-URL des gemeinsamen Boards: Zusammenarbeit. |
+| `poll-interval` | `pollInterval` | Gemeinsames Board: alle N ms (mindestens 250) nach Änderungen fragen statt Long Polling — für Server, die eine Anfrage nicht offen halten können. |
 | — | `provider` | Jeder andere Transport (nur per Script): ein `BoardProvider` — ein WebSocket, ein `MemoryHub`. |
 | `editable` | `editable` | Der Editor (für ein Board aus `src` oder Inhalt). |
 | `readonly` | `readonly` | Gemeinsames Board: nur ansehen. |
