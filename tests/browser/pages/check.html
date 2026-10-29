@@ -19,6 +19,9 @@
       <script type="application/json">{"version":1,"objects":{"s1":{"id":"s1","type":"sticky","color":"pink","text":"Hello from a board","x":0,"y":0,"w":200,"h":200,"z":"a0"},"s2":{"id":"s2","type":"shape","kind":"ellipse","text":"Shape","x":260,"y":40,"w":160,"h":100,"z":"a1"},"c1":{"id":"c1","type":"connector","from":{"id":"s1"},"to":{"id":"s2"},"route":"curve","x":0,"y":0,"w":0,"h":0,"z":"a2"}}}</script>
     </dsk-board>
     <dsk-board id="edit-board" editable name="board" height="320"></dsk-board>
+    <dsk-flow id="no-fs" fullscreen="false" height="200"><script type="text/plain">stateDiagram-v2
+  [*] --> A
+  A --> [*]</script></dsk-flow>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <dsk-board id="shared-a" board-url="/api/board" user-name="Anna" user-color="#ec4899" height="300"></dsk-board>
       <dsk-board id="shared-b" board-url="/api/board" poll-interval="400" user-name="Boris" user-color="#3b82f6" height="300"></dsk-board>

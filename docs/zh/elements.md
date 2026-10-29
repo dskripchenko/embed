@@ -35,6 +35,17 @@
 - **事件**——名为 `dsk:<name>` 的冒泡 `CustomEvent`，负载位于 `detail` 中；每个元素都会触发
   `dsk:ready`，无法渲染时触发带 `{ message }` 的 `dsk:error`。见[事件](config-and-events.md#事件)。
 
+## 全屏
+
+`<dsk-diagram>`、`<dsk-flow>`、`<dsk-board>` 和 `<dsk-openapi>` 在悬停时（触摸屏上始终）
+显示全屏按钮。元素通过 Fullscreen API 进入全屏；在不支持的地方（iOS Safari 中的普通元素）
+则覆盖页面填满窗口。按 Escape 或再次点击按钮退出；流程图和白板会将内容适配到新尺寸。
+播放器有自己的全屏模式。
+
+- `fullscreen="false"` — 不显示按钮。
+- 方法 `enterFullscreen()`、`exitFullscreen()`；Getter `fullscreen`。
+- 事件 `dsk:fullscreen` `{ active }`。
+
 ## `<dsk-video>`
 
 ```html

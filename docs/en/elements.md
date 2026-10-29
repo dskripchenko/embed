@@ -41,6 +41,19 @@ Common to all elements:
   in `detail`; every element emits `dsk:ready`, and `dsk:error` with
   `{ message }` when it cannot render. See [events](config-and-events.md#events).
 
+## Full screen
+
+`<dsk-diagram>`, `<dsk-flow>`, `<dsk-board>` and `<dsk-openapi>` show a
+full-screen button on hover (always on touch screens). The element goes full
+screen with the Fullscreen API — or, where that is not available (plain
+elements in iOS Safari), fills the window over the page. Escape or the button
+leaves it; a flow and a board fit their content to the new size. Players have
+their own full screen.
+
+- `fullscreen="false"` — no button.
+- Methods `enterFullscreen()`, `exitFullscreen()`; getter `fullscreen`.
+- Event `dsk:fullscreen` `{ active }`.
+
 ## `<dsk-video>`
 
 ```html

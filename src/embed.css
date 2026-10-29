@@ -157,3 +157,53 @@
   background: var(--uid-surface-raised);
 }
 :where(.dsk-media) { min-width: 0; }
+
+/* Full screen (core/fullscreen.ts): the button, and the element filling the screen. */
+:where(dsk-diagram, dsk-flow, dsk-board, dsk-openapi)[data-dsk-state='ready'] { position: relative; }
+.dsk-fs-button {
+  position: absolute;
+  z-index: 20;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--uid-border-subtle, #e5e7eb);
+  border-radius: var(--uid-radius-md, 8px);
+  background: var(--uid-surface-raised, #fff);
+  color: var(--uid-text-secondary, #4b5563);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+:where(dsk-diagram, dsk-flow, dsk-board, dsk-openapi):hover > .dsk-fs-button,
+.dsk-fs-button:focus-visible,
+[data-dsk-fullscreen] > .dsk-fs-button { opacity: 1; }
+.dsk-fs-button:hover { color: var(--uid-text-primary, #111827); }
+@media (hover: none) { .dsk-fs-button { opacity: 1; } }
+/* Out of the widgets' own controls: a board's people and a flow's status sit top right,
+   a reference's search and downloads too. */
+dsk-board > .dsk-fs-button, dsk-flow > .dsk-fs-button { right: auto; left: 8px; }
+dsk-openapi > .dsk-fs-button { top: auto; bottom: 8px; }
+
+:where(dsk-diagram, dsk-flow, dsk-board, dsk-openapi)[data-dsk-fullscreen] {
+  --dsk-flow-height: 100vh;
+  --dsk-board-height: 100vh;
+  --dsk-openapi-height: calc(100vh - 32px);
+  box-sizing: border-box;
+  overflow: auto;
+  background: var(--uid-surface, #fff);
+}
+:where(dsk-diagram, dsk-openapi)[data-dsk-fullscreen] { padding: 16px; }
+[data-dsk-fullscreen] .dsk-flow-frame,
+[data-dsk-fullscreen] .dsk-board-frame { border: 0; border-radius: 0; }
+dsk-diagram[data-dsk-fullscreen] .dsk-diagram { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 32px); }
+/* The SVG carries an inline `max-width:100%; height:auto`: the full-screen size has to win over it. */
+dsk-diagram[data-dsk-fullscreen] .dsk-diagram svg { width: 100% !important; height: calc(100vh - 32px) !important; max-width: none !important; }
+/* Without the Fullscreen API: over the page, in the window. */
+.dsk-fs-fallback { position: fixed !important; inset: 0; z-index: 2147483000; margin: 0 !important; }
+.dsk-fs-locked, .dsk-fs-locked body { overflow: hidden !important; }

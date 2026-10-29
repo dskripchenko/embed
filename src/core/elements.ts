@@ -8,6 +8,7 @@
 import { SCHEMAS, attrOf, readAttributes, camel, type Schema } from './attrs'
 import { DATA_CHILDREN, readMediaChildren, readSource } from './source'
 import { normalizeLocale } from './config'
+import { attachFullscreen, FULLSCREEN_TAGS, type FullscreenControl } from './fullscreen'
 import type { ElementContext, ElementInstance, Host, Locale, PluginName } from './types'
 
 export interface ElementSpec {
@@ -82,6 +83,7 @@ function createElementClass(tag: string, spec: ElementSpec, schema: Schema): Cus
     _children: { sources: Record<string, string>[]; tracks: Record<string, string>[] } = { sources: [], tracks: [] }
     _instance: ElementInstance | null = null
     _container: HTMLElement | null = null
+    _fullscreen: FullscreenControl | null = null
     _starting = false
     _waitingForParse = false
     _updateQueued = false
@@ -207,6 +209,27 @@ function createElementClass(tag: string, spec: ElementSpec, schema: Schema): Cus
             locale: () => this._locale(),
           }
           this._instance = plugin.mountElement(ctx)
+          // A full-screen button on the visual elements (fullscreen="false" turns it off).
+          if (FULLSCREEN_TAGS.has(tag) && this.getAttribute('fullscreen') !== 'false') {
+            this._fullscreen = attachFullscreen(this, this._locale(), (active) => {
+              host.emit('fullscreen', { active }, this)
+              // Boards and flows fit their new size once the layout has settled.
+              const fit = (this as unknown as { fit?: () => unknown }).fit
+              if (typeof fit === 'function' && (tag === 'dsk-flow' || tag === 'dsk-board')) {
+                // After the widget has taken its new size: on the element's next resize, or a moment later.
+                let done = false
+                const run = () => {
+                  if (done) return
+                  done = true
+                  observer?.disconnect()
+                  requestAnimationFrame(() => Promise.resolve().then(() => fit.call(this)).catch(() => undefined))
+                }
+                const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(() => setTimeout(run, 50)) : null
+                observer?.observe(this)
+                setTimeout(run, 400)
+              }
+            })
+          }
           this.setAttribute('data-dsk-state', 'ready')
           this._resolveReady()
           host.emit('ready', { tag }, this)
@@ -237,6 +260,8 @@ function createElementClass(tag: string, spec: ElementSpec, schema: Schema): Cus
         }
       }
       this._instance = null
+      this._fullscreen?.destroy()
+      this._fullscreen = null
       this._container?.remove()
       this._container = null
       this.removeAttribute('data-dsk-state')
@@ -245,6 +270,21 @@ function createElementClass(tag: string, spec: ElementSpec, schema: Schema): Cus
   }
 
   const proto = Element.prototype as unknown as Record<string, unknown>
+
+  if (FULLSCREEN_TAGS.has(tag)) {
+    proto.enterFullscreen = function (this: Element) {
+      this._fullscreen?.enter()
+    }
+    proto.exitFullscreen = function (this: Element) {
+      this._fullscreen?.exit()
+    }
+    Object.defineProperty(proto, 'fullscreen', {
+      configurable: true,
+      get(this: Element) {
+        return this._fullscreen?.active ?? false
+      },
+    })
+  }
 
   // Attribute-backed properties: a value set from script wins over the attribute.
   for (const prop of schema) {
