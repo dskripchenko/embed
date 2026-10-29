@@ -23,16 +23,16 @@ export interface ElementSpec {
 export const ELEMENTS: Readonly<Record<string, ElementSpec>> = {
   'dsk-video': { plugin: 'media', methods: ['play', 'pause', 'toggle', 'seek', 'playChapter'], getters: ['state', 'media', 'chapters'], objects: [] },
   'dsk-audio': { plugin: 'media', methods: ['play', 'pause', 'toggle', 'seek', 'next', 'prev'], getters: ['state', 'media'], objects: [] },
-  'dsk-diagram': { plugin: 'diagram', methods: [], getters: ['svg'], objects: [] },
-  'dsk-openapi': { plugin: 'openapi', methods: ['go', 'open', 'print'], getters: ['loaded', 'value'], objects: ['spec', 'send', 'labels'] },
+  'dsk-diagram': { plugin: 'diagram', methods: ['enterFullscreen', 'exitFullscreen'], getters: ['svg', 'fullscreen'], objects: [] },
+  'dsk-openapi': { plugin: 'openapi', methods: ['go', 'open', 'print', 'enterFullscreen', 'exitFullscreen'], getters: ['loaded', 'value', 'fullscreen'], objects: ['spec', 'send', 'labels'] },
   'dsk-flow': {
     plugin: 'flow',
-    methods: ['fit', 'select', 'enter', 'back', 'refresh', 'undo', 'redo'],
-    getters: ['stack'],
+    methods: ['fit', 'select', 'enter', 'back', 'refresh', 'undo', 'redo', 'enterFullscreen', 'exitFullscreen'],
+    getters: ['stack', 'fullscreen'],
     objects: ['graph', 'loadSubgraph', 'persistToggle', 'labels', 'registry'],
   },
   'dsk-markdown': { plugin: 'markdown', methods: [], getters: ['value'], objects: [] },
-  'dsk-board': { plugin: 'board', methods: ['fit', 'select', 'toPng', 'toSvg', 'undo', 'redo'], getters: ['value'], objects: ['board', 'provider', 'labels'] },
+  'dsk-board': { plugin: 'board', methods: ['fit', 'select', 'toPng', 'toSvg', 'undo', 'redo', 'enterFullscreen', 'exitFullscreen'], getters: ['value', 'fullscreen'], objects: ['board', 'provider', 'labels'] },
   'dsk-editor': { plugin: 'editor', methods: ['focus'], getters: ['controller'], objects: [] },
 }
 

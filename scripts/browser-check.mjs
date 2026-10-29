@@ -477,6 +477,29 @@ for (const browserName of Object.keys(browsers)) {
       const shared = await page.evaluate(() => ({ b: document.querySelectorAll('#shared-b .bd-sticky').length, text: document.querySelector('#shared-b .bd-sticky text')?.textContent ?? '' }))
       check(`${tag}: board-url: a sticky made in one element appears in the other`, shared.b === before + 1, JSON.stringify(shared))
 
+      // Full screen: the button on each visual element; the element fills the screen and comes back.
+      for (const sel of ['#view-board', '#mermaid-flow', '#from-src', '#ref2']) {
+        const el = page.locator(sel)
+        await el.scrollIntoViewIfNeeded()
+        await el.hover()
+        const button = page.locator(`${sel} > .dsk-fs-button`)
+        // It fades in on hover.
+        const shown = (await button.count()) === 1 && (await page.waitForFunction((b) => getComputedStyle(b).opacity === '1', await button.elementHandle(), { timeout: 2000 }).then(() => true, () => false))
+        await button.click()
+        await page.waitForFunction((s) => document.querySelector(s)?.hasAttribute('data-dsk-fullscreen'), sel, { timeout: 5000 }).catch(() => {})
+        await sleep(400)
+        const full = await page.evaluate((s) => {
+          const r = document.querySelector(s).getBoundingClientRect()
+          return { on: document.querySelector(s).fullscreen, w: Math.round(r.width), h: Math.round(r.height), vw: window.innerWidth, vh: window.innerHeight }
+        }, sel)
+        if (tag.startsWith('chromium/loader')) await page.screenshot({ path: resolve(out, `fullscreen-${sel.slice(1)}.png`) })
+        await page.keyboard.press('Escape')
+        await page.waitForFunction((s) => !document.querySelector(s)?.hasAttribute('data-dsk-fullscreen'), sel, { timeout: 5000 }).catch(() => {})
+        const off = await page.evaluate((s) => document.querySelector(s).fullscreen, sel)
+        check(`${tag}: full screen: ${sel} goes full screen and back`, shown && full.on && full.w >= full.vw - 2 && full.h >= full.vh - 2 && off === false, JSON.stringify({ shown, ...full, off }))
+      }
+      check(`${tag}: full screen: fullscreen="false" has no button`, (await page.locator('#no-fs > .dsk-fs-button').count()) === 0)
+
       const r = await page.evaluate(() => ({
         mermaidFlow: document.querySelectorAll('#mermaid-flow [data-node-id]').length,
         editorFlow: !!document.querySelector('#editor-flow .fl-editor, #editor-flow [class*="editor"]'),

@@ -43,6 +43,19 @@ Allen Elementen gemeinsam:
   in `detail`; jedes Element sendet `dsk:ready` sowie `dsk:error` mit
   `{ message }`, wenn es nicht rendern kann. Siehe [Events](config-and-events.md#events).
 
+## Vollbild
+
+`<dsk-diagram>`, `<dsk-flow>`, `<dsk-board>` und `<dsk-openapi>` zeigen beim
+Überfahren (auf Touchscreens immer) eine Vollbild-Schaltfläche. Das Element
+geht über die Fullscreen API ins Vollbild — oder füllt, wo sie fehlt (einfache
+Elemente in Safari auf iOS), das Fenster über der Seite. Escape oder die
+Schaltfläche beenden es; Flow und Board passen ihren Inhalt an die neue Größe
+an. Die Player haben ein eigenes Vollbild.
+
+- `fullscreen="false"` — keine Schaltfläche.
+- Methoden `enterFullscreen()`, `exitFullscreen()`; Getter `fullscreen`.
+- Event `dsk:fullscreen` `{ active }`.
+
 ## `<dsk-video>`
 
 ```html

@@ -51,7 +51,7 @@ video; the markdown's diagram is live; the editor submits HTML with the form.
 | `<dsk-editor>` | WYSIWYG with the same live blocks; a form field | [`@dskripchenko/wysiwyg`](https://github.com/dskripchenko/wysiwyg) |
 
 All of them: attributes ↔ properties, `dsk:*` events, `ready`, `loading="lazy"`,
-light DOM (your CSS applies). → [Elements](docs/en/elements.md)
+light DOM (your CSS applies); diagrams, flows, boards and references open full screen. → [Elements](docs/en/elements.md)
 
 ## Working together
 

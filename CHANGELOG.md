@@ -1,5 +1,15 @@
 # @dskripchenko/embed
 
+## 1.2.0 — Unreleased
+
+### Added
+- **Full screen** for `<dsk-diagram>`, `<dsk-flow>`, `<dsk-board>` and
+  `<dsk-openapi>`: a button on hover puts the element full screen (the
+  Fullscreen API, or the whole window where it is not available); Escape or
+  the button leaves. Flows and boards fit their content to the new size.
+  `fullscreen="false"` hides the button; `enterFullscreen()`,
+  `exitFullscreen()`, `fullscreen`, `dsk:fullscreen` `{ active }`.
+
 ## 1.1.0 — 2026-10-29
 
 ### Added

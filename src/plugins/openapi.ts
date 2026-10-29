@@ -14,6 +14,7 @@ import { OpenApiBlock, OpenApiEditor, OpenApiOperation, OpenApiReference, proxyS
 import { cssLength } from '../core/attrs'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
 import { errorText, fetchText, instanceRef, mountElementView, mountView, setupRuntime, state, hc } from './runtime'
+import { withFullscreen } from './fullscreen'
 
 export function setup(host: Host): void {
   setupRuntime(host)
@@ -178,14 +179,23 @@ export function mountElement(ctx: ElementContext): ElementInstance {
     return r
   }
 
+  const fs = withFullscreen(ctx)
   return {
     update() {
       // A new source from outside replaces what was edited in the widget.
       if (ctx.source() !== v.view.source) blockText = null
       v.refresh()
     },
-    destroy: () => v.unmount(),
+    destroy: () => {
+      fs?.destroy()
+      v.unmount()
+    },
     api: {
+      enterFullscreen: () => fs?.enter(),
+      exitFullscreen: () => fs?.exit(),
+      get fullscreen() {
+        return fs?.active ?? false
+      },
       /** Opens an operation (`createOrder`, `operation/createOrder`), a schema or a tag. */
       go: (target: string, options?: { tryIt?: boolean }) => reference().go(anchorOf(String(target)), options),
       open: (id: string) => reference().open(id),

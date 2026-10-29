@@ -21,6 +21,7 @@ import { FlowEditor, FlowView } from '@dskripchenko/flow/vue'
 import { cssLength } from '../core/attrs'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
 import { errorText, fetchText, instanceRef, mountElementView, mountView, setupRuntime, state, hc } from './runtime'
+import { withFullscreen } from './fullscreen'
 
 export function setup(host: Host): void {
   setupRuntime(host)
@@ -256,6 +257,7 @@ export function mountElement(ctx: ElementContext): ElementInstance {
     return (fn as (...a: unknown[]) => unknown)(...args)
   }
 
+  const fs = withFullscreen(ctx, () => comp.ref.value?.fit?.())
   return {
     update() {
       v.refresh()
@@ -263,11 +265,17 @@ export function mountElement(ctx: ElementContext): ElementInstance {
       if (ctx.props().editable && !mermaidSync) void loadMermaid().then((m) => (mermaidSync = m.fromMermaid), () => undefined)
     },
     destroy() {
+      fs?.destroy()
       v.unmount()
       input?.remove()
     },
     api: {
       fit: call('fit'),
+      enterFullscreen: () => fs?.enter(),
+      exitFullscreen: () => fs?.exit(),
+      get fullscreen() {
+        return fs?.active ?? false
+      },
       select: call('select'),
       enter: call('enter'),
       back: call('back'),
