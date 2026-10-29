@@ -8,6 +8,7 @@
  */
 import { DiagramError, render } from '@dskripchenko/diagrams'
 import type { BlockRenderer, ElementContext, ElementInstance } from '../core/types'
+import { withFullscreen } from './fullscreen'
 
 let sequence = 0
 const textCache = new Map<string, Promise<string>>()
@@ -77,10 +78,19 @@ export function mountElement(ctx: ElementContext): ElementInstance {
   }
 
   void draw()
+  const fs = withFullscreen(ctx)
   return {
     update: () => void draw(),
-    destroy: () => box.remove(),
+    destroy: () => {
+      fs?.destroy()
+      box.remove()
+    },
     api: {
+      enterFullscreen: () => fs?.enter(),
+      exitFullscreen: () => fs?.exit(),
+      get fullscreen() {
+        return fs?.active ?? false
+      },
       get svg() {
         return box.querySelector('svg')
       },

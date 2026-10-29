@@ -4,10 +4,11 @@
  * elements in iOS Safari — fills the window over the page. Escape, the button
  * or the browser's own gesture leave it.
  */
-import type { Locale } from './types'
+import type { ElementContext, Locale } from '../core/types'
+import fullscreenCss from '../fullscreen.css?inline'
+import { injectStyle } from '../core/styles'
 
-/** The elements that get the button; players have their own full screen. */
-export const FULLSCREEN_TAGS = new Set(['dsk-diagram', 'dsk-flow', 'dsk-board', 'dsk-openapi'])
+// In the plugins (a chunk they share), not in the loader: the loader stays small.
 
 const LABELS: Record<'en' | 'ru', { enter: string; exit: string }> = {
   en: { enter: 'Full screen', exit: 'Exit full screen' },
@@ -28,6 +29,7 @@ export interface FullscreenControl {
 }
 
 export function attachFullscreen(el: HTMLElement, locale: Locale, onChange: (active: boolean) => void): FullscreenControl {
+  injectStyle('fullscreen', fullscreenCss, el.ownerDocument)
   const button = document.createElement('button')
   button.type = 'button'
   button.className = 'dsk-fs-button'
@@ -122,4 +124,32 @@ export function attachFullscreen(el: HTMLElement, locale: Locale, onChange: (act
       button.remove()
     },
   }
+}
+
+/**
+ * The button for a plugin's element, unless `fullscreen="false"`. `fit` runs
+ * once the element has its new size (flows and boards fit their content).
+ */
+export function withFullscreen(ctx: ElementContext, fit?: () => void): FullscreenControl | null {
+  if (ctx.el.getAttribute('fullscreen') === 'false') return null
+  return attachFullscreen(ctx.el, ctx.locale(), (active) => {
+    ctx.emit('fullscreen', { active })
+    if (!fit) return
+    let done = false
+    const run = () => {
+      if (done) return
+      done = true
+      observer?.disconnect()
+      requestAnimationFrame(() => {
+        try {
+          fit()
+        } catch {
+          // Not ready yet: nothing to fit.
+        }
+      })
+    }
+    const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(() => setTimeout(run, 50)) : null
+    observer?.observe(ctx.el)
+    setTimeout(run, 400)
+  })
 }
