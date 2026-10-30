@@ -8,6 +8,8 @@
 import { DrawioError, parseDrawio, render, type DrawioFile } from '@dskripchenko/drawio'
 import type { BlockRenderer, ElementContext, ElementInstance } from '../core/types'
 import { withFullscreen } from './fullscreen'
+import drawioCss from '../drawio.css?inline'
+import { injectStyle } from '../core/styles'
 
 let sequence = 0
 const textCache = new Map<string, Promise<string>>()
@@ -34,6 +36,7 @@ function message(error: unknown): string {
 }
 
 export function mountElement(ctx: ElementContext): ElementInstance {
+  injectStyle('drawio', drawioCss, ctx.el.ownerDocument)
   const root = document.createElement('div')
   root.className = 'dsk-drawio'
   const tabs = document.createElement('div')

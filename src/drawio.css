@@ -1,0 +1,29 @@
+/* <dsk-drawio> (plugins/drawio.ts): the file's pages as tabs over the drawing. */
+:where(.dsk-drawio__pages) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: var(--uid-space-sm, 8px);
+  border-bottom: 1px solid var(--uid-border-subtle, #e5e7eb);
+}
+:where(.dsk-drawio__pages[hidden]) { display: none; }
+:where(.dsk-drawio__tab) {
+  padding: 6px 12px;
+  margin-bottom: -1px;
+  border: 1px solid transparent;
+  border-radius: var(--uid-radius-md, 8px) var(--uid-radius-md, 8px) 0 0;
+  background: none;
+  color: var(--uid-text-secondary, #4b5563);
+  font: 500 var(--uid-font-size-sm, 13px) / 1.4 var(--uid-font-family-sans, system-ui, sans-serif);
+  cursor: pointer;
+}
+:where(.dsk-drawio__tab):hover { color: var(--uid-text-primary, #111827); }
+:where(.dsk-drawio__tab[aria-selected='true']) {
+  border-color: var(--uid-border-subtle, #e5e7eb);
+  border-bottom-color: var(--uid-surface, #fff);
+  background: var(--uid-surface, #fff);
+  color: var(--uid-text-primary, #111827);
+}
+:where(.dsk-drawio__tab):focus-visible { outline: 2px solid var(--uid-color-focus-ring, #3b82f6); outline-offset: -2px; }
+:where(.dsk-drawio__page) { overflow-x: auto; }
+:where(.dsk-drawio__page) > svg { display: block; max-width: 100%; height: auto; margin-inline: auto; }
