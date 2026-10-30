@@ -5,14 +5,14 @@
  * our tags, so the host page's own CSS wins.
  */
 
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor) {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio) {
   display: block;
   min-width: 0;
   position: relative;
 }
 
 /* Before the upgrade: the raw source is not shown. */
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor):not([data-dsk-state]) {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio):not([data-dsk-state]) {
   visibility: hidden;
   min-height: 2rem;
   overflow: hidden;
@@ -32,7 +32,9 @@
 :where(dsk-video[data-dsk-state='loading']) { aspect-ratio: 16 / 9; }
 :where(dsk-audio[data-dsk-state='loading']) { min-height: 72px; }
 :where(dsk-diagram[data-dsk-state='loading'], dsk-markdown[data-dsk-state='loading']) { min-height: 120px; }
-:where(dsk-openapi[data-dsk-state='loading'], dsk-editor[data-dsk-state='loading']) { min-height: 240px; }
+:where(dsk-openapi[data-dsk-state='loading'], dsk-asyncapi[data-dsk-state='loading'], dsk-editor[data-dsk-state='loading']) { min-height: 240px; }
+:where(dsk-bpmn[data-dsk-state='loading'], dsk-dmn[data-dsk-state='loading']) { min-height: 480px; }
+:where(dsk-drawio[data-dsk-state='loading']) { min-height: 160px; }
 :where(.dsk-block[data-dsk-state='loading']) { min-height: 96px; }
 @keyframes dsk-pulse { 50% { opacity: 0.55; } }
 @media (prefers-reduced-motion: reduce) {
@@ -56,16 +58,16 @@
  * and images must stay as they are. Overlays (menus, drawers, tooltips) are
  * teleported to <body>, hence the uid-* match.
  */
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']),
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *,
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::before,
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::after {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']),
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) *,
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) *::before,
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) *::after {
   box-sizing: border-box;
 }
-:where(dsk-video, dsk-audio, dsk-openapi, dsk-flow, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) :where(button, input, textarea, select) {
+:where(dsk-video, dsk-audio, dsk-openapi, dsk-asyncapi, dsk-flow, dsk-editor, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) :where(button, input, textarea, select) {
   font: inherit;
 }
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, body > [class^='uid-'], body > [class*=' uid-']) {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, body > [class^='uid-'], body > [class*=' uid-']) {
   font-family: var(--uid-font-family-sans);
   line-height: var(--uid-line-height-normal);
   color: var(--uid-text-primary);
@@ -147,9 +149,10 @@
   margin: var(--uid-space-md, 12px) 0;
   min-width: 0;
 }
-:where(.dsk-block--mermaid) { overflow-x: auto; }
-:where(.dsk-block--mermaid) svg { display: block; max-width: 100%; height: auto; margin-inline: auto; }
-:where(.dsk-flow-frame, .dsk-board-frame) {
+:where(.dsk-block--mermaid, .dsk-block--plantuml, .dsk-block--puml, .dsk-block--dot, .dsk-block--graphviz, .dsk-block--d2, .dsk-block--dbml, .dsk-block--structurizr, .dsk-block--wardley, .dsk-block--bpmn, .dsk-block--dmn, .dsk-block--drawio) { overflow-x: auto; }
+:where(.dsk-block--mermaid, .dsk-block--plantuml, .dsk-block--puml, .dsk-block--dot, .dsk-block--graphviz, .dsk-block--d2, .dsk-block--dbml, .dsk-block--structurizr, .dsk-block--wardley, .dsk-block--bpmn, .dsk-block--drawio) svg,
+:where(.dsk-block--dmn) .dsk-dmn-block > svg { display: block; max-width: 100%; height: auto; margin-inline: auto; }
+:where(.dsk-flow-frame, .dsk-board-frame, .dsk-bpmn-frame) {
   position: relative;
   border: 1px solid var(--uid-border-subtle);
   border-radius: var(--uid-radius-md);
@@ -157,3 +160,33 @@
   background: var(--uid-surface-raised);
 }
 :where(.dsk-media) { min-width: 0; }
+
+/* draw.io: the file's pages as tabs over the drawing. */
+:where(.dsk-drawio__pages) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: var(--uid-space-sm, 8px);
+  border-bottom: 1px solid var(--uid-border-subtle, #e5e7eb);
+}
+:where(.dsk-drawio__pages[hidden]) { display: none; }
+:where(.dsk-drawio__tab) {
+  padding: 6px 12px;
+  margin-bottom: -1px;
+  border: 1px solid transparent;
+  border-radius: var(--uid-radius-md, 8px) var(--uid-radius-md, 8px) 0 0;
+  background: none;
+  color: var(--uid-text-secondary, #4b5563);
+  font: 500 var(--uid-font-size-sm, 13px) / 1.4 var(--uid-font-family-sans, system-ui, sans-serif);
+  cursor: pointer;
+}
+:where(.dsk-drawio__tab):hover { color: var(--uid-text-primary, #111827); }
+:where(.dsk-drawio__tab[aria-selected='true']) {
+  border-color: var(--uid-border-subtle, #e5e7eb);
+  border-bottom-color: var(--uid-surface, #fff);
+  background: var(--uid-surface, #fff);
+  color: var(--uid-text-primary, #111827);
+}
+:where(.dsk-drawio__tab):focus-visible { outline: 2px solid var(--uid-color-focus-ring, #3b82f6); outline-offset: -2px; }
+:where(.dsk-drawio__page) { overflow-x: auto; }
+:where(.dsk-drawio__page) > svg { display: block; max-width: 100%; height: auto; margin-inline: auto; }
