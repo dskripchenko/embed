@@ -1,6 +1,6 @@
 # @dskripchenko/embed
 
-## 1.4.0 — Unreleased
+## 1.4.0 — 2026-10-31
 
 ### Added
 - **More diagram syntaxes**: `<dsk-diagram>` and blocks draw PlantUML
