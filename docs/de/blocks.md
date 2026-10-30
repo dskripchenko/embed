@@ -15,6 +15,11 @@ seitenweite Registry bedient jede Stelle, an der Blöcke vorkommen:
 | Sprache | Wird zu | Lädt |
 |---|---|---|
 | `mermaid` | SVG-Diagramm | diagrams |
+| `plantuml` (`puml`), `dot` (`graphviz`), `d2`, `dbml`, `structurizr`, `wardley` | SVG-Diagramm in dieser Syntax | diagrams |
+| `bpmn` | einen BPMN-2.0-Prozess im Layout des Modelers | bpmn |
+| `dmn` | das Entscheidungsanforderungsdiagramm und die Tabelle jeder Entscheidung | bpmn |
+| `drawio` | die erste Seite einer draw.io-Datei (einfach oder komprimiert) | drawio |
+| `asyncapi` | eine AsyncAPI-2.x-/3.0-Referenz | openapi |
 | `openapi` | das lebendige API-Widget: eine Anfrage, mehrere oder ein ganzes Dokument | openapi |
 | `flow` | eine Prozessansicht, aus JSON oder Mermaid-Quelltext (state/flowchart) | flow |
 | `board` | ein schreibgeschütztes Whiteboard, aus dem JSON des Boards | board |

@@ -14,7 +14,7 @@ const dist = resolve(root, 'dist')
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
 
 /** The runtime packages, pinned to the exact versions installed (and tested). */
-const RUNTIME = ['vue', '@dskripchenko/ui', '@dskripchenko/wysiwyg', '@dskripchenko/diagrams', '@dskripchenko/openapi', '@dskripchenko/flow', '@dskripchenko/board']
+const RUNTIME = ['vue', '@dskripchenko/ui', '@dskripchenko/wysiwyg', '@dskripchenko/diagrams', '@dskripchenko/openapi', '@dskripchenko/flow', '@dskripchenko/board', '@dskripchenko/bpmn', '@dskripchenko/drawio']
 // Not every package exports ./package.json: read it from node_modules directly.
 const pkgDir = (name) => realpathSync(resolve(root, 'node_modules', name))
 const versions = Object.fromEntries(RUNTIME.map((name) => [name, JSON.parse(readFileSync(join(pkgDir(name), 'package.json'), 'utf8')).version]))
@@ -61,6 +61,7 @@ for (const [name, file] of [
   ['@dskripchenko/openapi', 'dist/vue.mjs'],
   ['@dskripchenko/flow', 'dist/vue.mjs'],
   ['@dskripchenko/board', 'dist/vue.mjs'],
+  ['@dskripchenko/bpmn', 'dist/vue.mjs'],
   ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
 ]) {
   const code = readFileSync(join(pkgDir(name), file), 'utf8')
@@ -70,7 +71,7 @@ for (const [name, file] of [
 }
 
 // ---- 2. The plugin modules ----
-const plugins = ['media', 'diagram', 'openapi', 'flow', 'markdown', 'editor', 'board']
+const plugins = ['media', 'diagram', 'openapi', 'flow', 'markdown', 'editor', 'board', 'bpmn', 'drawio']
 await build({
   root,
   configFile: false,
@@ -161,6 +162,9 @@ const files = {
   '@dskripchenko/flow/mermaid': ['@dskripchenko/flow', 'dist/mermaid.mjs'],
   '@dskripchenko/board': ['@dskripchenko/board', 'dist/index.mjs'],
   '@dskripchenko/board/vue': ['@dskripchenko/board', 'dist/vue.mjs'],
+  '@dskripchenko/bpmn': ['@dskripchenko/bpmn', 'dist/index.mjs'],
+  '@dskripchenko/bpmn/vue': ['@dskripchenko/bpmn', 'dist/vue.mjs'],
+  '@dskripchenko/drawio': ['@dskripchenko/drawio', 'dist/index.mjs'],
 }
 const imports = Object.fromEntries(Object.entries(files).map(([spec, [name, path]]) => [spec, `${cdn}${name}@${versions[name]}/${path}`]))
 writeFileSync(resolve(dist, 'importmap.json'), JSON.stringify({ imports }, null, 2) + '\n')

@@ -14,6 +14,11 @@
 | 语言 | 渲染为 | 加载 |
 |---|---|---|
 | `mermaid` | SVG 图表 | diagrams |
+| `plantuml`（`puml`）、`dot`（`graphviz`）、`d2`、`dbml`、`structurizr`、`wardley` | 该语法的 SVG 图表 | diagrams |
+| `bpmn` | 按建模工具布局绘制的 BPMN 2.0 流程 | bpmn |
+| `dmn` | 决策需求图及每个决策的决策表 | bpmn |
+| `drawio` | draw.io 文件（普通或压缩）的第一页 | drawio |
+| `asyncapi` | AsyncAPI 2.x / 3.0 参考 | openapi |
 | `openapi` | 实时 API 组件：一个请求、多个请求或整个文档 | openapi |
 | `flow` | 流程视图，源为 JSON 或 Mermaid state/flowchart | flow |
 | `board` | 只读白板，源为白板的 JSON | board |

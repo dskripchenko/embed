@@ -1,6 +1,31 @@
 # @dskripchenko/embed
 
-## 1.3.0 — Unreleased
+## 1.4.0 — Unreleased
+
+### Added
+- **More diagram syntaxes**: `<dsk-diagram>` and blocks draw PlantUML
+  (```` ```plantuml ````, ```` ```puml ````), Graphviz DOT (```` ```dot ````,
+  ```` ```graphviz ````), D2, DBML, Structurizr DSL and Wardley maps
+  (@dskripchenko/diagrams 1.3.0); `syntax` names the syntax when it is not
+  recognised from the source.
+- **`<dsk-bpmn>` and `<dsk-dmn>`** (new `bpmn` plugin, @dskripchenko/bpmn
+  0.4.0): BPMN 2.0 processes and DMN decisions as laid out in their modeler —
+  a view with pan, zoom, highlight and clicks, or with `editable` the editor
+  (`name` keeps the XML in a form field). ```` ```bpmn ```` and
+  ```` ```dmn ```` blocks draw the diagram (and DMN decision tables).
+- **`<dsk-drawio>`** (new `drawio` plugin, @dskripchenko/drawio 0.1.0):
+  draw.io files — compressed or plain pages, `.drawio.svg` — with page tabs;
+  ```` ```drawio ```` blocks. No Vue.
+- **`<dsk-asyncapi>`** and ```` ```asyncapi ```` blocks: AsyncAPI 2.x / 3.0
+  references (@dskripchenko/openapi 1.2.0).
+- Per-plugin bundles `bundles/bpmn.js` and `bundles/drawio.js`.
+
+### Changed
+- Runtime: @dskripchenko/ui 1.17.0, diagrams 1.3.0, flow 1.2.0 (EPC, DFD
+  and IDEF0 notations), openapi 1.2.0; bpmn 0.4.0 and drawio 0.1.0 added to
+  the import map.
+
+## 1.3.0 — 2026-10-30
 
 ### Added
 - **Per-plugin bundles** — `dist/bundles/<plugin>.js` (`media`, `diagram`,

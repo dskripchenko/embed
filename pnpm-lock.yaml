@@ -10,22 +10,28 @@ importers:
     devDependencies:
       '@dskripchenko/board':
         specifier: 0.2.1
-        version: 0.2.1(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 0.2.1(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/bpmn':
+        specifier: 0.4.0
+        version: 0.4.0(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/diagrams':
-        specifier: 1.1.0
-        version: 1.1.0
+        specifier: 1.3.0
+        version: 1.3.0
+      '@dskripchenko/drawio':
+        specifier: 0.1.0
+        version: 0.1.0
       '@dskripchenko/flow':
-        specifier: 1.1.1
-        version: 1.1.1(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: 1.2.0
+        version: 1.2.0(@dskripchenko/diagrams@1.3.0)(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/openapi':
-        specifier: 1.1.3
-        version: 1.1.3(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: 1.2.0
+        version: 1.2.0(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/ui':
-        specifier: 1.16.0
-        version: 1.16.0(vue@3.5.44(typescript@6.0.3))
+        specifier: 1.17.0
+        version: 1.17.0(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/wysiwyg':
         specifier: 0.5.3
-        version: 0.5.3(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 0.5.3(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.13.0)
@@ -152,12 +158,28 @@ packages:
       vue:
         optional: true
 
-  '@dskripchenko/diagrams@1.1.0':
-    resolution: {integrity: sha512-Q07LPeEGlwT8xhb9RrnFlzbtAvRkvupT4RaUj70sJO4WTcZOgj0hZOHUgq3pRVsszGoB76rjK55JnZKbxv+iaw==}
+  '@dskripchenko/bpmn@0.4.0':
+    resolution: {integrity: sha512-846PCqWnymSgCsUR9e+kCrBpikyFj3h9Ss/GJFNU29impCZuFhr3338XSq7wNVNU6E5a7U08wwpaIajwZvwm2A==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@dskripchenko/ui': ^1.17.0
+      vue: ^3.4.0
+    peerDependenciesMeta:
+      '@dskripchenko/ui':
+        optional: true
+      vue:
+        optional: true
+
+  '@dskripchenko/diagrams@1.3.0':
+    resolution: {integrity: sha512-a9/BEBBYvZQKNIOov3Clz2Mrpu6/zNrybyxueHofvXdgeAEPDC5R+fnopULG19CXF0w49E58hIOL7OTJ3Z4d7w==}
     engines: {node: '>=20'}
 
-  '@dskripchenko/flow@1.1.1':
-    resolution: {integrity: sha512-9W8Q5+lxLkRFOAhpFAl3NI74hjedA1SJaz5+WNKDPC+jTnr6NLL5HpT27SSZ1OoZFdiujMJbmnI2STtPcOz8kw==}
+  '@dskripchenko/drawio@0.1.0':
+    resolution: {integrity: sha512-QJ0rAPq6sItt/dy0oKAfI/2DGS+/kjgC2+h5kl+QyZlcqntkW6fHaK98MXEwSC5YDC9cvbRA2aoy8PeKWg4SFA==}
+    engines: {node: '>=20'}
+
+  '@dskripchenko/flow@1.2.0':
+    resolution: {integrity: sha512-4KfI61U55sVSwZuraL+aj9yfZiSyFO2uOwZvEawR+GcU94EW8Dn9U57bUU4rjsQnATcHrLfMy+xnd62KXIIUSA==}
     engines: {node: '>=20'}
     peerDependencies:
       '@dskripchenko/diagrams': ^1.1.0
@@ -171,8 +193,8 @@ packages:
       vue:
         optional: true
 
-  '@dskripchenko/openapi@1.1.3':
-    resolution: {integrity: sha512-SZainjPUlMlhfedYAc/8//mTg8KFuDa5SYMgD9oaopYKpP/Tb4emr/Iiul3uRnAa2GBIPAmCnuPhWSSetOuKNQ==}
+  '@dskripchenko/openapi@1.2.0':
+    resolution: {integrity: sha512-nuQSXyFrPtSymwELuPnlipgsTCSV2Nf3c6bCf0z7XJgDDviXLf35rzOooJsQ2DmHfLyD4BTEBGBrs1hS+3CsHQ==}
     engines: {node: '>=20'}
     peerDependencies:
       '@dskripchenko/ui': ^1.13.0
@@ -183,8 +205,8 @@ packages:
       vue:
         optional: true
 
-  '@dskripchenko/ui@1.16.0':
-    resolution: {integrity: sha512-6J3l0vaiBHQdAWyCyIIgLAJoh7U2DldKXlFvWij5BGcGVIrQ76o2xtvclRHTzpk3LT7y1+zq17xnn7Dbr8cS9Q==}
+  '@dskripchenko/ui@1.17.0':
+    resolution: {integrity: sha512-kjTL5kRTfJ9n3brb2/40/u/1XnmzeKoa1D8cLIGw5W+1AVv5yfoJaoowiP5ELjCIuobRPHJgGUTqqOk/5lM2pw==}
     engines: {node: '>=20'}
     peerDependencies:
       vue: ^3.4.0
@@ -1208,34 +1230,41 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.2': {}
 
-  '@dskripchenko/board@0.2.1(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/board@0.2.1(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
-      '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.17.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/diagrams@1.1.0': {}
-
-  '@dskripchenko/flow@1.1.1(@dskripchenko/diagrams@1.1.0)(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/bpmn@0.4.0(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
-      '@dskripchenko/diagrams': 1.1.0
-      '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.17.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/openapi@1.1.3(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/diagrams@1.3.0': {}
+
+  '@dskripchenko/drawio@0.1.0': {}
+
+  '@dskripchenko/flow@1.2.0(@dskripchenko/diagrams@1.3.0)(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
-      '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/diagrams': 1.3.0
+      '@dskripchenko/ui': 1.17.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/openapi@1.2.0(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+    optionalDependencies:
+      '@dskripchenko/ui': 1.17.0(vue@3.5.44(typescript@6.0.3))
+      vue: 3.5.44(typescript@6.0.3)
+
+  '@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       lucide-vue-next: 0.460.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/wysiwyg@0.5.3(@dskripchenko/ui@1.16.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/wysiwyg@0.5.3(@dskripchenko/ui@1.17.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       vue: 3.5.44(typescript@6.0.3)
     optionalDependencies:
-      '@dskripchenko/ui': 1.16.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.17.0(vue@3.5.44(typescript@6.0.3))
 
   '@eslint-community/eslint-utils@4.10.1(eslint@10.13.0)':
     dependencies:

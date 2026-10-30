@@ -1,12 +1,13 @@
 /**
- * `<dsk-diagram>` and ```mermaid blocks: Mermaid source → SVG through
+ * `<dsk-diagram>` and diagram blocks — ```mermaid, ```plantuml, ```dot,
+ * ```d2, ```dbml, ```structurizr, ```wardley: source → SVG through
  * @dskripchenko/diagrams. No Vue here: a page with diagrams alone loads the
  * diagrams package and nothing else. The SVG escapes every label by
  * construction, which is what makes it safe to insert as markup; its colours
  * are `--dg-*` custom properties, mapped onto the kit's theme tokens in the
  * embed's base stylesheet, so both themes follow.
  */
-import { DiagramError, render } from '@dskripchenko/diagrams'
+import { DiagramError, render, type Syntax } from '@dskripchenko/diagrams'
 import type { BlockRenderer, ElementContext, ElementInstance } from '../core/types'
 import { withFullscreen } from './fullscreen'
 
@@ -57,7 +58,8 @@ export function mountElement(ctx: ElementContext): ElementInstance {
     if (key === lastKey) return
     lastKey = key
     try {
-      const result = render(code, { idPrefix: `dsk-dg-${++sequence}`, ...(label ? { title: label } : {}) })
+      const syntax = typeof props.syntax === 'string' ? (props.syntax as Syntax) : undefined
+      const result = render(code, { idPrefix: `dsk-dg-${++sequence}`, ...(syntax ? { syntax } : {}), ...(label ? { title: label } : {}) })
       box.innerHTML = result.svg
       ctx.emit('render', { type: result.type, width: result.width, height: result.height })
     } catch (error) {
@@ -98,13 +100,28 @@ export function mountElement(ctx: ElementContext): ElementInstance {
   }
 }
 
-export const renderers: Record<string, BlockRenderer> = {
-  mermaid(code) {
+/** The syntax each block language is written in. */
+export const LANGUAGES: Readonly<Record<string, Syntax>> = {
+  mermaid: 'mermaid',
+  plantuml: 'plantuml',
+  puml: 'plantuml',
+  dot: 'dot',
+  graphviz: 'dot',
+  d2: 'd2',
+  dbml: 'dbml',
+  structurizr: 'structurizr',
+  wardley: 'wardley',
+}
+
+function block(syntax: Syntax): BlockRenderer {
+  return (code) => {
     try {
-      return { html: render(code, { idPrefix: `dsk-dg-${++sequence}` }).svg }
+      return { html: render(code, { syntax, idPrefix: `dsk-dg-${++sequence}` }).svg }
     } catch (error) {
       if (error instanceof DiagramError) return { error: message(error) }
       throw error
     }
-  },
+  }
 }
+
+export const renderers: Record<string, BlockRenderer> = Object.fromEntries(Object.entries(LANGUAGES).map(([language, syntax]) => [language, block(syntax)]))

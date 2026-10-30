@@ -6,5 +6,6 @@ import openapi from '@dskripchenko/openapi/style.css?inline'
 import flow from '@dskripchenko/flow/style.css?inline'
 import editor from '@dskripchenko/wysiwyg/style.css?inline'
 import board from '@dskripchenko/board/style.css?inline'
+import bpmn from '@dskripchenko/bpmn/style.css?inline'
 
-export const STYLES = { tokens, themes, kit, openapi, flow, editor, board } as const
+export const STYLES = { tokens, themes, kit, openapi, flow, editor, board, bpmn } as const

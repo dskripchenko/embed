@@ -34,6 +34,10 @@ export const ELEMENTS: Readonly<Record<string, ElementSpec>> = {
   'dsk-markdown': { plugin: 'markdown', methods: [], getters: ['value'], objects: [] },
   'dsk-board': { plugin: 'board', methods: ['fit', 'select', 'toPng', 'toSvg', 'undo', 'redo', 'enterFullscreen', 'exitFullscreen'], getters: ['value', 'fullscreen'], objects: ['board', 'provider', 'labels'] },
   'dsk-editor': { plugin: 'editor', methods: ['focus'], getters: ['controller'], objects: [] },
+  'dsk-asyncapi': { plugin: 'openapi', methods: ['enterFullscreen', 'exitFullscreen'], getters: ['loaded', 'fullscreen'], objects: ['spec', 'labels'] },
+  'dsk-bpmn': { plugin: 'bpmn', methods: ['fit', 'undo', 'redo', 'toSvg', 'enterFullscreen', 'exitFullscreen'], getters: ['value', 'fullscreen'], objects: ['labels', 'highlight'] },
+  'dsk-dmn': { plugin: 'bpmn', methods: ['fit', 'undo', 'redo', 'toSvg', 'open', 'enterFullscreen', 'exitFullscreen'], getters: ['value', 'fullscreen'], objects: ['labels', 'highlight'] },
+  'dsk-drawio': { plugin: 'drawio', methods: ['showPage', 'enterFullscreen', 'exitFullscreen'], getters: ['svg', 'pages', 'page', 'fullscreen'], objects: [] },
 }
 
 export type DskElement = HTMLElement & {

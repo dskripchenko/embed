@@ -15,6 +15,11 @@ blocks appear:
 | Language | Becomes | Loads |
 |---|---|---|
 | `mermaid` | SVG diagram | diagrams |
+| `plantuml` (`puml`), `dot` (`graphviz`), `d2`, `dbml`, `structurizr`, `wardley` | SVG diagram in that syntax | diagrams |
+| `bpmn` | a BPMN 2.0 process, as laid out in its modeler | bpmn |
+| `dmn` | the decision requirements diagram and each decision's table | bpmn |
+| `drawio` | the first page of a draw.io file (plain or compressed) | drawio |
+| `asyncapi` | an AsyncAPI 2.x / 3.0 reference | openapi |
 | `openapi` | the live API widget: one request, several, or a whole document | openapi |
 | `flow` | a process view, from JSON or Mermaid state/flowchart source | flow |
 | `board` | a read-only whiteboard, from the board's JSON | board |

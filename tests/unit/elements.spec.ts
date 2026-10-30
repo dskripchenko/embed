@@ -54,7 +54,7 @@ describe('elements and the embed API', () => {
   })
 
   it('the global API: blocks, events, config, renderBlocks through built-in lazy renderers', async () => {
-    expect(api.blocks.list().sort()).toEqual(['audio', 'board', 'flow', 'mermaid', 'openapi', 'video'])
+    expect(api.blocks.list().sort()).toEqual(['asyncapi', 'audio', 'board', 'bpmn', 'd2', 'dbml', 'dmn', 'dot', 'drawio', 'flow', 'graphviz', 'mermaid', 'openapi', 'plantuml', 'puml', 'structurizr', 'video', 'wardley'])
     const off = api.blocks.register('chart', { html: '<b>chart</b>' })
     expect(api.blocks.has('chart')).toBe(true)
     off()
