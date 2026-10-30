@@ -12,6 +12,8 @@ import { renderBlocks, unrenderBlocks, type RenderBlocksOptions } from './render
 import type { BlockRegistry, BlockRendererInput, ConfigInput, EmbedConfig, Host, PluginModule, PluginName } from './types'
 import type { ImportMap } from './importmap'
 
+export const ALL_PLUGINS: readonly PluginName[] = ['media', 'diagram', 'openapi', 'flow', 'markdown', 'editor', 'board']
+
 /** Which plugin draws each built-in fence language. */
 export const BUILTIN_BLOCKS: Readonly<Record<string, PluginName>> = {
   mermaid: 'diagram',
@@ -31,7 +33,15 @@ export interface EmbedOptions {
   /** `loader` or `bundle`. */
   mode: 'loader' | 'bundle'
   importMap?: ImportMap
+  /**
+   * The plugins this build provides (default: all). Elements and block
+   * languages of the others are not defined until `extend` brings them.
+   */
+  plugins?: readonly PluginName[]
 }
+
+/** What `extend` takes: plugin modules, or functions that bring them. */
+export type PluginSources = Partial<Record<PluginName, PluginModule | (() => Promise<PluginModule>)>>
 
 export interface DskEmbedApi {
   readonly version: string
@@ -56,6 +66,14 @@ export interface DskEmbedApi {
   unrenderBlocks(root?: ParentNode): number
   /** Loads a plugin ahead of its first element (e.g. on hover of a link). */
   preload(...names: PluginName[]): Promise<void>
+  /** The plugins available on the page. */
+  plugins(): PluginName[]
+  /**
+   * Adds plugins from another build on the same page (a per-plugin bundle
+   * loaded after this one): their elements and block languages are defined;
+   * plugins already available are kept. Returns the names that were added.
+   */
+  extend(sources: PluginSources): PluginName[]
   /** @internal The plugins' side of the core. */
   readonly host: Host
 }
@@ -65,6 +83,8 @@ export function createEmbed(options: EmbedOptions): DskEmbedApi {
   const registry: BlockRegistry = createRegistry()
   const bus = createBus(document)
   const plugins = new Map<PluginName, Promise<PluginModule>>()
+  const available = new Set<PluginName>(options.plugins ?? ALL_PLUGINS)
+  const extra = new Map<PluginName, () => Promise<PluginModule>>()
 
   const host: Host = {
     version: options.version,
@@ -75,7 +95,9 @@ export function createEmbed(options: EmbedOptions): DskEmbedApi {
     load(name) {
       let p = plugins.get(name)
       if (!p) {
-        p = options.loadPlugin(name, config.get()).then((module) => {
+        const source = extra.get(name)
+        if (!source && !available.has(name)) return Promise.reject(new Error(`the ${name} plugin is not on this page`))
+        p = (source ? source() : options.loadPlugin(name, config.get())).then((module) => {
           ;(module as PluginModule & { setup?: (h: Host) => void }).setup?.(host)
           return module
         })
@@ -87,15 +109,20 @@ export function createEmbed(options: EmbedOptions): DskEmbedApi {
     },
   }
 
-  // The built-in fence languages: the plugin is fetched on the first block.
-  for (const [language, plugin] of Object.entries(BUILTIN_BLOCKS)) {
-    registry.register(language, async (code, ctx) => {
-      const module = await host.load(plugin)
-      const renderer = module.renderers?.[language]
-      if (!renderer) return { error: `no ${language} renderer in the ${plugin} plugin` }
-      return renderer(code, ctx)
-    })
+  // The built-in fence languages of the available plugins: the plugin is fetched on the first block.
+  const registerBlocks = (names: Iterable<PluginName>): void => {
+    const wanted = new Set(names)
+    for (const [language, plugin] of Object.entries(BUILTIN_BLOCKS)) {
+      if (!wanted.has(plugin) || registry.has(language)) continue
+      registry.register(language, async (code, ctx) => {
+        const module = await host.load(plugin)
+        const renderer = module.renderers?.[language]
+        if (!renderer) return { error: `no ${language} renderer in the ${plugin} plugin` }
+        return renderer(code, ctx)
+      })
+    }
   }
+  registerBlocks(available)
 
   config.subscribe((c) => {
     bus.emit('config', { theme: c.theme, resolvedTheme: c.resolvedTheme, locale: c.locale })
@@ -125,10 +152,25 @@ export function createEmbed(options: EmbedOptions): DskEmbedApi {
     preload: async (...names) => {
       await Promise.all(names.map((n) => host.load(n)))
     },
+    plugins: () => [...available],
+    extend(sources) {
+      const added: PluginName[] = []
+      for (const [name, source] of Object.entries(sources) as [PluginName, PluginSources[PluginName]][]) {
+        if (!source || available.has(name)) continue
+        extra.set(name, typeof source === 'function' ? source : () => Promise.resolve(source))
+        available.add(name)
+        added.push(name)
+      }
+      if (added.length > 0) {
+        defineElements(host, available)
+        registerBlocks(added)
+      }
+      return added
+    },
     host,
   }
 
-  defineElements(host)
+  defineElements(host, available)
   return api
 }
 

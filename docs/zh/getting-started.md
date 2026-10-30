@@ -71,6 +71,27 @@ UI 组件库和一套块渲染器，彼此之间通过 DOM 事件通信。
 
 一个页面上二者选其一，不要同时使用（后加载的那个会被忽略并给出警告）。
 
+## 按插件拆分的打包版
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@dskripchenko/embed@1/dist/bundles/diagram.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@dskripchenko/embed@1/dist/bundles/markdown.js"></script>
+```
+
+按插件切分的完整打包版：每个文件包含一个插件以及 Vue 和组件库，只定义该插件的元素和代码块语言。页面上的多个打包文件共享同一个 `DskEmbed`：第一个创建它，之后的每一个通过 `DskEmbed.extend` 添加自己的插件——顺序和时机不限。`<dsk-markdown>` 中的 ```mermaid 代码块在页面加载 `bundles/diagram.js` 之前保持为代码，加载后即绘制；`DskEmbed.plugins()` 列出当前可用的插件。重复加载的打包文件不会添加任何内容。
+
+| 文件 | gzip |
+|---|---|
+| `bundles/markdown.js` | 91 KB |
+| `bundles/media.js` | 116 KB |
+| `bundles/diagram.js` | 118 KB |
+| `bundles/board.js` | 120 KB |
+| `bundles/editor.js` | 205 KB |
+| `bundles/openapi.js` | 222 KB |
+| `bundles/flow.js` | 227 KB |
+
+每个打包文件自带 Vue 和组件库，因此两个打包文件比通过加载器加载同样两个插件更大；它们适合分别交付组件的宿主。同一主版本的打包文件可以协同工作。
+
 ## 自托管
 
 加载器获取的所有内容都可以按 CDN 的目录结构由你自己的服务器提供。在该包的检出目录中：

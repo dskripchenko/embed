@@ -1,6 +1,21 @@
 # @dskripchenko/embed
 
-## 1.2.0 — Unreleased
+## 1.3.0 — Unreleased
+
+### Added
+- **Per-plugin bundles** — `dist/bundles/<plugin>.js` (`media`, `diagram`,
+  `openapi`, `flow`, `markdown`, `editor`, `board`): one plugin with Vue and
+  the kit, defining only its elements and block languages. Several on a page
+  share one `DskEmbed`: a bundle loaded later adds its plugins, and blocks of
+  its languages in markdown and the editor start to draw.
+- `DskEmbed.extend(plugins)` and `DskEmbed.plugins()`.
+
+### Changed
+- The bundles put each stylesheet in once by its own id (`tokens`,
+  `themes`, `kit`, `openapi`, `flow`, `editor`, `board`) instead of one
+  combined `kit` style.
+
+## 1.2.0 — 2026-10-29
 
 ### Added
 - **Full screen** for `<dsk-diagram>`, `<dsk-flow>`, `<dsk-board>` and

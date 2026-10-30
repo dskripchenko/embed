@@ -303,11 +303,11 @@ function createElementClass(tag: string, spec: ElementSpec, schema: Schema): Cus
   return Element
 }
 
-/** Defines every element (once per page) against the host. */
-export function defineElements(host: Host, registry: CustomElementRegistry = customElements): void {
+/** Defines the elements of the given plugins (each once per page) against the host. */
+export function defineElements(host: Host, plugins?: ReadonlySet<PluginName>, registry: CustomElementRegistry = customElements): void {
   hostRef = host
   for (const [tag, spec] of Object.entries(ELEMENTS)) {
-    if (registry.get(tag)) continue
+    if (registry.get(tag) || (plugins && !plugins.has(spec.plugin))) continue
     registry.define(tag, createElementClass(tag, spec, SCHEMAS[tag] ?? []))
   }
 }
