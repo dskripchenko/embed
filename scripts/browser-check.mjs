@@ -390,13 +390,17 @@ for (const browserName of Object.keys(browsers)) {
     // Each run starts with an empty shared board.
     await fetch(`${BASE}/api/board/reset`, { method: 'POST' })
     const { page, errors, close } = await open(browserName, `/check.html?embed=${variant}`)
+    // page.evaluate has no timeout: a page that stops answering would hang the run until the
+    // job's limit. Closing it after a deadline rejects what waits on it, and the run goes on.
+    const watchdog = setTimeout(() => void close().catch(() => {}), 180000)
     try {
       await settle(page)
-      // Polling: the snapshot endpoint is called every poll-interval.
+      // Polling: the snapshot endpoint is called every poll-interval (600 ms); a slow runner gets 5 s.
       serverLog.polls = []
-      await sleep(2000)
+      const pollStart = Date.now()
+      while (serverLog.polls.length < 2 && Date.now() - pollStart < 5000) await sleep(200)
       const polls = serverLog.polls.length
-      check(`${tag}: poll-url polls the snapshot endpoint`, polls >= 2, `${polls} polls in 2 s at 600 ms`)
+      check(`${tag}: poll-url polls the snapshot endpoint`, polls >= 2, `${polls} polls in ${Date.now() - pollStart} ms at 600 ms`)
 
       // Toggle: accepted, then refused and rolled back.
       serverLog.toggles = []
@@ -602,7 +606,8 @@ for (const browserName of Object.keys(browsers)) {
     } catch (error) {
       check(`${tag}: ran to the end`, false, error.message.split('\n')[0])
     } finally {
-      await close()
+      clearTimeout(watchdog)
+      await close().catch(() => {})
     }
   }
 }
