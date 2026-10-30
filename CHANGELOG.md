@@ -19,6 +19,9 @@
 - **`<dsk-asyncapi>`** and ```` ```asyncapi ```` blocks: AsyncAPI 2.x / 3.0
   references (@dskripchenko/openapi 1.2.0).
 - Per-plugin bundles `bundles/bpmn.js` and `bundles/drawio.js`.
+- The new elements in the base styles: block boxes, hidden source before the
+  upgrade, loading placeholders, full screen (BPMN / DMN fill the screen,
+  AsyncAPI follows `--dsk-openapi-height`), and draw.io page tabs.
 
 ### Changed
 - Runtime: @dskripchenko/ui 1.17.0, diagrams 1.3.0, flow 1.2.0 (EPC, DFD

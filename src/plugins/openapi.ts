@@ -116,7 +116,7 @@ function mountAsyncApi(ctx: ElementContext): ElementInstance {
     if (failure.value) return h('div', { class: 'dsk-error', role: 'alert' }, failure.value)
     if (text.value === null) return h('div', { class: 'dsk-openapi dsk-openapi--asyncapi' })
     const height = cssLength(props.height)
-    return hc('div', { class: 'dsk-openapi dsk-openapi--asyncapi', style: height ? { height, overflow: 'auto' } : undefined }, [
+    return hc('div', { class: 'dsk-openapi dsk-openapi--asyncapi', style: height ? { height: `var(--dsk-openapi-height, ${height})`, overflow: 'auto' } : undefined }, [
       hc(AsyncApiReference, { spec: text.value, locale: view.locale, ...(props.labels && typeof props.labels === 'object' ? { labels: props.labels } : {}) }),
     ])
   })

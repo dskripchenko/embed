@@ -5,14 +5,14 @@
  * our tags, so the host page's own CSS wins.
  */
 
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor) {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio) {
   display: block;
   min-width: 0;
   position: relative;
 }
 
 /* Before the upgrade: the raw source is not shown. */
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor):not([data-dsk-state]) {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio):not([data-dsk-state]) {
   visibility: hidden;
   min-height: 2rem;
   overflow: hidden;
@@ -32,7 +32,9 @@
 :where(dsk-video[data-dsk-state='loading']) { aspect-ratio: 16 / 9; }
 :where(dsk-audio[data-dsk-state='loading']) { min-height: 72px; }
 :where(dsk-diagram[data-dsk-state='loading'], dsk-markdown[data-dsk-state='loading']) { min-height: 120px; }
-:where(dsk-openapi[data-dsk-state='loading'], dsk-editor[data-dsk-state='loading']) { min-height: 240px; }
+:where(dsk-openapi[data-dsk-state='loading'], dsk-asyncapi[data-dsk-state='loading'], dsk-editor[data-dsk-state='loading']) { min-height: 240px; }
+:where(dsk-bpmn[data-dsk-state='loading'], dsk-dmn[data-dsk-state='loading']) { min-height: 480px; }
+:where(dsk-drawio[data-dsk-state='loading']) { min-height: 160px; }
 :where(.dsk-block[data-dsk-state='loading']) { min-height: 96px; }
 @keyframes dsk-pulse { 50% { opacity: 0.55; } }
 @media (prefers-reduced-motion: reduce) {
@@ -56,16 +58,16 @@
  * and images must stay as they are. Overlays (menus, drawers, tooltips) are
  * teleported to <body>, hence the uid-* match.
  */
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']),
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *,
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::before,
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) *::after {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']),
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) *,
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) *::before,
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) *::after {
   box-sizing: border-box;
 }
-:where(dsk-video, dsk-audio, dsk-openapi, dsk-flow, dsk-editor, .dsk-block, [class^='uid-'], [class*=' uid-']) :where(button, input, textarea, select) {
+:where(dsk-video, dsk-audio, dsk-openapi, dsk-asyncapi, dsk-flow, dsk-editor, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) :where(button, input, textarea, select) {
   font: inherit;
 }
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, .dsk-block, body > [class^='uid-'], body > [class*=' uid-']) {
+:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, body > [class^='uid-'], body > [class*=' uid-']) {
   font-family: var(--uid-font-family-sans);
   line-height: var(--uid-line-height-normal);
   color: var(--uid-text-primary);
@@ -147,9 +149,10 @@
   margin: var(--uid-space-md, 12px) 0;
   min-width: 0;
 }
-:where(.dsk-block--mermaid) { overflow-x: auto; }
-:where(.dsk-block--mermaid) svg { display: block; max-width: 100%; height: auto; margin-inline: auto; }
-:where(.dsk-flow-frame, .dsk-board-frame) {
+/* Drawn blocks (diagrams, BPMN, DMN, draw.io): the picture is the block's SVG. */
+:where(.dsk-block:has(> svg, > .dsk-dmn-block)) { overflow-x: auto; }
+:where(.dsk-block, .dsk-dmn-block) > svg { display: block; max-width: 100%; height: auto; margin-inline: auto; }
+:where(.dsk-flow-frame, .dsk-board-frame, .dsk-bpmn-frame) {
   position: relative;
   border: 1px solid var(--uid-border-subtle);
   border-radius: var(--uid-radius-md);
