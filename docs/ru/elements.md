@@ -166,10 +166,15 @@ timeline, xychart, mindmap — рендерится в SVG через `@dskripch
 |---|---|---|
 | `src` | `src` | Скачать исходник по URL вместо содержимого. |
 | `label` | `label` | Доступный заголовок SVG. |
+| `syntax` | `syntax` | `mermaid`, `plantuml`, `dot`, `d2`, `dbml`, `structurizr` или `wardley`; без него — по тексту источника. |
 
 Геттер: `svg` (элемент `<svg>`). События: `dsk:render` `{ type, width, height }`;
 `dsk:error` `{ message, line, column, hint }` — элемент также показывает
 сообщение с позицией вместо диаграммы.
+
+Кроме Mermaid элемент читает PlantUML (`@startuml`), Graphviz DOT, D2,
+DBML, Structurizr DSL и карты Уордли; синтаксис распознаётся по тексту или
+задаётся атрибутом `syntax`.
 
 ## `<dsk-openapi>`
 
@@ -375,6 +380,76 @@ timeline, xychart, mindmap — рендерится в SVG через `@dskripch
 
 События: `dsk:change` `{ board, ops, origin }`; `dsk:select` `{ ids }`;
 `dsk:load` `{ objects }`.
+
+## `<dsk-bpmn>` и `<dsk-dmn>`
+
+```html
+<dsk-bpmn src="/processes/order.bpmn" highlight="Task_Check"></dsk-bpmn>
+<dsk-bpmn src="/processes/order.bpmn" editable properties name="process"></dsk-bpmn>
+<dsk-dmn src="/decisions/loan.dmn" decision="Decision_Risk"></dsk-dmn>
+```
+
+Процессы BPMN 2.0 и решения DMN через `@dskripchenko/bpmn` — в той раскладке,
+в какой их сохранил моделер (Camunda Modeler, bpmn.io и другие). Просмотр
+двигается, масштабируется и сообщает о щелчках; `editable` превращает его в
+редактор — палитра, контекстная панель, панель свойств, отмена, — а `name`
+кладёт правленый XML в скрытое поле для формы. `<dsk-dmn>` открывает таблицу
+решения по двойному щелчку или сразу — с `decision`.
+
+| Атрибут | Свойство | |
+|---|---|---|
+| `src` | `src` | Загрузить файл по адресу вместо содержимого. |
+| `editable` | `editable` | Редактор вместо просмотра. |
+| `properties` | `properties` | (`dsk-bpmn`, редактор) Панель свойств открыта сразу. |
+| `diagram` | `diagram` | (`dsk-bpmn`) Какая диаграмма файла. |
+| `decision` | `decision` | (`dsk-dmn`) Открыть логику этого решения. |
+| `highlight` | `highlight` | Id элементов для обводки, через запятую. |
+| `height` | `height` | Высота; в CSS — `--dsk-bpmn-height` / `--dsk-dmn-height`. |
+| `name` | `name` | Скрытое поле с XML для формы. |
+
+Методы: `fit()`, `undo()`, `redo()`, `toSvg()`, `open(decision)` (DMN).
+Геттер: `value` (XML). События: `dsk:change` `{ xml }`, `dsk:select`
+`{ ids }`, `dsk:element` `{ id }` (щелчок), `dsk:open` `{ decision }` (DMN),
+`dsk:error` `{ message }`.
+
+## `<dsk-drawio>`
+
+```html
+<dsk-drawio src="/docs/architecture.drawio" page="Overview"></dsk-drawio>
+```
+
+Файлы draw.io (diagrams.net) через `@dskripchenko/drawio`: сжатые и обычные
+страницы и `.drawio.svg`. У файла с несколькими страницами есть вкладки
+страниц. Vue не загружается. Подписи читаются как текст, никогда как
+разметка; фигуры библиотек поставщиков становятся подписанными заглушками, а
+картинки из сети не загружаются, если их не разрешить `external-images`.
+
+| Атрибут | Свойство | |
+|---|---|---|
+| `src` | `src` | Загрузить файл по адресу вместо содержимого. |
+| `page` | `page` | Страница, показанная первой: номер, id или название. |
+| `label` | `label` | Доступный заголовок SVG. |
+| `external-images` | `externalImages` | Загружать картинки с адресов http(s). |
+
+Метод: `showPage(page)`. Геттеры: `svg`, `pages` (названия), `page` (номер).
+События: `dsk:render` `{ page, pages, width, height, warnings }`, `dsk:error`.
+
+## `<dsk-asyncapi>`
+
+```html
+<dsk-asyncapi src="/api/events.yaml"></dsk-asyncapi>
+```
+
+Документ AsyncAPI 2.x или 3.0 событийного API как справочник: серверы,
+операции (отправка / приём) с каналами, сообщениями, схемами, примерами и
+ответами. Свойство `spec` принимает разобранный объект.
+
+| Атрибут | Свойство | |
+|---|---|---|
+| `src` | `src` | Загрузить документ по адресу вместо содержимого. |
+| `height` | `height` | Высота прокручиваемой области; по умолчанию — высота страницы. |
+
+Геттер: `loaded`. События: `dsk:load`, `dsk:error` `{ message }`.
 
 ## `<dsk-markdown>`
 

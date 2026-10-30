@@ -15,6 +15,11 @@ HTML), который показывается как то, что он опис
 | Язык | Превращается в | Загружает |
 |---|---|---|
 | `mermaid` | SVG-диаграмму | diagrams |
+| `plantuml` (`puml`), `dot` (`graphviz`), `d2`, `dbml`, `structurizr`, `wardley` | SVG-диаграмму в этом синтаксисе | diagrams |
+| `bpmn` | процесс BPMN 2.0 в раскладке из моделера | bpmn |
+| `dmn` | диаграмму требований и таблицу каждого решения | bpmn |
+| `drawio` | первую страницу файла draw.io (обычного или сжатого) | drawio |
+| `asyncapi` | справочник AsyncAPI 2.x / 3.0 | openapi |
 | `openapi` | живой API-виджет: один запрос, несколько или целый документ | openapi |
 | `flow` | просмотр процесса из JSON или исходника Mermaid state/flowchart | flow |
 | `board` | доска только для чтения из JSON доски | board |

@@ -27,6 +27,9 @@ export const RUNTIME_FILES: Readonly<Record<string, readonly [string, string]>> 
   '@dskripchenko/flow/mermaid': ['@dskripchenko/flow', 'dist/mermaid.mjs'],
   '@dskripchenko/board': ['@dskripchenko/board', 'dist/index.mjs'],
   '@dskripchenko/board/vue': ['@dskripchenko/board', 'dist/vue.mjs'],
+  '@dskripchenko/bpmn': ['@dskripchenko/bpmn', 'dist/index.mjs'],
+  '@dskripchenko/bpmn/vue': ['@dskripchenko/bpmn', 'dist/vue.mjs'],
+  '@dskripchenko/drawio': ['@dskripchenko/drawio', 'dist/index.mjs'],
 }
 
 /** Stylesheets of the runtime packages: [package, path]. */
@@ -37,6 +40,7 @@ export const RUNTIME_STYLES: Readonly<Record<string, readonly [string, string]>>
   openapi: ['@dskripchenko/openapi', 'dist/style.css'],
   flow: ['@dskripchenko/flow', 'dist/style.css'],
   board: ['@dskripchenko/board', 'dist/style.css'],
+  bpmn: ['@dskripchenko/bpmn', 'dist/style.css'],
   editor: ['@dskripchenko/wysiwyg', 'dist/style.css'],
 }
 

@@ -71,7 +71,7 @@ async function open(browserName, path, { viewport = DESKTOP, phone = false } = {
 /** Waits until every element on the page is ready (or failed). */
 async function settle(page, timeout = 20000) {
   await page.waitForFunction(
-    () => [...document.querySelectorAll('dsk-video,dsk-audio,dsk-diagram,dsk-openapi,dsk-flow,dsk-board,dsk-markdown,dsk-editor')]
+    () => [...document.querySelectorAll('dsk-video,dsk-audio,dsk-diagram,dsk-openapi,dsk-flow,dsk-board,dsk-markdown,dsk-editor,dsk-bpmn,dsk-dmn,dsk-drawio,dsk-asyncapi')]
       .filter((e) => e.getAttribute('loading') !== 'lazy' || e.hasAttribute('data-dsk-state'))
       .every((e) => ['ready', 'error'].includes(e.getAttribute('data-dsk-state'))),
     null,
@@ -598,6 +598,57 @@ for (const browserName of Object.keys(browsers)) {
       const vue = await oneVue(page)
       check(`${tag}: one app context`, vue.contexts === 1, `${vue.mounts} mounts`)
       if (browserName === 'chromium' && variant === 'loader') await shot(page, 'check-desktop-light')
+      check(`${tag}: no console errors`, errors.length === 0, errors.slice(0, 5).join(' | '))
+    } catch (error) {
+      check(`${tag}: ran to the end`, false, error.message.split('\n')[0])
+    } finally {
+      await close()
+    }
+  }
+}
+
+// ---------------------------------------------------------------- notations: PlantUML, DOT, BPMN, DMN, draw.io, AsyncAPI
+for (const browserName of Object.keys(browsers)) {
+  for (const variant of ['loader', 'bundle']) {
+    const tag = `${browserName}/${variant}/notations`
+    if (!wants(tag)) continue
+    const { page, errors, close } = await open(browserName, `/notations.html?embed=${variant}`)
+    try {
+      await settle(page, 40000)
+      const r = await page.evaluate(() => {
+        const q = (s) => document.querySelector(s)
+        const md = (lang) => !!q(`#md .uid-markdown__block[data-language="${lang}"] svg`)
+        return {
+          puml: !!q('#puml svg'),
+          dot: !!q('#dot svg'),
+          bpmn: !!q('#bpmn [data-element-id="Task_Check"]') && !!q('#bpmn .bpmn-ed-highlight'),
+          editor: !!q('#bpmn-edit [data-palette]') && !!q('#bpmn-edit .bpmn-props'),
+          input: (q('#bpmn-edit input[name="process"]')?.value ?? '').includes('definitions'),
+          dmn: !!q('#dmn [data-element-id="Decision_Risk"]'),
+          drawio: !!q('#drawio svg') && document.querySelectorAll('#drawio .dsk-drawio__tab').length === 2,
+          async: document.querySelectorAll('#async .oa-async-op').length,
+          blocks: ['plantuml', 'dot', 'd2', 'dbml', 'structurizr', 'wardley', 'bpmn', 'dmn', 'drawio'].filter((l) => !md(l)),
+          table: !!q('#md .uid-markdown__block[data-language="dmn"] .dmn-table'),
+        }
+      })
+      check(`${tag}: <dsk-diagram> draws PlantUML and DOT`, r.puml && r.dot, JSON.stringify(r))
+      check(`${tag}: <dsk-bpmn> shows a process with a highlight`, r.bpmn)
+      check(`${tag}: <dsk-bpmn editable> is the editor, its XML in the form`, r.editor && r.input, JSON.stringify(r))
+      check(`${tag}: <dsk-dmn> shows the decision diagram`, r.dmn)
+      check(`${tag}: <dsk-drawio> draws a page with page tabs`, r.drawio)
+      check(`${tag}: <dsk-asyncapi> shows every operation`, r.async === 3, String(r.async))
+      check(`${tag}: markdown draws every new block language`, r.blocks.length === 0 && r.table, `missing: ${r.blocks.join(', ')}`)
+      // The second draw.io page.
+      await page.evaluate(() => document.querySelector('#drawio').showPage(1))
+      await sleep(300)
+      check(`${tag}: showPage() switches the draw.io page`, (await page.evaluate(() => document.querySelector('#drawio').page)) === 1)
+      // DMN: a double-click opens the decision table.
+      await page.locator('#dmn [data-element-id="Decision_Risk"]').first().dblclick()
+      await page.waitForSelector('#dmn [data-decision="Decision_Risk"]', { timeout: 5000 }).catch(() => {})
+      check(`${tag}: <dsk-dmn> opens a decision table`, (await page.locator('#dmn [data-decision="Decision_Risk"]').count()) === 1)
+      const vue = await oneVue(page)
+      check(`${tag}: one Vue`, vue.contexts <= 1 && vue.versions.length <= 1, JSON.stringify(vue))
+      if (browserName === 'chromium' && variant === 'loader') await shot(page, 'notations-desktop-light')
       check(`${tag}: no console errors`, errors.length === 0, errors.slice(0, 5).join(' | '))
     } catch (error) {
       check(`${tag}: ran to the end`, false, error.message.split('\n')[0])

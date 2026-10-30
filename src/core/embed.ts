@@ -12,12 +12,24 @@ import { renderBlocks, unrenderBlocks, type RenderBlocksOptions } from './render
 import type { BlockRegistry, BlockRendererInput, ConfigInput, EmbedConfig, Host, PluginModule, PluginName } from './types'
 import type { ImportMap } from './importmap'
 
-export const ALL_PLUGINS: readonly PluginName[] = ['media', 'diagram', 'openapi', 'flow', 'markdown', 'editor', 'board']
+export const ALL_PLUGINS: readonly PluginName[] = ['media', 'diagram', 'openapi', 'flow', 'markdown', 'editor', 'board', 'bpmn', 'drawio']
 
 /** Which plugin draws each built-in fence language. */
 export const BUILTIN_BLOCKS: Readonly<Record<string, PluginName>> = {
   mermaid: 'diagram',
+  plantuml: 'diagram',
+  puml: 'diagram',
+  dot: 'diagram',
+  graphviz: 'diagram',
+  d2: 'diagram',
+  dbml: 'diagram',
+  structurizr: 'diagram',
+  wardley: 'diagram',
   openapi: 'openapi',
+  asyncapi: 'openapi',
+  bpmn: 'bpmn',
+  dmn: 'bpmn',
+  drawio: 'drawio',
   flow: 'flow',
   board: 'board',
   video: 'media',

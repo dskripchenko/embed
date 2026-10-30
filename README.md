@@ -43,15 +43,18 @@ video; the markdown's diagram is live; the editor submits HTML with the form.
 |---|---|---|
 | `<dsk-video>` | player: sources and quality menu, subtitles, chapters, thumbnails, HLS | [`@dskripchenko/ui`](https://github.com/dskripchenko/ui) |
 | `<dsk-audio>` | player, playlist, waveform | `@dskripchenko/ui` |
-| `<dsk-diagram>` | Mermaid → SVG, 11 diagram types, no Vue loaded | [`@dskripchenko/diagrams`](https://github.com/dskripchenko/diagrams) |
+| `<dsk-diagram>` | Mermaid, PlantUML, Graphviz DOT, D2, DBML, Structurizr, Wardley → SVG, no Vue loaded | [`@dskripchenko/diagrams`](https://github.com/dskripchenko/diagrams) |
 | `<dsk-openapi>` | full reference (several specs), one operation, or a live API block | [`@dskripchenko/openapi`](https://github.com/dskripchenko/openapi) |
 | `<dsk-flow>` | process view with monitoring, toggles and sub-processes over plain HTTP — or the editor | [`@dskripchenko/flow`](https://github.com/dskripchenko/flow) |
+| `<dsk-asyncapi>` | AsyncAPI 2.x / 3.0 reference of an event-driven API | `@dskripchenko/openapi` |
+| `<dsk-bpmn>`, `<dsk-dmn>` | BPMN processes and DMN decisions as laid out in the modeler — a view or the editor | [`@dskripchenko/bpmn`](https://github.com/dskripchenko/bpmn) |
+| `<dsk-drawio>` | draw.io files to SVG, page tabs, no Vue loaded | [`@dskripchenko/drawio`](https://github.com/dskripchenko/drawio) |
 | `<dsk-board>` | infinite whiteboard: shapes, stickies, frames, connectors, pen — a view, an editor, or a shared board edited in real time | [`@dskripchenko/board`](https://github.com/dskripchenko/board) |
-| `<dsk-markdown>` | markdown with live `mermaid` / `openapi` / `flow` / `board` / `video` / `audio` blocks | `@dskripchenko/ui` |
+| `<dsk-markdown>` | markdown with live blocks: diagrams in every syntax above, `bpmn`, `dmn`, `drawio`, `openapi`, `asyncapi`, `flow`, `board`, `video`, `audio` | `@dskripchenko/ui` |
 | `<dsk-editor>` | WYSIWYG with the same live blocks; a form field | [`@dskripchenko/wysiwyg`](https://github.com/dskripchenko/wysiwyg) |
 
 All of them: attributes ↔ properties, `dsk:*` events, `ready`, `loading="lazy"`,
-light DOM (your CSS applies); diagrams, flows, boards and references open full screen. → [Elements](docs/en/elements.md)
+light DOM (your CSS applies); diagrams, processes, flows, boards and references open full screen. → [Elements](docs/en/elements.md)
 
 ## Working together
 

@@ -146,9 +146,12 @@ mindmap——由 `@dskripchenko/diagrams` 渲染为 SVG。图表不会加载 Vue
 |---|---|---|
 | `src` | `src` | 从 URL 获取源，而不是使用元素内容。 |
 | `label` | `label` | SVG 的无障碍标题。 |
+| `syntax` | `syntax` | `mermaid`、`plantuml`、`dot`、`d2`、`dbml`、`structurizr` 或 `wardley`；省略时根据源码识别。 |
 
 Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, height }`；
 `dsk:error` `{ message, line, column, hint }`——元素还会在图表的位置显示该消息及出错位置。
+
+除 Mermaid 外，该元素还可读取 PlantUML（`@startuml`）、Graphviz DOT、D2、DBML、Structurizr DSL 和 Wardley 地图；语法根据源码识别，或用 `syntax` 指定。
 
 ## `<dsk-openapi>`
 
@@ -343,6 +346,61 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 
 事件：`dsk:change` `{ board, ops, origin }`；`dsk:select` `{ ids }`；
 `dsk:load` `{ objects }`。
+
+## `<dsk-bpmn>` 与 `<dsk-dmn>`
+
+```html
+<dsk-bpmn src="/processes/order.bpmn" highlight="Task_Check"></dsk-bpmn>
+<dsk-bpmn src="/processes/order.bpmn" editable properties name="process"></dsk-bpmn>
+<dsk-dmn src="/decisions/loan.dmn" decision="Decision_Risk"></dsk-dmn>
+```
+
+通过 `@dskripchenko/bpmn` 显示 BPMN 2.0 流程和 DMN 决策，按保存它们的建模工具（Camunda Modeler、bpmn.io 等）的布局绘制。查看模式可平移、缩放并报告点击；`editable` 使其成为编辑器——调色板、上下文面板、属性面板、撤销——`name` 会把编辑后的 XML 放入隐藏输入框供表单使用。`<dsk-dmn>` 双击时打开决策表，或通过 `decision` 直接打开。
+
+| 属性 | 特性 | |
+|---|---|---|
+| `src` | `src` | 从 URL 加载文件，而不是使用内容。 |
+| `editable` | `editable` | 使用编辑器而非查看器。 |
+| `properties` | `properties` | （`dsk-bpmn`，编辑器）一开始就打开属性面板。 |
+| `diagram` | `diagram` | （`dsk-bpmn`）文件中的哪个图。 |
+| `decision` | `decision` | （`dsk-dmn`）打开此决策的逻辑。 |
+| `highlight` | `highlight` | 要描边的元素 id，用逗号分隔。 |
+| `height` | `height` | 高度；CSS 中为 `--dsk-bpmn-height` / `--dsk-dmn-height`。 |
+| `name` | `name` | 存放 XML 的隐藏输入框，供表单使用。 |
+
+方法：`fit()`、`undo()`、`redo()`、`toSvg()`、`open(decision)`（DMN）。取值器：`value`（XML）。事件：`dsk:change` `{ xml }`、`dsk:select` `{ ids }`、`dsk:element` `{ id }`（点击）、`dsk:open` `{ decision }`（DMN）、`dsk:error` `{ message }`。
+
+## `<dsk-drawio>`
+
+```html
+<dsk-drawio src="/docs/architecture.drawio" page="Overview"></dsk-drawio>
+```
+
+通过 `@dskripchenko/drawio` 显示 draw.io（diagrams.net）文件：压缩或普通页面以及 `.drawio.svg`。多页文件会显示页面标签。不加载 Vue。标签按文本读取，绝不作为标记；厂商库的图形显示为带名称的占位符，网络图片除非 `external-images` 允许否则不加载。
+
+| 属性 | 特性 | |
+|---|---|---|
+| `src` | `src` | 从 URL 加载文件，而不是使用内容。 |
+| `page` | `page` | 首先显示的页面：序号、id 或名称。 |
+| `label` | `label` | SVG 的无障碍标题。 |
+| `external-images` | `externalImages` | 加载 http(s) 地址的图片。 |
+
+方法：`showPage(page)`。取值器：`svg`、`pages`（名称）、`page`（序号）。事件：`dsk:render` `{ page, pages, width, height, warnings }`、`dsk:error`。
+
+## `<dsk-asyncapi>`
+
+```html
+<dsk-asyncapi src="/api/events.yaml"></dsk-asyncapi>
+```
+
+以参考文档形式显示事件驱动 API 的 AsyncAPI 2.x 或 3.0 文档：服务器、操作（发送/接收）及其通道、消息、schema、示例和回复。`spec` 特性接受已解析的对象。
+
+| 属性 | 特性 | |
+|---|---|---|
+| `src` | `src` | 从 URL 加载文档，而不是使用内容。 |
+| `height` | `height` | 滚动区域的高度；默认为页面高度。 |
+
+取值器：`loaded`。事件：`dsk:load`、`dsk:error` `{ message }`。
 
 ## `<dsk-markdown>`
 

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>embed — notations</title>
+  <script src="{{EMBED_SRC}}"></script>
+  <style>body { font: 14px system-ui, sans-serif; margin: 16px; } section { margin: 16px 0; }</style>
+</head>
+<body>
+  <section>
+    <dsk-diagram id="puml" label="Sequence">
+      <script type="text/plain">@startuml
+Alice -> Bob : hello
+Bob --> Alice : hi
+@enduml</script>
+    </dsk-diagram>
+    <dsk-diagram id="dot" syntax="dot">
+      <script type="text/plain">digraph G { rankdir=LR; a -> b -> c; a -> c [label="skip"] }</script>
+    </dsk-diagram>
+  </section>
+  <section>
+    <dsk-bpmn id="bpmn" src="/fixtures/notations/order.bpmn" height="420" highlight="Task_Check"></dsk-bpmn>
+    <dsk-bpmn id="bpmn-edit" src="/fixtures/notations/order.bpmn" editable properties name="process" height="520"></dsk-bpmn>
+  </section>
+  <section>
+    <dsk-dmn id="dmn" src="/fixtures/notations/loan.dmn" height="420"></dsk-dmn>
+  </section>
+  <section>
+    <dsk-drawio id="drawio" src="/fixtures/notations/architecture.drawio" label="Architecture"></dsk-drawio>
+  </section>
+  <section>
+    <dsk-asyncapi id="async" src="/fixtures/notations/orders-3.yaml" height="520"></dsk-asyncapi>
+  </section>
+  <section>
+    <dsk-markdown id="md">
+      <script type="text/markdown">
+## Notations in markdown
+
+```plantuml
+@startuml
+[*] --> Draft
+Draft --> Done
+@enduml
+```
+
+```dot
+digraph { a -> b }
+```
+
+```d2
+user -> api: request
+api -> db: query
+```
+
+```dbml
+Table users {
+  id int [pk]
+}
+Table posts {
+  id int [pk]
+  user_id int [ref: > users.id]
+}
+```
+
+```structurizr
+workspace {
+  model {
+    u = person "User"
+    s = softwareSystem "Shop"
+    u -> s "Buys"
+  }
+  views {
+    systemContext s {
+      include *
+    }
+  }
+}
+```
+
+```wardley
+title Tea shop
+component Customer [0.95, 0.63]
+component Cup of Tea [0.79, 0.61]
+Customer->Cup of Tea
+```
+
+```bpmn
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="D">
+  <bpmn:process id="P"><bpmn:startEvent id="S" /><bpmn:task id="T" name="Do it" /><bpmn:sequenceFlow id="F" sourceRef="S" targetRef="T" /></bpmn:process>
+  <bpmndi:BPMNDiagram id="DI"><bpmndi:BPMNPlane bpmnElement="P">
+    <bpmndi:BPMNShape bpmnElement="S"><dc:Bounds x="100" y="100" width="36" height="36" /></bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="T"><dc:Bounds x="200" y="78" width="100" height="80" /></bpmndi:BPMNShape>
+    <bpmndi:BPMNEdge bpmnElement="F"><di:waypoint x="136" y="118" /><di:waypoint x="200" y="118" /></bpmndi:BPMNEdge>
+  </bpmndi:BPMNPlane></bpmndi:BPMNDiagram>
+</bpmn:definitions>
+```
+
+```dmn
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" id="D" name="Discount" namespace="x">
+  <decision id="Dec" name="Discount">
+    <decisionTable id="T" hitPolicy="FIRST">
+      <input id="I"><inputExpression id="E" typeRef="number"><text>amount</text></inputExpression></input>
+      <output id="O" name="discount" typeRef="number" />
+      <rule id="R"><inputEntry id="A"><text>&gt; 100</text></inputEntry><outputEntry id="B"><text>0.1</text></outputEntry></rule>
+    </decisionTable>
+  </decision>
+</definitions>
+```
+
+```drawio
+<mxGraphModel><root><mxCell id="0"/><mxCell id="1" parent="0"/><mxCell id="a" value="Drawn" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="0" y="0" width="120" height="60" as="geometry"/></mxCell></root></mxGraphModel>
+```
+      </script>
+    </dsk-markdown>
+  </section>
+</body>
+</html>

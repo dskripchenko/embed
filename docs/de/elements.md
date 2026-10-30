@@ -166,10 +166,15 @@ ab; überschreiben Sie beliebige davon in Ihrem CSS).
 |---|---|---|
 | `src` | `src` | Den Quelltext von einer URL holen statt aus dem Inhalt. |
 | `label` | `label` | Der zugängliche Titel des SVG. |
+| `syntax` | `syntax` | `mermaid`, `plantuml`, `dot`, `d2`, `dbml`, `structurizr` oder `wardley`; ohne Angabe aus der Quelle erkannt. |
 
 Getter: `svg` (das `<svg>`-Element). Events: `dsk:render` `{ type, width, height }`;
 `dsk:error` `{ message, line, column, hint }` — das Element zeigt die Meldung
 mitsamt Position außerdem anstelle des Diagramms an.
+
+Neben Mermaid liest das Element PlantUML (`@startuml`), Graphviz DOT, D2,
+DBML, Structurizr DSL und Wardley Maps; die Syntax wird aus der Quelle
+erkannt oder mit `syntax` genannt.
 
 ## `<dsk-openapi>`
 
@@ -378,6 +383,79 @@ Methoden: `fit()`, `select(ids)`, `toPng()` (ein `Blob`), `toSvg()`
 
 Events: `dsk:change` `{ board, ops, origin }`; `dsk:select` `{ ids }`;
 `dsk:load` `{ objects }`.
+
+## `<dsk-bpmn>` und `<dsk-dmn>`
+
+```html
+<dsk-bpmn src="/processes/order.bpmn" highlight="Task_Check"></dsk-bpmn>
+<dsk-bpmn src="/processes/order.bpmn" editable properties name="process"></dsk-bpmn>
+<dsk-dmn src="/decisions/loan.dmn" decision="Decision_Risk"></dsk-dmn>
+```
+
+BPMN-2.0-Prozesse und DMN-Entscheidungen über `@dskripchenko/bpmn`, so
+gezeichnet, wie der Modeler sie gespeichert hat (Camunda Modeler, bpmn.io
+und andere). Die Ansicht lässt sich verschieben und zoomen und meldet Klicks;
+`editable` macht daraus den Editor — Palette, Kontextmenü,
+Eigenschaften-Panel, Rückgängig —, und `name` legt das bearbeitete XML in ein
+verstecktes Feld für ein Formular. `<dsk-dmn>` öffnet die Tabelle einer
+Entscheidung per Doppelklick oder sofort mit `decision`.
+
+| Attribut | Property | |
+|---|---|---|
+| `src` | `src` | Die Datei von einer URL statt aus dem Inhalt laden. |
+| `editable` | `editable` | Der Editor statt der Ansicht. |
+| `properties` | `properties` | (`dsk-bpmn`, Editor) Eigenschaften-Panel von Anfang an offen. |
+| `diagram` | `diagram` | (`dsk-bpmn`) Welches Diagramm der Datei. |
+| `decision` | `decision` | (`dsk-dmn`) Die Logik dieser Entscheidung öffnen. |
+| `highlight` | `highlight` | Hervorzuhebende Element-ids, durch Komma getrennt. |
+| `height` | `height` | Höhe; in CSS `--dsk-bpmn-height` / `--dsk-dmn-height`. |
+| `name` | `name` | Ein verstecktes Feld mit dem XML für ein Formular. |
+
+Methoden: `fit()`, `undo()`, `redo()`, `toSvg()`, `open(decision)` (DMN).
+Getter: `value` (das XML). Ereignisse: `dsk:change` `{ xml }`, `dsk:select`
+`{ ids }`, `dsk:element` `{ id }` (ein Klick), `dsk:open` `{ decision }`
+(DMN), `dsk:error` `{ message }`.
+
+## `<dsk-drawio>`
+
+```html
+<dsk-drawio src="/docs/architecture.drawio" page="Overview"></dsk-drawio>
+```
+
+draw.io-Dateien (diagrams.net) über `@dskripchenko/drawio`: komprimierte und
+einfache Seiten sowie `.drawio.svg`. Eine Datei mit mehreren Seiten bekommt
+Seiten-Reiter. Vue wird nicht geladen. Beschriftungen werden als Text
+gelesen, nie als Markup; Formen von Herstellerbibliotheken werden zu
+beschrifteten Platzhaltern, und Bilder aus dem Netz werden nur mit
+`external-images` geladen.
+
+| Attribut | Property | |
+|---|---|---|
+| `src` | `src` | Die Datei von einer URL statt aus dem Inhalt laden. |
+| `page` | `page` | Die zuerst gezeigte Seite: Index, id oder Name. |
+| `label` | `label` | Der zugängliche Titel des SVG. |
+| `external-images` | `externalImages` | Bilder von http(s)-Adressen laden. |
+
+Methode: `showPage(page)`. Getter: `svg`, `pages` (Namen), `page` (Index).
+Ereignisse: `dsk:render` `{ page, pages, width, height, warnings }`, `dsk:error`.
+
+## `<dsk-asyncapi>`
+
+```html
+<dsk-asyncapi src="/api/events.yaml"></dsk-asyncapi>
+```
+
+Ein AsyncAPI-2.x- oder -3.0-Dokument einer ereignisgesteuerten API als
+Referenz: Server, Operationen (Senden / Empfangen) mit ihren Kanälen,
+Nachrichten, Schemata, Beispielen und Antworten. Die Property `spec` nimmt
+ein geparstes Objekt.
+
+| Attribut | Property | |
+|---|---|---|
+| `src` | `src` | Das Dokument von einer URL statt aus dem Inhalt laden. |
+| `height` | `height` | Höhe eines scrollenden Bereichs; standardmäßig die Höhe der Seite. |
+
+Getter: `loaded`. Ereignisse: `dsk:load`, `dsk:error` `{ message }`.
 
 ## `<dsk-markdown>`
 

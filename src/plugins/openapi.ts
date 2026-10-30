@@ -8,9 +8,12 @@
  *   document — as the live widget, editable with `editable`;
  * - editor mode: the whole spec in the visual editor (a tree of the document
  *   and a form for each part), with its source and preview views.
+ *
+ * `<dsk-asyncapi>` and ```asyncapi blocks show AsyncAPI 2.x / 3.0 documents
+ * of event-driven APIs the same way.
  */
-import { h, shallowReactive } from 'vue'
-import { OpenApiBlock, OpenApiEditor, OpenApiOperation, OpenApiReference, proxySend } from '@dskripchenko/openapi/vue'
+import { h, shallowReactive, shallowRef } from 'vue'
+import { AsyncApiReference, OpenApiBlock, OpenApiEditor, OpenApiOperation, OpenApiReference, proxySend } from '@dskripchenko/openapi/vue'
 import { cssLength } from '../core/attrs'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
 import { errorText, fetchText, instanceRef, mountElementView, mountView, setupRuntime, state, hc } from './runtime'
@@ -87,7 +90,62 @@ function titleOf(spec: unknown): string | undefined {
   return doc?.info?.title
 }
 
+/** `<dsk-asyncapi>`: an AsyncAPI document from `src`, the `spec` property, or the element's text. */
+function mountAsyncApi(ctx: ElementContext): ElementInstance {
+  const text = shallowRef<string | object | null>(null)
+  const failure = shallowRef<string | null>(null)
+  let loadedFrom = ''
+
+  async function load(): Promise<void> {
+    const props = ctx.props()
+    const key = props.spec !== undefined ? 'object' : typeof props.src === 'string' && props.src !== '' ? `src:${props.src}` : `source:${ctx.source()}`
+    if (key === loadedFrom && key !== 'object') return
+    loadedFrom = key
+    try {
+      text.value = props.spec !== undefined ? (props.spec as string | object) : typeof props.src === 'string' && props.src !== '' ? await fetchText(props.src) : ctx.source()
+      failure.value = null
+      ctx.emit('load', {})
+    } catch (error) {
+      failure.value = errorText(error)
+      ctx.emit('error', { message: failure.value })
+    }
+  }
+
+  const v = mountElementView(ctx, (view) => {
+    const props = view.props
+    if (failure.value) return h('div', { class: 'dsk-error', role: 'alert' }, failure.value)
+    if (text.value === null) return h('div', { class: 'dsk-openapi dsk-openapi--asyncapi' })
+    const height = cssLength(props.height)
+    return hc('div', { class: 'dsk-openapi dsk-openapi--asyncapi', style: height ? { height, overflow: 'auto' } : undefined }, [
+      hc(AsyncApiReference, { spec: text.value, locale: view.locale, ...(props.labels && typeof props.labels === 'object' ? { labels: props.labels } : {}) }),
+    ])
+  })
+  void load()
+  const fs = withFullscreen(ctx)
+  return {
+    update() {
+      v.refresh()
+      void load()
+    },
+    destroy() {
+      fs?.destroy()
+      v.unmount()
+    },
+    api: {
+      enterFullscreen: () => fs?.enter(),
+      exitFullscreen: () => fs?.exit(),
+      get fullscreen() {
+        return fs?.active ?? false
+      },
+      get loaded() {
+        return text.value !== null && failure.value === null
+      },
+    },
+  }
+}
+
 export function mountElement(ctx: ElementContext): ElementInstance {
+  if (ctx.tag === 'dsk-asyncapi') return mountAsyncApi(ctx)
   const comp = instanceRef<Reference>()
   // Block and editor modes: the text as edited in the widget.
   let blockText: string | null = null
@@ -212,6 +270,21 @@ export function mountElement(ctx: ElementContext): ElementInstance {
 }
 
 export const renderers: Record<string, BlockRenderer> = {
+  asyncapi() {
+    return {
+      mount(el, ctx) {
+        el.classList.add('dsk-openapi-block', 'dsk-asyncapi-block')
+        const view = shallowReactive({ code: ctx.code })
+        const mounted = mountView(el, () => hc(AsyncApiReference, { spec: view.code, locale: state.locale }))
+        return {
+          update(code) {
+            if (code !== view.code) view.code = code
+          },
+          destroy: () => mounted.unmount(),
+        }
+      },
+    }
+  },
   openapi() {
     return {
       mount(el, ctx) {

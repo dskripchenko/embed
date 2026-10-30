@@ -1,6 +1,6 @@
 {
   "name": "@dskripchenko/embed",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Drop-in custom elements for any web page from a CDN: video and audio players, Mermaid diagrams, OpenAPI references, process flows, live markdown and a WYSIWYG editor, sharing one Vue runtime and cooperating through a block registry and an event bus.",
   "type": "module",
   "license": "MIT",
@@ -22,7 +22,12 @@
     "workflow",
     "wysiwyg",
     "markdown",
-    "vue"
+    "vue",
+    "bpmn",
+    "dmn",
+    "drawio",
+    "asyncapi",
+    "plantuml"
   ],
   "files": [
     "dist",
@@ -52,10 +57,12 @@
   },
   "devDependencies": {
     "@dskripchenko/board": "0.2.1",
-    "@dskripchenko/diagrams": "1.1.0",
-    "@dskripchenko/flow": "1.1.1",
-    "@dskripchenko/openapi": "1.1.3",
-    "@dskripchenko/ui": "1.16.0",
+    "@dskripchenko/bpmn": "0.4.0",
+    "@dskripchenko/diagrams": "1.3.0",
+    "@dskripchenko/drawio": "0.1.0",
+    "@dskripchenko/flow": "1.2.0",
+    "@dskripchenko/openapi": "1.2.0",
+    "@dskripchenko/ui": "1.17.0",
     "@dskripchenko/wysiwyg": "0.5.3",
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.5",

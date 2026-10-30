@@ -163,10 +163,15 @@ them in your CSS).
 |---|---|---|
 | `src` | `src` | Fetch the source from a URL instead of the content. |
 | `label` | `label` | The SVG's accessible title. |
+| `syntax` | `syntax` | `mermaid`, `plantuml`, `dot`, `d2`, `dbml`, `structurizr` or `wardley`; recognised from the source when omitted. |
 
 Getter: `svg` (the `<svg>` element). Events: `dsk:render` `{ type, width, height }`;
 `dsk:error` `{ message, line, column, hint }` — the element also shows the
 message, with the position, in place of the diagram.
+
+Besides Mermaid, the element reads PlantUML (`@startuml`), Graphviz DOT,
+D2, DBML, Structurizr DSL and Wardley maps; the syntax is recognised from the
+source, or named with `syntax`.
 
 ## `<dsk-openapi>`
 
@@ -371,6 +376,76 @@ Methods: `fit()`, `select(ids)`, `toPng()` (a `Blob`), `toSvg()`
 
 Events: `dsk:change` `{ board, ops, origin }`; `dsk:select` `{ ids }`;
 `dsk:load` `{ objects }`.
+
+## `<dsk-bpmn>` and `<dsk-dmn>`
+
+```html
+<dsk-bpmn src="/processes/order.bpmn" highlight="Task_Check"></dsk-bpmn>
+<dsk-bpmn src="/processes/order.bpmn" editable properties name="process"></dsk-bpmn>
+<dsk-dmn src="/decisions/loan.dmn" decision="Decision_Risk"></dsk-dmn>
+```
+
+BPMN 2.0 processes and DMN decisions through `@dskripchenko/bpmn`, drawn as
+the modeler that saved them laid them out (Camunda Modeler, bpmn.io and
+others). A view pans, zooms and reports clicks; `editable` makes it the
+editor — palette, context pad, properties panel, undo — and `name` puts the
+edited XML in a hidden input for a form. A `<dsk-dmn>` opens a decision's
+table on a double-click, or at once with `decision`.
+
+| Attribute | Property | |
+|---|---|---|
+| `src` | `src` | Fetch the file from a URL instead of the content. |
+| `editable` | `editable` | The editor instead of the view. |
+| `properties` | `properties` | (`dsk-bpmn`, editor) The properties panel open from the start. |
+| `diagram` | `diagram` | (`dsk-bpmn`) Which diagram of the file. |
+| `decision` | `decision` | (`dsk-dmn`) Open this decision's logic. |
+| `highlight` | `highlight` | Element ids to outline, comma-separated. |
+| `height` | `height` | Height; `--dsk-bpmn-height` / `--dsk-dmn-height` in CSS. |
+| `name` | `name` | A hidden input with the XML, for a form. |
+
+Methods: `fit()`, `undo()`, `redo()`, `toSvg()`, `open(decision)` (DMN).
+Getter: `value` (the XML). Events: `dsk:change` `{ xml }`, `dsk:select`
+`{ ids }`, `dsk:element` `{ id }` (a click), `dsk:open` `{ decision }` (DMN),
+`dsk:error` `{ message }`.
+
+## `<dsk-drawio>`
+
+```html
+<dsk-drawio src="/docs/architecture.drawio" page="Overview"></dsk-drawio>
+```
+
+draw.io (diagrams.net) files through `@dskripchenko/drawio`: compressed or
+plain pages and `.drawio.svg`. A file with several pages gets page tabs. No
+Vue is loaded. Labels are read as text, never as markup; shapes of vendor
+libraries become labelled placeholders, and images on the web are not loaded
+unless `external-images` allows them.
+
+| Attribute | Property | |
+|---|---|---|
+| `src` | `src` | Fetch the file from a URL instead of the content. |
+| `page` | `page` | The page shown first: its index, id or name. |
+| `label` | `label` | The SVG's accessible title. |
+| `external-images` | `externalImages` | Load images from http(s) addresses. |
+
+Method: `showPage(page)`. Getters: `svg`, `pages` (names), `page` (index).
+Events: `dsk:render` `{ page, pages, width, height, warnings }`, `dsk:error`.
+
+## `<dsk-asyncapi>`
+
+```html
+<dsk-asyncapi src="/api/events.yaml"></dsk-asyncapi>
+```
+
+An AsyncAPI 2.x or 3.0 document of an event-driven API as a reference:
+servers, operations (send / receive) with their channels, messages,
+schemas, examples and replies. The `spec` property takes a parsed object.
+
+| Attribute | Property | |
+|---|---|---|
+| `src` | `src` | Fetch the document from a URL instead of the content. |
+| `height` | `height` | Height of a scrolling box; the page's height by default. |
+
+Getter: `loaded`. Events: `dsk:load`, `dsk:error` `{ message }`.
 
 ## `<dsk-markdown>`
 
