@@ -628,6 +628,38 @@ for (const browserName of Object.keys(browsers)) {
       await close()
     }
   }
+  if (wants(`${browserName}/bundles`)) {
+    const { page, errors, close } = await open(browserName, '/bundles.html')
+    try {
+      await page.waitForSelector('#md[data-dsk-state="ready"]', { timeout: 20000 })
+      await sleep(500)
+      const before = await page.evaluate(() => ({
+        svg: !!document.querySelector('#md .uid-markdown__block[data-language="mermaid"] svg'),
+        code: !!document.querySelector('#md code[data-language="mermaid"]'),
+        diagram: !!customElements.get('dsk-diagram'),
+        plugins: window.DskEmbed.plugins(),
+      }))
+      check(`${browserName}/bundles: markdown alone leaves a mermaid block as code and <dsk-diagram> undefined`, !before.svg && before.code && !before.diagram && before.plugins.join() === 'markdown', JSON.stringify(before))
+      await page.evaluate(() => window.addBundle('diagram'))
+      await page.waitForSelector('#md .uid-markdown__block[data-language="mermaid"] svg', { timeout: 20000 }).catch(() => {})
+      await page.waitForSelector('#d svg', { timeout: 20000 }).catch(() => {})
+      const after = await page.evaluate(() => ({
+        md: !!document.querySelector('#md .uid-markdown__block[data-language="mermaid"] svg'),
+        el: !!document.querySelector('#d svg'),
+        plugins: window.DskEmbed.plugins().sort(),
+        kit: document.querySelectorAll('style[data-dsk-embed="kit"]').length,
+        tokens: document.querySelectorAll('style[data-dsk-embed="tokens"]').length,
+      }))
+      check(`${browserName}/bundles: the diagram bundle joins — the block and <dsk-diagram> draw`, after.md && after.el && after.plugins.join() === 'diagram,markdown', JSON.stringify(after))
+      check(`${browserName}/bundles: shared stylesheets go in once`, after.kit === 1 && after.tokens === 1, JSON.stringify(after))
+      await page.evaluate(() => window.addBundle('diagram'))
+      check(`${browserName}/bundles: no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '))
+    } catch (error) {
+      check(`${browserName}/bundles: ran`, false, error.message.split('\n')[0])
+    } finally {
+      await close()
+    }
+  }
   if (wants(`${browserName}/existing-map`)) {
     const { page, errors, close } = await open(browserName, '/existing-map.html')
     try {

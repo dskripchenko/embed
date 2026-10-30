@@ -82,6 +82,37 @@ zur Laufzeit nichts nachgeladen werden darf.
 Verwenden Sie auf einer Seite das eine oder das andere, nicht beides (das
 zweite, das geladen wird, wird mit einer Warnung ignoriert).
 
+## Bundles pro Plugin
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@dskripchenko/embed@1/dist/bundles/diagram.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@dskripchenko/embed@1/dist/bundles/markdown.js"></script>
+```
+
+Das Fat Bundle, nach Plugins geschnitten: Jede Datei enthält ein Plugin mit
+Vue und dem Kit und definiert nur dessen Elemente und Block-Sprachen.
+Mehrere auf einer Seite teilen sich ein `DskEmbed`: Das erste legt es an,
+jedes weitere fügt seine Plugins hinzu (`DskEmbed.extend`) — in beliebiger
+Reihenfolge und zu jedem Zeitpunkt. Ein ```mermaid-Block in
+`<dsk-markdown>` bleibt Code, bis `bundles/diagram.js` auf der Seite ist,
+und wird dann gezeichnet; `DskEmbed.plugins()` listet, was da ist. Ein
+zweimal geladenes Bundle fügt nichts hinzu.
+
+| Datei | gzip |
+|---|---|
+| `bundles/markdown.js` | 91 KB |
+| `bundles/media.js` | 116 KB |
+| `bundles/diagram.js` | 118 KB |
+| `bundles/board.js` | 120 KB |
+| `bundles/editor.js` | 205 KB |
+| `bundles/openapi.js` | 222 KB |
+| `bundles/flow.js` | 227 KB |
+
+Jedes Bundle bringt sein eigenes Vue und Kit mit; zwei Bundles kosten daher
+mehr als dieselben zwei Plugins über den Loader. Sie passen zu Hosts, die
+Widgets getrennt ausliefern. Bundles derselben Major-Version arbeiten
+zusammen.
+
 ## Self-Hosting
 
 Alles, was der Loader holt, kann von Ihrem eigenen Server ausgeliefert werden,

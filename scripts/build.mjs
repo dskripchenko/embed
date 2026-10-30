@@ -2,6 +2,7 @@
 //   embed.js              the loader (classic script, no Vue)
 //   plugins/*.js, chunks/ the plugin modules (ESM; vue and the packages external, via the import map)
 //   embed.bundle.js       the fat bundle (classic script, everything inside)
+//   bundles/*.js          one plugin per classic script; several on a page share one runtime
 //   importmap.json        the runtime's import map on jsDelivr, for pages that write their own
 import { mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync, readdirSync, statSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
@@ -125,6 +126,25 @@ await build({
     lib: { entry: resolve(root, 'src/bundle.ts'), formats: ['iife'], name: 'DskEmbedBundle', fileName: () => 'embed.bundle.js' },
   },
 })
+
+// ---- 4b. The per-plugin bundles: one classic script per plugin, each joins the others on a page ----
+for (const p of plugins) {
+  await build({
+    root,
+    configFile: false,
+    logLevel: 'warn',
+    define: { ...define, ...vueFlags },
+    plugins: [virtualLight],
+    build: {
+      emptyOutDir: false,
+      outDir: dist,
+      minify: true,
+      target: 'es2022',
+      cssMinify: true,
+      lib: { entry: resolve(root, `src/bundles/${p}.ts`), formats: ['iife'], name: 'DskEmbedBundle', fileName: () => `bundles/${p}.js` },
+    },
+  })
+}
 
 // ---- 5. The import map, for pages that compose their own ----
 const cdn = 'https://cdn.jsdelivr.net/npm/'

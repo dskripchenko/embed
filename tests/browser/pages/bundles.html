@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>embed — per-plugin bundles</title>
+  <!-- Only markdown at first: its ```mermaid block stays code until the diagram bundle joins. -->
+  <script src="{{CDN}}@dskripchenko/embed@1/dist/bundles/markdown.js"></script>
+</head>
+<body>
+  <dsk-markdown id="md">
+    <script type="text/markdown">
+      # Бандлы
+
+      ```mermaid
+      graph LR; A-->B
+      ```
+    </script>
+  </dsk-markdown>
+  <dsk-diagram id="d">graph TD; C-->D</dsk-diagram>
+  <script>
+    window.addBundle = (name) => new Promise((resolve, reject) => {
+      const s = document.createElement('script')
+      s.src = '{{CDN}}@dskripchenko/embed@1/dist/bundles/' + name + '.js'
+      s.onload = resolve
+      s.onerror = reject
+      document.head.appendChild(s)
+    })
+  </script>
+</body>
+</html>

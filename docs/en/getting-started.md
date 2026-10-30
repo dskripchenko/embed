@@ -77,6 +77,35 @@ are not available, or where nothing may be loaded at run time.
 Use one or the other on a page, not both (the second one to load is ignored
 with a warning).
 
+## Per-plugin bundles
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@dskripchenko/embed@1/dist/bundles/diagram.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@dskripchenko/embed@1/dist/bundles/markdown.js"></script>
+```
+
+The fat bundle cut by plugin: each file holds one plugin with Vue and the
+kit, and defines only that plugin's elements and block languages. Several
+on a page share one `DskEmbed`: the first builds it, each later one adds its
+plugins (`DskEmbed.extend`), in any order and at any time. A ```mermaid
+block in `<dsk-markdown>` stays code until `bundles/diagram.js` is on the
+page, then draws; `DskEmbed.plugins()` lists what is there. A bundle loaded
+twice adds nothing.
+
+| File | gzipped |
+|---|---|
+| `bundles/markdown.js` | 91 KB |
+| `bundles/media.js` | 116 KB |
+| `bundles/diagram.js` | 118 KB |
+| `bundles/board.js` | 120 KB |
+| `bundles/editor.js` | 205 KB |
+| `bundles/openapi.js` | 222 KB |
+| `bundles/flow.js` | 227 KB |
+
+Each bundle carries its own Vue and kit, so two bundles cost more than the
+same two plugins through the loader; they suit hosts that ship widgets
+separately. Bundles of one major version work together.
+
 ## Self-hosting
 
 Everything the loader fetches can be served from your own server, in the

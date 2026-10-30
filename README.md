@@ -75,6 +75,7 @@ light DOM (your CSS applies); diagrams, flows, boards and references open full s
 |---|---|---|
 | `dist/embed.js` — the loader | **9.1 KB** | Classic script; elements, API, import map. Everything else on demand. |
 | `dist/embed.bundle.js` — the fat bundle | **563 KB** (2.0 MB) | Everything inside; no import map, no further requests. |
+| `dist/bundles/<plugin>.js` — one plugin each | **91–227 KB** | Vue and the kit inside; several on a page share one runtime. → [Getting started](docs/en/getting-started.md#per-plugin-bundles) |
 
 What the loader fetches on demand (gzip -9 of the published files; jsDelivr
 serves Brotli, a little smaller):
