@@ -1,6 +1,6 @@
 /**
  * `<dsk-calendar>` and ```calendar blocks: events written as markup (see
- * calendar/markup.ts) — dates, ranges, times and repeats — in the kit's
+ * the kit's markup format) — dates, ranges, times and repeats — in the kit's
  * UidCalendar: day, week, month, year and agenda.
  *
  * `editable` — drag, resize, the event builder and the markup's source; each
@@ -11,11 +11,8 @@
  */
 import { shallowRef } from 'vue'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
-import { errorText, fetchText, hc, mountElementView, mountView, setupRuntime, state } from './runtime'
-import { CalendarView } from './calendar/CalendarView'
-import { parseCalendar } from './calendar/markup'
-import calendarCss from '../calendar.css?inline'
-import { injectStyle } from '../core/styles'
+import { errorText, fetchText, hc, mountElementView, mountView, setupRuntime } from './runtime'
+import { UidEventCalendar, parseEventCalendar } from '@dskripchenko/ui'
 
 export function setup(host: Host): void {
   setupRuntime(host)
@@ -24,7 +21,6 @@ export function setup(host: Host): void {
 const VIEWS = ['day', 'week', 'month', 'year', 'agenda']
 
 export function mountElement(ctx: ElementContext): ElementInstance {
-  injectStyle('calendar', calendarCss, ctx.el.ownerDocument)
   const source = shallowRef('')
   const failure = shallowRef<string | null>(null)
   const locked = shallowRef<boolean | null>(null)
@@ -52,7 +48,7 @@ export function mountElement(ctx: ElementContext): ElementInstance {
       source.value = typeof props.src === 'string' && props.src !== '' ? await fetchText(props.src) : ctx.source()
       failure.value = null
       syncInput()
-      ctx.emit('load', { problems: parseCalendar(source.value).problems })
+      ctx.emit('load', { problems: parseEventCalendar(source.value).problems })
     } catch (error) {
       failure.value = errorText(error)
       ctx.emit('error', { message: failure.value })
@@ -63,12 +59,11 @@ export function mountElement(ctx: ElementContext): ElementInstance {
     const props = view.props
     if (failure.value) return hc('div', { class: 'dsk-error', role: 'alert' }, failure.value)
     const views = Array.isArray(props.views) ? (props.views as string[]).filter((x) => VIEWS.includes(x)) : []
-    return hc(CalendarView, {
+    return hc(UidEventCalendar, {
       source: source.value,
       editable: props.editable === true,
       locked: locked.value ?? props.locked === true,
       lockable: props.lockable === true,
-      locale: view.locale,
       view: typeof props.view === 'string' ? props.view : '',
       date: typeof props.date === 'string' ? props.date : '',
       ...(views.length ? { views } : {}),
@@ -108,13 +103,12 @@ export function mountElement(ctx: ElementContext): ElementInstance {
 
 export const renderers: Record<string, BlockRenderer> = {
   calendar(code) {
-    const doc = parseCalendar(code)
+    const doc = parseEventCalendar(code)
     if (doc.items.length === 0 && doc.problems.length > 0) return { error: `Line ${doc.problems[0].line}: ${doc.problems[0].message}` }
     return {
       mount(el) {
-        injectStyle('calendar', calendarCss, el.ownerDocument)
         const view = shallowRef(code)
-        const mounted = mountView(el, () => hc(CalendarView, { source: view.value, locale: state.locale }))
+        const mounted = mountView(el, () => hc(UidEventCalendar, { source: view.value }))
         return {
           update(next) {
             view.value = next
