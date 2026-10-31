@@ -416,9 +416,13 @@ for (const browserName of Object.keys(browsers)) {
       void toggles
       // Through the details drawer's "Enabled" switch (the hover bar needs a real hover).
       for (const id of ['create', 'done']) {
-        await clickAt(page, `#api-flow [data-node-id="${id}"] .fl-node__body, #api-flow [data-node-id="${id}"]`)
         const sw = page.locator('.uid-drawer .uid-switch input, .uid-drawer [role="switch"]').first()
-        await sw.waitFor({ state: 'attached', timeout: 5000 })
+        // WebKit on CI now and then misses the first click on a node: click again before giving up.
+        for (let attempt = 0; attempt < 3; attempt++) {
+          await clickAt(page, `#api-flow [data-node-id="${id}"] .fl-node__body, #api-flow [data-node-id="${id}"]`)
+          if (await sw.waitFor({ state: 'attached', timeout: 5000 }).then(() => true, () => false)) break
+        }
+        await sw.waitFor({ state: 'attached', timeout: 1000 })
         // The switch's input is visually hidden: click it the way its label does.
         await sw.evaluate((input) => input.click())
         await sleep(900)
