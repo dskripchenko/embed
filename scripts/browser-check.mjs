@@ -106,6 +106,9 @@ async function strings(page, selector) {
 
 /** Clicks the centre of an element: active flow nodes pulse, and never count as "stable" for a locator click. */
 async function clickAt(page, selector) {
+  // A click at coordinates misses what is off screen: an earlier step may have scrolled the page away.
+  // The DOM's own scrollIntoView: Playwright's would wait for the element to be visible and stable.
+  await page.locator(selector).first().evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' }))
   const box = await page.locator(selector).first().boundingBox()
   if (!box) throw new Error(`nothing to click: ${selector}`)
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
@@ -417,12 +420,8 @@ for (const browserName of Object.keys(browsers)) {
       // Through the details drawer's "Enabled" switch (the hover bar needs a real hover).
       for (const id of ['create', 'done']) {
         const sw = page.locator('.uid-drawer .uid-switch input, .uid-drawer [role="switch"]').first()
-        // WebKit on CI now and then misses the first click on a node: click again before giving up.
-        for (let attempt = 0; attempt < 3; attempt++) {
-          await clickAt(page, `#api-flow [data-node-id="${id}"] .fl-node__body, #api-flow [data-node-id="${id}"]`)
-          if (await sw.waitFor({ state: 'attached', timeout: 5000 }).then(() => true, () => false)) break
-        }
-        await sw.waitFor({ state: 'attached', timeout: 1000 })
+        await clickAt(page, `#api-flow [data-node-id="${id}"] .fl-node__body, #api-flow [data-node-id="${id}"]`)
+        await sw.waitFor({ state: 'attached', timeout: 5000 })
         // The switch's input is visually hidden: click it the way its label does.
         await sw.evaluate((input) => input.click())
         await sleep(900)
