@@ -49,8 +49,10 @@ video; the markdown's diagram is live; the editor submits HTML with the form.
 | `<dsk-asyncapi>` | AsyncAPI 2.x / 3.0 reference of an event-driven API | `@dskripchenko/openapi` |
 | `<dsk-bpmn>`, `<dsk-dmn>` | BPMN processes and DMN decisions as laid out in the modeler — a view or the editor | [`@dskripchenko/bpmn`](https://github.com/dskripchenko/bpmn) |
 | `<dsk-drawio>` | draw.io files to SVG, page tabs, no Vue loaded | [`@dskripchenko/drawio`](https://github.com/dskripchenko/drawio) |
+| `<dsk-kanban>` | a kanban board written as markup: columns, lanes, tags, WIP limits; drag cards, edit them, a lock | `@dskripchenko/ui` |
+| `<dsk-calendar>` | events written as markup, with repeats: day, week, month, year, agenda; drag, an event builder, a lock | `@dskripchenko/ui` |
 | `<dsk-board>` | infinite whiteboard: shapes, stickies, frames, connectors, pen — a view, an editor, or a shared board edited in real time | [`@dskripchenko/board`](https://github.com/dskripchenko/board) |
-| `<dsk-markdown>` | markdown with live blocks: diagrams in every syntax above, `bpmn`, `dmn`, `drawio`, `openapi`, `asyncapi`, `flow`, `board`, `video`, `audio` | `@dskripchenko/ui` |
+| `<dsk-markdown>` | markdown with live blocks: diagrams in every syntax above, `bpmn`, `dmn`, `drawio`, `openapi`, `asyncapi`, `flow`, `board`, `kanban`, `calendar`, `video`, `audio` | `@dskripchenko/ui` |
 | `<dsk-editor>` | WYSIWYG with the same live blocks; a form field | [`@dskripchenko/wysiwyg`](https://github.com/dskripchenko/wysiwyg) |
 
 All of them: attributes ↔ properties, `dsk:*` events, `ready`, `loading="lazy"`,

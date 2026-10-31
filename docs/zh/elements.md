@@ -30,6 +30,7 @@
 - **`locale`**——仅对当前元素生效的 `en` 或 `ru`；默认：全局语言
   （[配置](config-and-events.md)）。
 - **`loading="lazy"`**——仅当元素接近视口时才加载和渲染。
+- **`data-dsk`**——每个元素在连接时为自己设置该属性；embed 的基础样式据此选择元素。
 - **状态**——`data-dsk-state` 为 `loading`、`ready` 或 `error`；可据此为占位内容设置样式。
   加载期间，元素会预留一个尺寸合理的区域。
 - **事件**——名为 `dsk:<name>` 的冒泡 `CustomEvent`，负载位于 `detail` 中；每个元素都会触发
@@ -401,6 +402,98 @@ Getter：`svg`（`<svg>` 元素）。事件：`dsk:render` `{ type, width, heigh
 | `height` | `height` | 滚动区域的高度；默认为页面高度。 |
 
 取值器：`loaded`。事件：`dsk:load`、`dsk:error` `{ message }`。
+
+## `<dsk-kanban>`
+
+```html
+<dsk-kanban editable lockable name="plan">
+  <script type="text/plain">
+    # 3.0 版本
+    lanes: 支付, 退款
+    tags: payments=info, refunds=warning
+
+    ## 待办
+    - 即时支付 #payments {lane: 支付, who: Anna, due: 2026-11-15}
+    - 通过 API 部分退款 #refunds !high {lane: 退款}
+      商户希望无需致电即可退还部分金额。
+
+    ## 进行中 {wip: 3}
+    - [ACME-398](https://jira.example.com/browse/ACME-398) 反欺诈 v2 {who: Oleg}
+
+    ## 已完成 {done}
+    - 带签名的 Webhook #payments
+  </script>
+</dsk-kanban>
+```
+
+以标记书写、由组件库的 `UidBoard` 绘制的看板，包含列和卡片。标记读起来像 markdown：
+
+- `# …` —— 看板标题；第一列之前的 `key: value` 行是设置：`lanes`（泳道，按顺序）、`tags`（每个标签的色调：`info`、`success`、`warning`、`danger`）。
+- `## 列名 {wip: 3, done}` —— 一列；`wip` 是在制品上限（超过时计数变红），`done` 标记已完成卡片所在的列（划线显示，永不逾期）。
+- `- 卡片标题 #标签 !high {lane: …, who: …, due: YYYY-MM-DD, 任意: 值}` —— 一张卡片。标题支持行内 markdown（链接、代码、粗体）；`!high` / `!low` 为优先级；花括号中为属性；其下缩进的行是卡片的 markdown 描述。`<!-- 注释 -->` 会被保留。
+
+点击卡片可查看详情。启用 `editable` 后，可在列和泳道之间拖动卡片，列中的 `+` 添加卡片，面板可修改或删除卡片，**源码**标签页可直接编辑标记并按行显示问题。每次修改只重写它涉及的行——注释、空行和其余文本保持不变——并以 `dsk:change` 发送完整的新源码。看板上方可按标签和人员筛选。
+
+`locked` 使看板对所有人只读；`lockable` 显示锁按钮，它发送 `dsk:lock` `{ locked }`：宿主负责保存（作为属性，或保存在存放源码的地方），就像在 `dsk:change` 时保存源码一样。
+
+| 属性 | 特性 | |
+|---|---|---|
+| `src` | `src` | 从 URL 获取标记，而不是使用内容。 |
+| `editable` | `editable` | 拖放、新建和修改卡片、源码标签页。 |
+| `locked` | `locked` | 只读，无论 `editable` 如何。 |
+| `lockable` | `lockable` | 显示锁按钮。 |
+| `name` | `name` | 含标记的隐藏输入框，用于表单。 |
+
+Getter：`value`（标记）、`board`（解析后的看板）。事件：`dsk:change` `{ source }`、`dsk:lock` `{ locked }`、`dsk:open` `{ card }`、`dsk:load` `{ problems }`、`dsk:error` `{ message }`。
+
+## `<dsk-calendar>`
+
+```html
+<dsk-calendar view="month" editable lockable name="events">
+  <script type="text/plain">
+    # 发布与值班
+    tags: release=danger
+
+    2026-11-03 10:00-11:00 发布演示 #release {where: 4 号会议室}
+    2026-11-10..2026-11-14 代码冻结 #release
+    every mon 11:00-11:30 迭代计划 {from: 2026-11-02, until: 2026-12-28, except: 2026-11-30}
+    every 2 weeks fri 16:00-17:00 回顾 {from: 2026-11-06}
+    every month last fri 发布到生产 #release
+    every year 12-31 新年冻结
+  </script>
+</dsk-calendar>
+```
+
+以标记书写的事件，显示在组件库的 `UidCalendar` 中：日、周、月、年和日程。先写设置（`key: value`）——`view`（首先显示的视图）、`date`（首先显示的日期）、`tags`（每个标签的色调）——然后每行一个事件：
+
+- **何时**：日期 `2026-11-03` 或范围 `2026-11-10..2026-11-14`，然后是可选的时间 `10:00` 或 `10:00-11:00`（无时间即全天）。
+- **何事**：标题（行内 markdown）、`#标签`（第一个决定颜色）、`{属性}`——`where`、`who`、`url`、`description` 或自定义属性。
+- **重复**以 `every` 代替日期开头——用文字表达的 RFC 5545 RRULE 子集：
+
+  | 行 | 重复方式 |
+  |---|---|
+  | `every day`、`every 3 days` | 每（三）天 |
+  | `every mon,wed`、`every 2 weeks fri` | 在这些星期几，每（隔一）周 |
+  | `every month 15`、`every month last` | 每月的这一天、每月最后一天 |
+  | `every month 2nd tue`、`every month last fri` | 每月第 n 个 / 最后一个该星期几 |
+  | `every year 12-31` | 每年的这一天 |
+
+  界限和例外写在属性中：`from`（第一个日期；`count` 和“每 N”需要它）、`until`、`count`、`except`（日期，逗号分隔）。`{rrule: FREQ=WEEKLY;BYDAY=MO,WE;INTERVAL=2}` 原样接受规则，例如从 iCal 复制的规则。重复只针对屏幕上显示的日期展开。
+
+启用 `editable` 后：可将事件拖到另一天或另一小时，在日视图和周视图中拉伸事件，点击空白时段（或月视图中的某一天，或 **+ 事件**）新建事件。**事件生成器**通过选择组合出一个事件——日期或范围、全天或时间、重复（“每 2 周的周一和周三”“每月最后一个周五”、直到某日期 / N 次）、跳过的日期——并显示它将写入的那一行。编辑重复事件的某一次时，会询问只改这一次还是整个系列：这一次会成为独立事件，系列跳过它的日期（拖动某一次也是如此）。**源码**标签页可编辑标记并按行显示问题。每次修改重写一行（分离出的单次为两行），并以 `dsk:change` 发送完整的新源码。`locked` 和 `lockable` 与 `<dsk-kanban>` 相同。
+
+| 属性 | 特性 | |
+|---|---|---|
+| `src` | `src` | 从 URL 获取标记，而不是使用内容。 |
+| `view` | `view` | `day`、`week`、`month`、`year` 或 `agenda`——首先显示的视图。 |
+| `date` | `date` | 首先显示的日期（`YYYY-MM-DD`）；默认为今天。 |
+| `views` | `views` | 提供的视图，逗号分隔；默认全部五种。 |
+| `editable` | `editable` | 拖动、拉伸、事件生成器、源码标签页。 |
+| `locked` | `locked` | 只读，无论 `editable` 如何。 |
+| `lockable` | `lockable` | 显示锁按钮。 |
+| `name` | `name` | 含标记的隐藏输入框，用于表单。 |
+
+Getter：`value`（标记）。事件：`dsk:change` `{ source }`、`dsk:lock` `{ locked }`、`dsk:open` `{ event }`、`dsk:range` `{ view, start, end }`（屏幕上的日期）、`dsk:load` `{ problems }`、`dsk:error` `{ message }`。
 
 ## `<dsk-markdown>`
 

@@ -34,6 +34,8 @@ Common to all elements:
   locale ([configuration](config-and-events.md)).
 - **`loading="lazy"`** — load and render only when the element comes near
   the viewport.
+- **`data-dsk`** — every element marks itself with it when it connects;
+  the embed's base styles select elements by it.
 - **State** — `data-dsk-state` is `loading`, `ready` or `error`; style
   placeholders with it. While loading, the element reserves a box of a
   plausible size.
@@ -446,6 +448,140 @@ schemas, examples and replies. The `spec` property takes a parsed object.
 | `height` | `height` | Height of a scrolling box; the page's height by default. |
 
 Getter: `loaded`. Events: `dsk:load`, `dsk:error` `{ message }`.
+
+## `<dsk-kanban>`
+
+```html
+<dsk-kanban editable lockable name="plan">
+  <script type="text/plain">
+    # Release 3.0
+    lanes: Payments, Refunds
+    tags: payments=info, refunds=warning
+
+    ## Backlog
+    - Instant payments #payments {lane: Payments, who: Anna, due: 2026-11-15}
+    - Partial refunds over the API #refunds !high {lane: Refunds}
+      Merchants ask to refund part of an amount without a call.
+
+    ## In progress {wip: 3}
+    - [ACME-398](https://jira.example.com/browse/ACME-398) Antifraud v2 {who: Oleg}
+
+    ## Done {done}
+    - Signed webhooks #payments
+  </script>
+</dsk-kanban>
+```
+
+A board of columns and cards written as markup and drawn with the kit's
+`UidBoard`. The markup reads like markdown:
+
+- `# …` — the board's title; `key: value` lines before the first column —
+  settings: `lanes` (swimlanes, in order), `tags` (a tone per tag:
+  `info`, `success`, `warning`, `danger`).
+- `## Column {wip: 3, done}` — a column; `wip` is a work-in-progress limit
+  (the counter turns red above it), `done` marks the column of finished
+  cards (struck through, never overdue).
+- `- Card title #tag !high {lane: …, who: …, due: YYYY-MM-DD, any: value}` — a
+  card. The title takes inline markdown (links, code, bold); `!high` /
+  `!low` — priority; properties in braces; lines indented under it — the
+  card's description in markdown. `<!-- comments -->` are kept.
+
+A click on a card opens its details. With `editable`, cards are dragged
+between columns and lanes, `+` in a column adds a card, the panel edits or
+deletes one, and the **Source** tab edits the markup itself with problems by
+line. Every change rewrites only the lines it touches — comments, blank
+lines and the rest of the text stay as they were — and is sent as
+`dsk:change` with the whole new source. Filters by tag and by person are
+above the board.
+
+`locked` makes the board read-only for everyone; `lockable` shows the lock
+button, which sends `dsk:lock` `{ locked }`: the host saves it (as an
+attribute or wherever it keeps the source), as it saves the source on
+`dsk:change`.
+
+| Attribute | Property | |
+|---|---|---|
+| `src` | `src` | Fetch the markup from a URL instead of the content. |
+| `editable` | `editable` | Drag and drop, new and changed cards, the source tab. |
+| `locked` | `locked` | Read-only, whatever `editable` says. |
+| `lockable` | `lockable` | Show the lock button. |
+| `name` | `name` | A hidden input with the markup, for a form. |
+
+Getters: `value` (the markup), `board` (the parsed board). Events:
+`dsk:change` `{ source }`, `dsk:lock` `{ locked }`, `dsk:open` `{ card }`,
+`dsk:load` `{ problems }`, `dsk:error` `{ message }`.
+
+## `<dsk-calendar>`
+
+```html
+<dsk-calendar view="month" editable lockable name="events">
+  <script type="text/plain">
+    # Releases and duty
+    tags: release=danger
+
+    2026-11-03 10:00-11:00 Release demo #release {where: Room 4}
+    2026-11-10..2026-11-14 Code freeze #release
+    every mon 11:00-11:30 Sprint planning {from: 2026-11-02, until: 2026-12-28, except: 2026-11-30}
+    every 2 weeks fri 16:00-17:00 Retro {from: 2026-11-06}
+    every month last fri Release to production #release
+    every year 12-31 New year freeze
+  </script>
+</dsk-calendar>
+```
+
+Events written as markup in the kit's `UidCalendar`: day, week, month, year
+and agenda. Settings (`key: value`) come first — `view` (the view shown
+first), `date` (the date shown first), `tags` (a tone per tag) — then one
+event per line:
+
+- **When**: a date `2026-11-03` or a range `2026-11-10..2026-11-14`, then
+  an optional time `10:00` or `10:00-11:00` (none — all day).
+- **What**: the title (inline markdown), `#tags` (the first gives the
+  colour), `{properties}` — `where`, `who`, `url`, `description` or your own.
+- **Repeats** start with `every` instead of a date — an RFC 5545 RRULE subset
+  in words:
+
+  | Line | Repeats |
+  |---|---|
+  | `every day`, `every 3 days` | every (third) day |
+  | `every mon,wed`, `every 2 weeks fri` | on those weekdays, every (other) week |
+  | `every month 15`, `every month last` | on that day of the month, on its last day |
+  | `every month 2nd tue`, `every month last fri` | on the n-th / last weekday |
+  | `every year 12-31` | every year on that date |
+
+  Bounds and exceptions go in the properties: `from` (the first date;
+  needed for `count` and for "every N"), `until`, `count`, `except` (dates,
+  comma-separated). `{rrule: FREQ=WEEKLY;BYDAY=MO,WE;INTERVAL=2}` takes a
+  rule as it is, for one copied from iCal. Repeats are expanded only for the
+  days on screen.
+
+With `editable`: drag an event to another day or hour, stretch it in the day
+and week views, click an empty slot (or a day in the month, or **+ Event**)
+for a new event. The **event builder** puts an event together from choices —
+date or range, all day or a time, the repeat ("every 2 weeks on Mon and
+Wed", "the last Friday of every month", until a date / N times), skipped
+dates — and shows the line it writes. Editing one occurrence of a repeat asks
+whether to change that one or the whole series: that one becomes an event of
+its own and the series skips its date (dragging an occurrence does the
+same). The **Source** tab edits the markup with problems by line. Every
+change rewrites one line (two for a detached occurrence) and is sent as
+`dsk:change` with the whole new source. `locked` and `lockable` work as in
+`<dsk-kanban>`.
+
+| Attribute | Property | |
+|---|---|---|
+| `src` | `src` | Fetch the markup from a URL instead of the content. |
+| `view` | `view` | `day`, `week`, `month`, `year` or `agenda` — the view shown first. |
+| `date` | `date` | The date shown first (`YYYY-MM-DD`); today by default. |
+| `views` | `views` | The views offered, comma-separated; all five by default. |
+| `editable` | `editable` | Drag, resize, the event builder, the source tab. |
+| `locked` | `locked` | Read-only, whatever `editable` says. |
+| `lockable` | `lockable` | Show the lock button. |
+| `name` | `name` | A hidden input with the markup, for a form. |
+
+Getter: `value` (the markup). Events: `dsk:change` `{ source }`, `dsk:lock`
+`{ locked }`, `dsk:open` `{ event }`, `dsk:range` `{ view, start, end }`
+(the days on screen), `dsk:load` `{ problems }`, `dsk:error` `{ message }`.
 
 ## `<dsk-markdown>`
 

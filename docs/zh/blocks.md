@@ -22,6 +22,8 @@
 | `openapi` | 实时 API 组件：一个请求、多个请求或整个文档 | openapi |
 | `flow` | 流程视图，源为 JSON 或 Mermaid state/flowchart | flow |
 | `board` | 只读白板，源为白板的 JSON | board |
+| `kanban` | 只读看板，源为看板标记 | kanban |
+| `calendar` | 事件日历（重复已展开） | calendar |
 | `video` | 组件库的视频播放器 | 组件库 |
 | `audio` | 组件库的音频播放器或播放列表 | 组件库 |
 
