@@ -107,7 +107,8 @@ async function strings(page, selector) {
 /** Clicks the centre of an element: active flow nodes pulse, and never count as "stable" for a locator click. */
 async function clickAt(page, selector) {
   // A click at coordinates misses what is off screen: an earlier step may have scrolled the page away.
-  await page.locator(selector).first().scrollIntoViewIfNeeded()
+  // The DOM's own scrollIntoView: Playwright's would wait for the element to be visible and stable.
+  await page.locator(selector).first().evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' }))
   const box = await page.locator(selector).first().boundingBox()
   if (!box) throw new Error(`nothing to click: ${selector}`)
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
