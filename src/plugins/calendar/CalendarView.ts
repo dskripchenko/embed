@@ -75,10 +75,25 @@ export const CalendarView = defineComponent({
     const t = computed(() => calendarText(props.locale))
     const doc = computed(() => parseCalendar(text.value))
     const canEdit = computed(() => props.editable && !props.locked)
-    const settingView = (doc.value.settings.get('view') ?? '') as View
-    const view = ref<View>(props.view || (VIEWS.includes(settingView) ? settingView : 'month'))
+    const settingView = (): View | null => {
+      const v = (doc.value.settings.get('view') ?? '') as View
+      return VIEWS.includes(v) ? v : null
+    }
+    const settingDate = (): string | null => {
+      const d = doc.value.settings.get('date') ?? ''
+      return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null
+    }
+    const view = ref<View>(props.view || settingView() || 'month')
     watch(() => props.view, (v) => v && (view.value = v))
-    const anchor = ref<string>(props.date || doc.value.settings.get('date') || today())
+    const anchor = ref<string>(props.date || settingDate() || today())
+    // The markup usually arrives after the first render (src, the element's body): its `view:` and
+    // `date:` apply then — unless the attributes say otherwise or the reader has moved already.
+    let touched = false
+    watch(() => [settingView(), settingDate()] as const, ([v, d]) => {
+      if (touched) return
+      if (v && !props.view) view.value = v
+      if (d && !props.date) anchor.value = d
+    })
     const range = ref<{ start: string; end: string } | null>(null)
     const tab = ref<'calendar' | 'source'>('calendar')
     const open = ref(false)
@@ -255,9 +270,15 @@ export const CalendarView = defineComponent({
               events: events.value,
               views: props.views,
               view: view.value,
-              'onUpdate:view': (v: View) => (view.value = v),
+              'onUpdate:view': (v: View) => {
+                touched = true
+                view.value = v
+              },
               anchor: anchor.value,
-              'onUpdate:anchor': (v: string) => (anchor.value = v),
+              'onUpdate:anchor': (v: string) => {
+                touched = true
+                anchor.value = v
+              },
               editable: canEdit.value,
               onRange,
               'onEvent-click': (e: KitEvent) => openOccurrence(e.id),
