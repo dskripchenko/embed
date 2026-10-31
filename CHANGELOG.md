@@ -1,5 +1,11 @@
 # @dskripchenko/embed
 
+## 1.4.1
+
+### Patch Changes
+
+- 51df863: Runtime: @dskripchenko/board 0.3.0 — workshop templates (event storming, customer journey map, user story map, retrospective) in the board editor's Templates button.
+
 ## 1.4.0 — 2026-10-31
 
 ### Added
