@@ -18,8 +18,9 @@ import * as flow from './plugins/flow'
 import * as bpmn from './plugins/bpmn'
 import * as drawio from './plugins/drawio'
 import * as kanban from './plugins/kanban'
+import * as calendar from './plugins/calendar'
 import * as markdown from './plugins/markdown'
 import * as editor from './plugins/editor'
 import * as board from './plugins/board'
 
-bootBundle({ media, diagram, openapi, flow, markdown, editor, board, bpmn, drawio, kanban }, Object.entries(STYLES))
+bootBundle({ media, diagram, openapi, flow, markdown, editor, board, bpmn, drawio, kanban, calendar }, Object.entries(STYLES))
