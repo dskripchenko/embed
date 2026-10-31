@@ -15,17 +15,17 @@ importers:
         specifier: 0.3.0
         version: 0.3.0(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/bpmn':
-        specifier: 0.4.0
-        version: 0.4.0(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        specifier: 0.4.1
+        version: 0.4.1(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/diagrams':
-        specifier: 1.3.0
-        version: 1.3.0
+        specifier: 1.3.1
+        version: 1.3.1
       '@dskripchenko/drawio':
         specifier: 0.1.0
         version: 0.1.0
       '@dskripchenko/flow':
         specifier: 1.2.0
-        version: 1.2.0(@dskripchenko/diagrams@1.3.0)(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 1.2.0(@dskripchenko/diagrams@1.3.1)(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/openapi':
         specifier: 1.2.0
         version: 1.2.0(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
@@ -230,8 +230,8 @@ packages:
       vue:
         optional: true
 
-  '@dskripchenko/bpmn@0.4.0':
-    resolution: {integrity: sha512-846PCqWnymSgCsUR9e+kCrBpikyFj3h9Ss/GJFNU29impCZuFhr3338XSq7wNVNU6E5a7U08wwpaIajwZvwm2A==}
+  '@dskripchenko/bpmn@0.4.1':
+    resolution: {integrity: sha512-QsNBAKG+4mMdhiWQJ/j9O1qSDK7u2h5YPHSxH/Wgnj256g0Cjo8RfZTJ+vkC4GYt4IDVL70e1QdN4S3+4CcJqg==}
     engines: {node: '>=20'}
     peerDependencies:
       '@dskripchenko/ui': ^1.17.0
@@ -242,8 +242,8 @@ packages:
       vue:
         optional: true
 
-  '@dskripchenko/diagrams@1.3.0':
-    resolution: {integrity: sha512-a9/BEBBYvZQKNIOov3Clz2Mrpu6/zNrybyxueHofvXdgeAEPDC5R+fnopULG19CXF0w49E58hIOL7OTJ3Z4d7w==}
+  '@dskripchenko/diagrams@1.3.1':
+    resolution: {integrity: sha512-BWYIXqoe4nA/hLHRXiF453rYfRKQuASt4DrHl60Fehetu0a9FTYPc5o7o/S4pN3NXl7e/w5euIVGnpyiX4XOzw==}
     engines: {node: '>=20'}
 
   '@dskripchenko/drawio@0.1.0':
@@ -1483,18 +1483,18 @@ snapshots:
       '@dskripchenko/ui': 1.18.1(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/bpmn@0.4.0(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/bpmn@0.4.1(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
       '@dskripchenko/ui': 1.18.1(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/diagrams@1.3.0': {}
+  '@dskripchenko/diagrams@1.3.1': {}
 
   '@dskripchenko/drawio@0.1.0': {}
 
-  '@dskripchenko/flow@1.2.0(@dskripchenko/diagrams@1.3.0)(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/flow@1.2.0(@dskripchenko/diagrams@1.3.1)(@dskripchenko/ui@1.18.1(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
-      '@dskripchenko/diagrams': 1.3.0
+      '@dskripchenko/diagrams': 1.3.1
       '@dskripchenko/ui': 1.18.1(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
