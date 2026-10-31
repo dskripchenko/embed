@@ -2,17 +2,18 @@
  * The embed's own base styles: element boxes, loading placeholders, the
  * kit's reset scoped to our elements, and the diagram colours on the kit's
  * theme tokens. Everything here is zero-specificity (`:where`) or scoped to
- * our tags, so the host page's own CSS wins.
+ * our elements — each marks itself `data-dsk` when it connects — so the host
+ * page's own CSS wins.
  */
 
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio) {
+:where([data-dsk]) {
   display: block;
   min-width: 0;
   position: relative;
 }
 
 /* Before the upgrade: the raw source is not shown. */
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio):not([data-dsk-state]) {
+:where([data-dsk]):not([data-dsk-state]) {
   visibility: hidden;
   min-height: 2rem;
   overflow: hidden;
@@ -58,16 +59,16 @@
  * and images must stay as they are. Overlays (menus, drawers, tooltips) are
  * teleported to <body>, hence the uid-* match.
  */
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']),
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) *,
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) *::before,
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) *::after {
+:where([data-dsk], .dsk-block, [class^='uid-'], [class*=' uid-']),
+:where([data-dsk], .dsk-block, [class^='uid-'], [class*=' uid-']) *,
+:where([data-dsk], .dsk-block, [class^='uid-'], [class*=' uid-']) *::before,
+:where([data-dsk], .dsk-block, [class^='uid-'], [class*=' uid-']) *::after {
   box-sizing: border-box;
 }
-:where(dsk-video, dsk-audio, dsk-openapi, dsk-asyncapi, dsk-flow, dsk-editor, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, [class^='uid-'], [class*=' uid-']) :where(button, input, textarea, select) {
+:where([data-dsk]:not(dsk-diagram, dsk-board, dsk-markdown), .dsk-block, [class^='uid-'], [class*=' uid-']) :where(button, input, textarea, select) {
   font: inherit;
 }
-:where(dsk-video, dsk-audio, dsk-diagram, dsk-openapi, dsk-flow, dsk-board, dsk-markdown, dsk-editor, dsk-asyncapi, dsk-bpmn, dsk-dmn, dsk-drawio, .dsk-block, body > [class^='uid-'], body > [class*=' uid-']) {
+:where([data-dsk], .dsk-block, body > [class^='uid-'], body > [class*=' uid-']) {
   font-family: var(--uid-font-family-sans);
   line-height: var(--uid-line-height-normal);
   color: var(--uid-text-primary);

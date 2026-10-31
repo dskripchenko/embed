@@ -23,6 +23,8 @@ blocks appear:
 | `openapi` | the live API widget: one request, several, or a whole document | openapi |
 | `flow` | a process view, from JSON or Mermaid state/flowchart source | flow |
 | `board` | a read-only whiteboard, from the board's JSON | board |
+| `kanban` | a read-only kanban board, from the kanban markup | kanban |
+| `calendar` | a calendar of the events (repeats expanded) | calendar |
 | `video` | the kit's video player | kit |
 | `audio` | the kit's audio player or playlist | kit |
 

@@ -23,6 +23,8 @@ seitenweite Registry bedient jede Stelle, an der Blöcke vorkommen:
 | `openapi` | das lebendige API-Widget: eine Anfrage, mehrere oder ein ganzes Dokument | openapi |
 | `flow` | eine Prozessansicht, aus JSON oder Mermaid-Quelltext (state/flowchart) | flow |
 | `board` | ein schreibgeschütztes Whiteboard, aus dem JSON des Boards | board |
+| `kanban` | ein schreibgeschütztes Kanban-Board, aus dem Kanban-Markup | kanban |
+| `calendar` | ein Kalender der Termine (Wiederholungen aufgelöst) | calendar |
 | `video` | der Videoplayer des Kits | kit |
 | `audio` | der Audioplayer oder die Playlist des Kits | kit |
 

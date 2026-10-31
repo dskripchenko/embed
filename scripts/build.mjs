@@ -71,7 +71,7 @@ for (const [name, file] of [
 }
 
 // ---- 2. The plugin modules ----
-const plugins = ['media', 'diagram', 'openapi', 'flow', 'markdown', 'editor', 'board', 'bpmn', 'drawio']
+const plugins = ['media', 'diagram', 'openapi', 'flow', 'markdown', 'editor', 'board', 'bpmn', 'drawio', 'kanban', 'calendar']
 await build({
   root,
   configFile: false,

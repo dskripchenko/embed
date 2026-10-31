@@ -37,6 +37,8 @@ export const ELEMENTS: Readonly<Record<string, ElementSpec>> = {
   'dsk-asyncapi': { plugin: 'openapi', methods: ['enterFullscreen', 'exitFullscreen'], getters: ['loaded', 'fullscreen'], objects: ['spec', 'labels'] },
   'dsk-bpmn': { plugin: 'bpmn', methods: ['fit', 'undo', 'redo', 'toSvg', 'enterFullscreen', 'exitFullscreen'], getters: ['value', 'fullscreen'], objects: ['labels', 'highlight'] },
   'dsk-dmn': { plugin: 'bpmn', methods: ['fit', 'undo', 'redo', 'toSvg', 'open', 'enterFullscreen', 'exitFullscreen'], getters: ['value', 'fullscreen'], objects: ['labels', 'highlight'] },
+  'dsk-calendar': { plugin: 'calendar', methods: [], getters: ['value'], objects: [] },
+  'dsk-kanban': { plugin: 'kanban', methods: [], getters: ['value', 'board'], objects: [] },
   'dsk-drawio': { plugin: 'drawio', methods: ['showPage', 'enterFullscreen', 'exitFullscreen'], getters: ['svg', 'pages', 'page', 'fullscreen'], objects: [] },
 }
 
@@ -112,6 +114,8 @@ function createElementClass(tag: string, spec: ElementSpec, schema: Schema): Cus
     }
 
     connectedCallback(): void {
+      // The mark embed.css styles our elements by (one selector for every tag).
+      if (!this.hasAttribute('data-dsk')) this.setAttribute('data-dsk', '')
       // Moved within the page: the rendered content moved with it.
       if (this._instance || this._starting) return
       // Upgraded while the parser is still on the start tag: the children (the

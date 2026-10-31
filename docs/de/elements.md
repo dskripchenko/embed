@@ -36,6 +36,8 @@ Allen Elementen gemeinsam:
   Locale ([Konfiguration](config-and-events.md)).
 - **`loading="lazy"`** — erst laden und rendern, wenn das Element in die Nähe
   des Viewports kommt.
+- **`data-dsk`** — jedes Element setzt dieses Attribut beim Verbinden;
+  die Basisstile des Embeds wählen Elemente darüber aus.
 - **Zustand** — `data-dsk-state` ist `loading`, `ready` oder `error`; stylen
   Sie Platzhalter darüber. Während des Ladens reserviert das Element eine Box
   plausibler Größe.
@@ -456,6 +458,143 @@ ein geparstes Objekt.
 | `height` | `height` | Höhe eines scrollenden Bereichs; standardmäßig die Höhe der Seite. |
 
 Getter: `loaded`. Ereignisse: `dsk:load`, `dsk:error` `{ message }`.
+
+## `<dsk-kanban>`
+
+```html
+<dsk-kanban editable lockable name="plan">
+  <script type="text/plain">
+    # Release 3.0
+    lanes: Zahlungen, Erstattungen
+    tags: payments=info, refunds=warning
+
+    ## Backlog
+    - Sofortzahlungen #payments {lane: Zahlungen, who: Anna, due: 2026-11-15}
+    - Teilerstattungen per API #refunds !high {lane: Erstattungen}
+      Händler möchten einen Teil des Betrags ohne Anruf erstatten.
+
+    ## In Arbeit {wip: 3}
+    - [ACME-398](https://jira.example.com/browse/ACME-398) Antifraud v2 {who: Oleg}
+
+    ## Erledigt {done}
+    - Signierte Webhooks #payments
+  </script>
+</dsk-kanban>
+```
+
+Ein Board aus Spalten und Karten, als Markup geschrieben und mit dem
+`UidBoard` des Kits gezeichnet. Das Markup liest sich wie Markdown:
+
+- `# …` — der Titel des Boards; `key: value`-Zeilen vor der ersten Spalte —
+  Einstellungen: `lanes` (Swimlanes, in Reihenfolge), `tags` (ein Ton pro
+  Tag: `info`, `success`, `warning`, `danger`).
+- `## Spalte {wip: 3, done}` — eine Spalte; `wip` ist ein WIP-Limit (der
+  Zähler wird darüber rot), `done` markiert die Spalte der erledigten Karten
+  (durchgestrichen, nie überfällig).
+- `- Kartentitel #tag !high {lane: …, who: …, due: JJJJ-MM-TT, beliebig: Wert}` —
+  eine Karte. Der Titel kennt Inline-Markdown (Links, Code, Fett); `!high` /
+  `!low` — Priorität; Eigenschaften in geschweiften Klammern; darunter
+  eingerückte Zeilen — die Beschreibung der Karte in Markdown.
+  `<!-- Kommentare -->` bleiben erhalten.
+
+Ein Klick auf eine Karte öffnet ihre Details. Mit `editable` werden Karten
+zwischen Spalten und Lanes gezogen, `+` in einer Spalte fügt eine Karte
+hinzu, das Panel ändert oder löscht sie, und der Reiter **Quelltext**
+bearbeitet das Markup selbst, mit Problemen pro Zeile. Jede Änderung
+schreibt nur die Zeilen um, die sie betrifft — Kommentare, Leerzeilen und
+der übrige Text bleiben, wie sie waren — und wird als `dsk:change` mit dem
+ganzen neuen Quelltext gemeldet. Über dem Board filtern Tags und Personen.
+
+`locked` macht das Board für alle schreibgeschützt; `lockable` zeigt das
+Schloss, das `dsk:lock` `{ locked }` sendet: der Host speichert das (als
+Attribut oder dort, wo er den Quelltext ablegt), so wie er den Quelltext bei
+`dsk:change` speichert.
+
+| Attribut | Eigenschaft | |
+|---|---|---|
+| `src` | `src` | Das Markup von einer URL statt aus dem Inhalt laden. |
+| `editable` | `editable` | Drag and Drop, neue und geänderte Karten, der Quelltext-Reiter. |
+| `locked` | `locked` | Schreibgeschützt, unabhängig von `editable`. |
+| `lockable` | `lockable` | Die Schloss-Schaltfläche zeigen. |
+| `name` | `name` | Ein verstecktes Feld mit dem Markup, für ein Formular. |
+
+Getter: `value` (das Markup), `board` (das gelesene Board). Ereignisse:
+`dsk:change` `{ source }`, `dsk:lock` `{ locked }`, `dsk:open` `{ card }`,
+`dsk:load` `{ problems }`, `dsk:error` `{ message }`.
+
+## `<dsk-calendar>`
+
+```html
+<dsk-calendar view="month" editable lockable name="events">
+  <script type="text/plain">
+    # Releases und Bereitschaft
+    tags: release=danger
+
+    2026-11-03 10:00-11:00 Release-Demo #release {where: Raum 4}
+    2026-11-10..2026-11-14 Code-Freeze #release
+    every mon 11:00-11:30 Sprintplanung {from: 2026-11-02, until: 2026-12-28, except: 2026-11-30}
+    every 2 weeks fri 16:00-17:00 Retro {from: 2026-11-06}
+    every month last fri Release in Produktion #release
+    every year 12-31 Neujahrs-Freeze
+  </script>
+</dsk-calendar>
+```
+
+Als Markup geschriebene Termine im `UidCalendar` des Kits: Tag, Woche,
+Monat, Jahr und Agenda. Zuerst Einstellungen (`key: value`) — `view` (die
+erste Ansicht), `date` (das erste Datum), `tags` (ein Ton pro Tag) —, dann
+ein Termin pro Zeile:
+
+- **Wann**: ein Datum `2026-11-03` oder ein Zeitraum `2026-11-10..2026-11-14`,
+  dann optional eine Uhrzeit `10:00` oder `10:00-11:00` (ohne — ganztägig).
+- **Was**: der Titel (Inline-Markdown), `#Tags` (der erste gibt die Farbe),
+  `{Eigenschaften}` — `where`, `who`, `url`, `description` oder eigene.
+- **Wiederholungen** beginnen mit `every` statt mit einem Datum — eine
+  Teilmenge von RRULE aus RFC 5545 in Worten:
+
+  | Zeile | Wiederholt sich |
+  |---|---|
+  | `every day`, `every 3 days` | jeden (dritten) Tag |
+  | `every mon,wed`, `every 2 weeks fri` | an diesen Wochentagen, jede (zweite) Woche |
+  | `every month 15`, `every month last` | an diesem Tag des Monats, am letzten Tag |
+  | `every month 2nd tue`, `every month last fri` | am n-ten / letzten Wochentag |
+  | `every year 12-31` | jedes Jahr an diesem Datum |
+
+  Grenzen und Ausnahmen stehen in den Eigenschaften: `from` (das erste
+  Datum; nötig für `count` und „alle N“), `until`, `count`, `except` (Daten,
+  durch Kommas getrennt). `{rrule: FREQ=WEEKLY;BYDAY=MO,WE;INTERVAL=2}` nimmt
+  eine Regel, wie sie ist — etwa aus iCal kopiert. Wiederholungen werden nur
+  für die sichtbaren Tage aufgelöst.
+
+Mit `editable`: einen Termin auf einen anderen Tag oder eine andere Stunde
+ziehen, ihn in Tag- und Wochenansicht verlängern, eine leere Stelle (einen
+Tag im Monat oder **+ Termin**) anklicken für einen neuen Termin. Der
+**Termin-Builder** setzt einen Termin aus Auswahlen zusammen — Datum oder
+Zeitraum, ganztägig oder Uhrzeit, die Wiederholung („alle 2 Wochen Mo und
+Mi“, „der letzte Freitag jedes Monats“, bis zu einem Datum / N-mal),
+ausgelassene Daten — und zeigt die Zeile, die er schreibt. Beim Bearbeiten
+eines Vorkommens fragt er, ob nur dieses oder die ganze Serie geändert wird:
+dieses wird ein eigener Termin, und die Serie lässt sein Datum aus (Ziehen
+eines Vorkommens tut dasselbe). Der Reiter **Quelltext** bearbeitet das
+Markup mit Problemen pro Zeile. Jede Änderung schreibt eine Zeile um (zwei
+für ein abgetrenntes Vorkommen) und wird als `dsk:change` mit dem ganzen
+neuen Quelltext gemeldet. `locked` und `lockable` wie bei `<dsk-kanban>`.
+
+| Attribut | Eigenschaft | |
+|---|---|---|
+| `src` | `src` | Das Markup von einer URL statt aus dem Inhalt laden. |
+| `view` | `view` | `day`, `week`, `month`, `year` oder `agenda` — die erste Ansicht. |
+| `date` | `date` | Das erste Datum (`JJJJ-MM-TT`); standardmäßig heute. |
+| `views` | `views` | Die angebotenen Ansichten, durch Kommas getrennt; standardmäßig alle fünf. |
+| `editable` | `editable` | Ziehen, Verlängern, der Termin-Builder, der Quelltext-Reiter. |
+| `locked` | `locked` | Schreibgeschützt, unabhängig von `editable`. |
+| `lockable` | `lockable` | Die Schloss-Schaltfläche zeigen. |
+| `name` | `name` | Ein verstecktes Feld mit dem Markup, für ein Formular. |
+
+Getter: `value` (das Markup). Ereignisse: `dsk:change` `{ source }`,
+`dsk:lock` `{ locked }`, `dsk:open` `{ event }`, `dsk:range`
+`{ view, start, end }` (die sichtbaren Tage), `dsk:load` `{ problems }`,
+`dsk:error` `{ message }`.
 
 ## `<dsk-markdown>`
 

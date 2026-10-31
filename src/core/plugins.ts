@@ -14,4 +14,6 @@ export const PLUGIN_STYLES: Readonly<Record<PluginName, readonly StyleName[]>> =
   board: ['tokens', 'themes', 'kit', 'board'],
   bpmn: ['tokens', 'themes', 'kit', 'bpmn'],
   drawio: ['tokens', 'themes'],
+  kanban: ['tokens', 'themes', 'kit'],
+  calendar: ['tokens', 'themes', 'kit'],
 }

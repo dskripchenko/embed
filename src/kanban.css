@@ -1,0 +1,127 @@
+/* <dsk-kanban> (plugins/kanban.ts). */
+:where(.dsk-kanban) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--uid-space-sm, 8px);
+  min-width: 0;
+}
+:where(.dsk-kanban__bar) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--uid-space-sm, 8px);
+}
+:where(.dsk-kanban__title) {
+  font-size: var(--uid-font-size-lg, 16px);
+  font-weight: 600;
+  color: var(--uid-text-primary, #111827);
+  margin-right: var(--uid-space-sm, 8px);
+}
+:where(.dsk-kanban__filters) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--uid-space-sm, 8px);
+  flex: 1;
+  min-width: 0;
+}
+:where(.dsk-kanban__tags) { display: flex; flex-wrap: wrap; gap: 4px; }
+:where(.dsk-kanban__filter, .dsk-kanban__tab) {
+  padding: 2px 10px;
+  border: 1px solid var(--uid-border-subtle, #e5e7eb);
+  border-radius: 999px;
+  background: var(--uid-surface-raised, #fff);
+  color: var(--uid-text-secondary, #4b5563);
+  font: inherit;
+  font-size: var(--uid-font-size-sm, 13px);
+  cursor: pointer;
+}
+:where(.dsk-kanban__filter--on, .dsk-kanban__tab--on) {
+  border-color: var(--uid-accent, #2563eb);
+  background: var(--uid-accent-subtle, #eff6ff);
+  color: var(--uid-accent, #2563eb);
+}
+:where(.dsk-kanban__people) { min-width: 180px; }
+:where(.dsk-kanban__actions) { display: flex; align-items: center; gap: var(--uid-space-sm, 8px); margin-left: auto; }
+:where(.dsk-kanban__tabs) { display: flex; gap: 4px; }
+:where(.dsk-kanban__lock, .dsk-kanban__add) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--uid-border-subtle, #e5e7eb);
+  border-radius: var(--uid-radius-md, 8px);
+  background: var(--uid-surface-raised, #fff);
+  color: var(--uid-text-secondary, #4b5563);
+  cursor: pointer;
+}
+:where(.dsk-kanban__lock--on) { color: var(--uid-warning, #b45309); border-color: currentColor; }
+:where(.dsk-kanban__add) { width: 22px; height: 22px; border-color: transparent; background: none; margin-left: auto; }
+:where(.dsk-kanban__add):hover { color: var(--uid-text-primary, #111827); background: var(--uid-color-bg-subtle, rgb(127 127 127 / 0.1)); }
+:where(.dsk-kanban__filter, .dsk-kanban__tab, .dsk-kanban__lock, .dsk-kanban__add):focus-visible {
+  outline: 2px solid var(--uid-color-focus-ring, #3b82f6);
+  outline-offset: 1px;
+}
+:where(.dsk-kanban__column-head) { display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0; }
+:where(.dsk-kanban__column-title) { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:where(.dsk-kanban__count) {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--uid-color-bg-subtle, rgb(127 127 127 / 0.1));
+  color: var(--uid-text-secondary, #4b5563);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+:where(.dsk-kanban__column-head--over) .dsk-kanban__count { background: var(--uid-danger-subtle, #fee2e2); color: var(--uid-danger, #dc2626); }
+:where(.dsk-kanban__card) { position: relative; display: flex; flex-direction: column; gap: 6px; }
+:where(.dsk-kanban__card-title) { font-size: var(--uid-font-size-sm, 13px); line-height: 1.4; color: var(--uid-text-primary, #111827); overflow-wrap: anywhere; padding-right: 12px; }
+:where(.dsk-kanban__card-title) a { color: var(--uid-accent, #2563eb); }
+:where(.dsk-kanban__card-title) code { font-size: 0.92em; }
+:where(.dsk-kanban__card--done) .dsk-kanban__card-title { color: var(--uid-text-secondary, #4b5563); text-decoration: line-through; }
+:where(.dsk-kanban__card-meta) { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+:where(.dsk-kanban__card-foot) { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; font-size: 12px; color: var(--uid-text-secondary, #4b5563); }
+:where(.dsk-kanban__priority) { font-size: 11px; font-weight: 600; padding: 0 6px; border-radius: 4px; }
+:where(.dsk-kanban__priority--high) { background: var(--uid-danger-subtle, #fee2e2); color: var(--uid-danger, #dc2626); }
+:where(.dsk-kanban__priority--low) { background: var(--uid-color-bg-subtle, rgb(127 127 127 / 0.1)); color: var(--uid-text-secondary, #4b5563); }
+:where(.dsk-kanban__due) { font-variant-numeric: tabular-nums; }
+:where(.dsk-kanban__due--overdue) { color: var(--uid-danger, #dc2626); font-weight: 600; }
+:where(.dsk-kanban__who) { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+:where(.dsk-kanban__avatar) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--dsk-kanban-avatar, #64748b);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+}
+:where(.dsk-kanban__has-desc) { position: absolute; top: 0; right: 0; color: var(--uid-text-tertiary, #9ca3af); font-size: 12px; }
+:where(.dsk-kanban__source) { display: flex; flex-direction: column; gap: 6px; }
+:where(.dsk-kanban__code) {
+  width: 100%;
+  min-height: 320px;
+  padding: 10px 12px;
+  border: 1px solid var(--uid-border-subtle, #e5e7eb);
+  border-radius: var(--uid-radius-md, 8px);
+  background: var(--uid-surface-raised, #fff);
+  color: var(--uid-text-primary, #111827);
+  font: 13px/1.5 var(--uid-font-family-mono, ui-monospace, monospace);
+  resize: vertical;
+  tab-size: 2;
+}
+:where(.dsk-kanban__problems) { margin: 0; padding-left: 18px; color: var(--uid-danger, #dc2626); font-size: 13px; }
+:where(.dsk-kanban__form) { display: flex; flex-direction: column; gap: 12px; }
+:where(.dsk-kanban__field) { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+:where(.dsk-kanban__label) { font-size: 12px; font-weight: 600; color: var(--uid-text-secondary, #4b5563); }
+:where(.dsk-kanban__row) { display: flex; gap: 12px; }
+:where(.dsk-kanban__buttons) { display: flex; gap: 8px; }
+:where(.dsk-kanban__delete) { margin-left: auto; }
+:where(.dsk-kanban__details) { display: flex; flex-direction: column; gap: 12px; }
+:where(.dsk-kanban__props) { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; font-size: 13px; }
+:where(.dsk-kanban__props) dt { color: var(--uid-text-secondary, #4b5563); }
+:where(.dsk-kanban__props) dd { margin: 0; }
