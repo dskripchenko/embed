@@ -1,5 +1,11 @@
 # @dskripchenko/embed
 
+## 1.5.3
+
+### Patch Changes
+
+- 3636ada: Diagrams 1.3.2: edges between clusters no longer loop around the frames.
+
 ## 1.5.2
 
 ### Patch Changes
