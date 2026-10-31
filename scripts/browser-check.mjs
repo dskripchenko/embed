@@ -642,13 +642,13 @@ for (const browserName of Object.keys(browsers)) {
         return {
           columns: all('#kanban .uid-board__column'),
           lanes: all('#kanban .uid-board__lane-title'),
-          cards: all('#kanban .dsk-kanban__card'),
+          cards: all('#kanban .uid-kanban__card'),
           readonly: q('#kanban .uid-board__card')?.getAttribute('draggable'),
-          over: !!q('#kanban .dsk-kanban__column-head--over'),
-          overdue: !!q('#kanban .dsk-kanban__due--overdue'),
-          link: q('#kanban .dsk-kanban__card-title a')?.getAttribute('href'),
-          done: !!q('#kanban .dsk-kanban__card--done'),
-          block: all('#md .uid-markdown__block[data-language="kanban"] .dsk-kanban__card'),
+          over: !!q('#kanban .uid-kanban__column-head--over'),
+          overdue: !!q('#kanban .uid-kanban__due--overdue'),
+          link: q('#kanban .uid-kanban__card-title a')?.getAttribute('href'),
+          done: !!q('#kanban .uid-kanban__card--done'),
+          block: all('#md .uid-markdown__block[data-language="kanban"] .uid-kanban__card'),
         }
       })
       check(`${tag}: <dsk-kanban> draws columns, lanes and cards`, r.columns >= 3 && r.lanes === 2 && r.cards === 5, JSON.stringify(r))
@@ -656,13 +656,13 @@ for (const browserName of Object.keys(browsers)) {
       check(`${tag}: WIP over the limit, an overdue date, a link, a done column`, r.over && r.overdue && r.link === 'https://jira.example.com/browse/ACME-398' && r.done, JSON.stringify(r))
       check(`${tag}: a \`\`\`kanban block in markdown`, r.block === 2, String(r.block))
       // The tag filter.
-      await page.locator('#kanban .dsk-kanban__filter', { hasText: '#refunds' }).click()
-      check(`${tag}: the tag filter leaves matching cards`, (await page.locator('#kanban .dsk-kanban__card').count()) === 1)
-      await page.locator('#kanban .dsk-kanban__filter', { hasText: '#refunds' }).click()
+      await page.locator('#kanban .uid-kanban__filter', { hasText: '#refunds' }).click()
+      check(`${tag}: the tag filter leaves matching cards`, (await page.locator('#kanban .uid-kanban__card').count()) === 1)
+      await page.locator('#kanban .uid-kanban__filter', { hasText: '#refunds' }).click()
       // A read-only card opens its panel.
       await page.locator('#kanban .uid-board__card', { hasText: 'Partial refunds' }).click()
-      await page.waitForSelector('.uid-drawer .dsk-kanban__details', { timeout: 5000 }).catch(() => {})
-      check(`${tag}: a card opens its details`, (await page.locator('.uid-drawer .dsk-kanban__details').textContent() ?? '').includes('Merchants ask'))
+      await page.waitForSelector('.uid-drawer .uid-kanban__details', { timeout: 5000 }).catch(() => {})
+      check(`${tag}: a card opens its details`, (await page.locator('.uid-drawer .uid-kanban__details').textContent() ?? '').includes('Merchants ask'))
       await page.keyboard.press('Escape')
       await page.waitForSelector('.uid-drawer', { state: 'detached', timeout: 5000 }).catch(() => {})
       // Editable: a move rewrites the markup and fills the form input.
@@ -674,21 +674,21 @@ for (const browserName of Object.keys(browsers)) {
       const afterMove = await page.evaluate(() => ({ last: window.__kb.at(-1) ?? '', input: document.querySelector('#kanban-edit input[name="plan"]')?.value ?? '' }))
       check(`${tag}: dragging a card moves its line in the markup`, /## Doing\n- First #a/.test(afterMove.last) && afterMove.input === afterMove.last, JSON.stringify(afterMove.last))
       // A new card through the panel.
-      await page.locator('#kanban-edit .uid-board__column', { hasText: 'Done' }).locator('.dsk-kanban__add').click()
-      await page.waitForSelector('.uid-drawer .dsk-kanban__form', { timeout: 5000 })
-      await page.locator('.uid-drawer .dsk-kanban__form input').first().fill('Shipped card')
-      await page.locator('.uid-drawer .dsk-kanban__form button[type="submit"]').click()
+      await page.locator('#kanban-edit .uid-board__column', { hasText: 'Done' }).locator('.uid-kanban__add').click()
+      await page.waitForSelector('.uid-drawer .uid-kanban__form', { timeout: 5000 })
+      await page.locator('.uid-drawer .uid-kanban__form input').first().fill('Shipped card')
+      await page.locator('.uid-drawer .uid-kanban__form button[type="submit"]').click()
       await sleep(300)
       check(`${tag}: the panel adds a card to its column`, /## Done \{done\}\n- Third\n- Shipped card/.test(await page.evaluate(() => window.__kb.at(-1) ?? '')))
       // The source tab.
-      await page.locator('#kanban-edit .dsk-kanban__tab').nth(1).click()
-      check(`${tag}: the source tab shows the markup`, ((await page.locator('#kanban-edit .dsk-kanban__code').inputValue()) ?? '').includes('- Shipped card'))
-      await page.locator('#kanban-edit .dsk-kanban__tab').nth(0).click()
+      await page.locator('#kanban-edit .uid-kanban__tab').nth(1).click()
+      check(`${tag}: the source tab shows the markup`, ((await page.locator('#kanban-edit .uid-kanban__code').inputValue()) ?? '').includes('- Shipped card'))
+      await page.locator('#kanban-edit .uid-kanban__tab').nth(0).click()
       // The lock.
       await page.evaluate(() => { window.__lock = []; document.querySelector('#kanban-edit').addEventListener('dsk:lock', (e) => window.__lock.push(e.detail.locked)) })
-      await page.locator('#kanban-edit .dsk-kanban__lock').click()
+      await page.locator('#kanban-edit .uid-kanban__lock').click()
       await sleep(200)
-      const locked = await page.evaluate(() => ({ events: window.__lock, draggable: document.querySelector('#kanban-edit .uid-board__card')?.getAttribute('draggable'), add: document.querySelectorAll('#kanban-edit .dsk-kanban__add').length }))
+      const locked = await page.evaluate(() => ({ events: window.__lock, draggable: document.querySelector('#kanban-edit .uid-board__card')?.getAttribute('draggable'), add: document.querySelectorAll('#kanban-edit .uid-kanban__add').length }))
       check(`${tag}: the lock makes the board read-only and says so`, JSON.stringify(locked.events) === '[true]' && locked.draggable === 'false' && locked.add === 0, JSON.stringify(locked))
       // <dsk-calendar>: repeats expanded in the month, other views.
       const c = await page.evaluate(() => {
@@ -719,13 +719,13 @@ for (const browserName of Object.keys(browsers)) {
       await page.locator('#cal-edit .uid-calendar__tg-body').evaluate((b) => (b.scrollTop = 10 * 48))
       const wed = await page.locator('#cal-edit .uid-calendar__col[data-date="2026-11-04"]').boundingBox()
       await page.mouse.click(wed.x + 20, wed.y + 14 * 48 + 10)
-      await page.waitForSelector('.uid-drawer .dsk-cal__form', { timeout: 5000 })
-      await page.locator('.uid-drawer .dsk-cal__form input').first().fill('Standup')
-      await page.locator('.uid-drawer .dsk-cal__repeat .uid-select').first().click()
+      await page.waitForSelector('.uid-drawer .uid-event-calendar__form', { timeout: 5000 })
+      await page.locator('.uid-drawer .uid-event-calendar__form input').first().fill('Standup')
+      await page.locator('.uid-drawer .uid-event-calendar__repeat .uid-select').first().click()
       await page.locator('.uid-select__option, [role="option"]', { hasText: /^(Weekly|Каждую неделю)$/ }).first().click()
-      await page.locator('.uid-drawer .dsk-cal__day', { hasText: /^(Fri|Пт)$/ }).click()
-      const line = await page.locator('.uid-drawer .dsk-cal__line code').textContent()
-      await page.locator('.uid-drawer .dsk-cal__form button[type="submit"]').click()
+      await page.locator('.uid-drawer .uid-event-calendar__day', { hasText: /^(Fri|Пт)$/ }).click()
+      const line = await page.locator('.uid-drawer .uid-event-calendar__line code').textContent()
+      await page.locator('.uid-drawer .uid-event-calendar__form button[type="submit"]').click()
       await sleep(300)
       const saved = await page.evaluate(() => ({ last: window.__cal.at(-1) ?? '', input: document.querySelector('#cal-edit input[name="events"]')?.value ?? '' }))
       check(`${tag}: the event builder writes a weekly repeat`, line === 'every wed,fri 14:00-15:00 Standup {from: 2026-11-04}' && saved.last.endsWith(`${line}\n`) && saved.input === saved.last, JSON.stringify({ line, last: saved.last }))
@@ -739,9 +739,9 @@ for (const browserName of Object.keys(browsers)) {
       await page.mouse.up()
       await sleep(300)
       check(`${tag}: dragging an occurrence of a repeat moves that one only`, /every mon 11:00-11:30 Planning \{from: 2026-11-02, except: 2026-11-02\}\n2026-11-03 14:00-14:30 Planning/.test(await page.evaluate(() => window.__cal.at(-1) ?? '')), await page.evaluate(() => window.__cal.at(-1) ?? ''))
-      await page.locator('#cal-edit .dsk-cal__lock').click()
+      await page.locator('#cal-edit .uid-event-calendar__lock').click()
       await sleep(200)
-      check(`${tag}: the calendar lock hides the editing tools`, (await page.locator('#cal-edit .dsk-cal__btn').count()) === 0 && (await page.locator('#cal-edit .uid-calendar--editable').count()) === 0)
+      check(`${tag}: the calendar lock hides the editing tools`, (await page.locator('#cal-edit .uid-event-calendar__btn').count()) === 0 && (await page.locator('#cal-edit .uid-calendar--editable').count()) === 0)
       const vue = await oneVue(page)
       check(`${tag}: one Vue`, vue.contexts <= 1 && vue.versions.length <= 1, JSON.stringify(vue))
       if (browserName === 'chromium' && variant === 'loader') await shot(page, 'planning-desktop-light')
