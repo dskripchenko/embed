@@ -396,11 +396,14 @@ for (const browserName of Object.keys(browsers)) {
     try {
       await settle(page)
       // Polling: the snapshot endpoint is called every poll-interval (600 ms); a slow runner gets 5 s.
+      // flow pauses polling in a hidden tab, and headless WebKit may report the page hidden: front it.
+      await page.bringToFront()
+      const visibility = await page.evaluate(() => document.visibilityState)
       serverLog.polls = []
       const pollStart = Date.now()
       while (serverLog.polls.length < 2 && Date.now() - pollStart < 5000) await sleep(200)
       const polls = serverLog.polls.length
-      check(`${tag}: poll-url polls the snapshot endpoint`, polls >= 2, `${polls} polls in ${Date.now() - pollStart} ms at 600 ms`)
+      check(`${tag}: poll-url polls the snapshot endpoint`, polls >= 2, `${polls} polls in ${Date.now() - pollStart} ms at 600 ms, page ${visibility}`)
 
       // Toggle: accepted, then refused and rolled back.
       serverLog.toggles = []
