@@ -65,7 +65,7 @@
     "@dskripchenko/drawio": "0.1.0",
     "@dskripchenko/flow": "1.2.0",
     "@dskripchenko/openapi": "1.2.0",
-    "@dskripchenko/ui": "1.17.0",
+    "@dskripchenko/ui": "1.18.0",
     "@dskripchenko/wysiwyg": "0.5.3",
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.5",
