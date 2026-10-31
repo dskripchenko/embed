@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>embed — kanban and calendar</title>
+  <script src="{{EMBED_SRC}}"></script>
+  <style>body { font: 14px system-ui, sans-serif; margin: 16px; } section { margin: 16px 0; }</style>
+</head>
+<body>
+  <section>
+    <dsk-kanban id="kanban">
+      <script type="text/plain"># Release 3.0
+lanes: Payments, Refunds
+tags: payments=info, refunds=warning
+
+## Backlog
+- Connect the instant payments system #payments {lane: Payments, who: Anna Smith, due: 2026-11-15}
+- Partial refunds over the API #refunds !high {lane: Refunds}
+  Merchants ask to refund part of an amount without a call.
+
+## In progress {wip: 1}
+- [ACME-398](https://jira.example.com/browse/ACME-398) Antifraud v2 {lane: Payments, who: Oleg}
+- Settlement reports #payments {lane: Payments, who: Ira, due: 2020-01-01}
+
+## Done {done}
+- Signed webhooks #payments {lane: Payments}</script>
+    </dsk-kanban>
+  </section>
+  <section>
+    <form id="form">
+      <dsk-kanban id="kanban-edit" editable lockable name="plan">
+        <script type="text/plain">## To do
+- First #a
+- Second #b
+
+## Doing
+
+## Done {done}
+- Third</script>
+      </dsk-kanban>
+    </form>
+  </section>
+  <section>
+    <dsk-markdown id="md">
+      <script type="text/plain"># Plan in markdown
+
+```kanban
+## To do
+- A card
+## Done
+- Another
+```</script>
+    </dsk-markdown>
+  </section>
+</body>
+</html>

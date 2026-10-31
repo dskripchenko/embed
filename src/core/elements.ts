@@ -37,6 +37,7 @@ export const ELEMENTS: Readonly<Record<string, ElementSpec>> = {
   'dsk-asyncapi': { plugin: 'openapi', methods: ['enterFullscreen', 'exitFullscreen'], getters: ['loaded', 'fullscreen'], objects: ['spec', 'labels'] },
   'dsk-bpmn': { plugin: 'bpmn', methods: ['fit', 'undo', 'redo', 'toSvg', 'enterFullscreen', 'exitFullscreen'], getters: ['value', 'fullscreen'], objects: ['labels', 'highlight'] },
   'dsk-dmn': { plugin: 'bpmn', methods: ['fit', 'undo', 'redo', 'toSvg', 'open', 'enterFullscreen', 'exitFullscreen'], getters: ['value', 'fullscreen'], objects: ['labels', 'highlight'] },
+  'dsk-kanban': { plugin: 'kanban', methods: [], getters: ['value', 'board'], objects: [] },
   'dsk-drawio': { plugin: 'drawio', methods: ['showPage', 'enterFullscreen', 'exitFullscreen'], getters: ['svg', 'pages', 'page', 'fullscreen'], objects: [] },
 }
 

@@ -196,6 +196,14 @@ export const SCHEMAS: Readonly<Record<string, Schema>> = {
     { prop: 'height', type: 'string' },
     { prop: 'name', type: 'string' },
   ],
+  'dsk-kanban': [
+    ...COMMON,
+    { prop: 'src', type: 'string' },
+    { prop: 'editable', type: 'boolean' },
+    { prop: 'locked', type: 'boolean' },
+    { prop: 'lockable', type: 'boolean' },
+    { prop: 'name', type: 'string' },
+  ],
   'dsk-drawio': [
     ...COMMON,
     { prop: 'src', type: 'string' },

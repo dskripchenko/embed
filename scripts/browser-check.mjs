@@ -615,6 +615,80 @@ for (const browserName of Object.keys(browsers)) {
   }
 }
 
+// ---------------------------------------------------------------- planning: kanban (and calendar)
+for (const browserName of Object.keys(browsers)) {
+  for (const variant of ['loader', 'bundle']) {
+    const tag = `${browserName}/${variant}/planning`
+    if (!wants(tag)) continue
+    const { page, errors, close } = await open(browserName, `/planning.html?embed=${variant}`)
+    try {
+      await settle(page, 40000)
+      const r = await page.evaluate(() => {
+        const q = (s) => document.querySelector(s)
+        const all = (s) => document.querySelectorAll(s).length
+        return {
+          columns: all('#kanban .uid-board__column'),
+          lanes: all('#kanban .uid-board__lane-title'),
+          cards: all('#kanban .dsk-kanban__card'),
+          readonly: q('#kanban .uid-board__card')?.getAttribute('draggable'),
+          over: !!q('#kanban .dsk-kanban__column-head--over'),
+          overdue: !!q('#kanban .dsk-kanban__due--overdue'),
+          link: q('#kanban .dsk-kanban__card-title a')?.getAttribute('href'),
+          done: !!q('#kanban .dsk-kanban__card--done'),
+          block: all('#md .uid-markdown__block[data-language="kanban"] .dsk-kanban__card'),
+        }
+      })
+      check(`${tag}: <dsk-kanban> draws columns, lanes and cards`, r.columns >= 3 && r.lanes === 2 && r.cards === 5, JSON.stringify(r))
+      check(`${tag}: read-only cards do not drag`, r.readonly === 'false', String(r.readonly))
+      check(`${tag}: WIP over the limit, an overdue date, a link, a done column`, r.over && r.overdue && r.link === 'https://jira.example.com/browse/ACME-398' && r.done, JSON.stringify(r))
+      check(`${tag}: a \`\`\`kanban block in markdown`, r.block === 2, String(r.block))
+      // The tag filter.
+      await page.locator('#kanban .dsk-kanban__filter', { hasText: '#refunds' }).click()
+      check(`${tag}: the tag filter leaves matching cards`, (await page.locator('#kanban .dsk-kanban__card').count()) === 1)
+      await page.locator('#kanban .dsk-kanban__filter', { hasText: '#refunds' }).click()
+      // A read-only card opens its panel.
+      await page.locator('#kanban .uid-board__card', { hasText: 'Partial refunds' }).click()
+      await page.waitForSelector('.uid-drawer .dsk-kanban__details', { timeout: 5000 }).catch(() => {})
+      check(`${tag}: a card opens its details`, (await page.locator('.uid-drawer .dsk-kanban__details').textContent() ?? '').includes('Merchants ask'))
+      await page.keyboard.press('Escape')
+      await page.waitForSelector('.uid-drawer', { state: 'detached', timeout: 5000 }).catch(() => {})
+      // Editable: a move rewrites the markup and fills the form input.
+      await page.evaluate(() => { window.__kb = []; document.querySelector('#kanban-edit').addEventListener('dsk:change', (e) => window.__kb.push(e.detail.source)) })
+      const first = page.locator('#kanban-edit .uid-board__card', { hasText: 'First' })
+      const doing = page.locator('#kanban-edit .uid-board__column', { hasText: 'Doing' }).locator('.uid-board__cards')
+      await first.dragTo(doing)
+      await sleep(300)
+      const afterMove = await page.evaluate(() => ({ last: window.__kb.at(-1) ?? '', input: document.querySelector('#kanban-edit input[name="plan"]')?.value ?? '' }))
+      check(`${tag}: dragging a card moves its line in the markup`, /## Doing\n- First #a/.test(afterMove.last) && afterMove.input === afterMove.last, JSON.stringify(afterMove.last))
+      // A new card through the panel.
+      await page.locator('#kanban-edit .uid-board__column', { hasText: 'Done' }).locator('.dsk-kanban__add').click()
+      await page.waitForSelector('.uid-drawer .dsk-kanban__form', { timeout: 5000 })
+      await page.locator('.uid-drawer .dsk-kanban__form input').first().fill('Shipped card')
+      await page.locator('.uid-drawer .dsk-kanban__form button[type="submit"]').click()
+      await sleep(300)
+      check(`${tag}: the panel adds a card to its column`, /## Done \{done\}\n- Third\n- Shipped card/.test(await page.evaluate(() => window.__kb.at(-1) ?? '')))
+      // The source tab.
+      await page.locator('#kanban-edit .dsk-kanban__tab').nth(1).click()
+      check(`${tag}: the source tab shows the markup`, ((await page.locator('#kanban-edit .dsk-kanban__code').inputValue()) ?? '').includes('- Shipped card'))
+      await page.locator('#kanban-edit .dsk-kanban__tab').nth(0).click()
+      // The lock.
+      await page.evaluate(() => { window.__lock = []; document.querySelector('#kanban-edit').addEventListener('dsk:lock', (e) => window.__lock.push(e.detail.locked)) })
+      await page.locator('#kanban-edit .dsk-kanban__lock').click()
+      await sleep(200)
+      const locked = await page.evaluate(() => ({ events: window.__lock, draggable: document.querySelector('#kanban-edit .uid-board__card')?.getAttribute('draggable'), add: document.querySelectorAll('#kanban-edit .dsk-kanban__add').length }))
+      check(`${tag}: the lock makes the board read-only and says so`, JSON.stringify(locked.events) === '[true]' && locked.draggable === 'false' && locked.add === 0, JSON.stringify(locked))
+      const vue = await oneVue(page)
+      check(`${tag}: one Vue`, vue.contexts <= 1 && vue.versions.length <= 1, JSON.stringify(vue))
+      if (browserName === 'chromium' && variant === 'loader') await shot(page, 'planning-desktop-light')
+      check(`${tag}: no console errors`, errors.length === 0, errors.slice(0, 5).join(' | '))
+    } catch (error) {
+      check(`${tag}: ran to the end`, false, error.message.split('\n')[0])
+    } finally {
+      await close()
+    }
+  }
+}
+
 // ---------------------------------------------------------------- notations: PlantUML, DOT, BPMN, DMN, draw.io, AsyncAPI
 for (const browserName of Object.keys(browsers)) {
   for (const variant of ['loader', 'bundle']) {
