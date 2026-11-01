@@ -52,7 +52,7 @@ function boot(): void {
 
   const { map, conflicts } = installImportMap(buildImportMap(cdnBase, versions))
   for (const c of conflicts) {
-    console.warn(`[dsk-embed] the page maps "${c.specifier}" to ${c.page}, the embed expects ${c.embed}: map both to one file (two copies of Vue or the kit break the elements)`)
+    console.warn(`[dsk-embed] the page maps "${c.specifier}" to ${c.page}, not ${c.embed}: two copies break the elements`)
   }
 
   injectStyle('base', BASE_CSS)
