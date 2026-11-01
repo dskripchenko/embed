@@ -1,5 +1,11 @@
 # @dskripchenko/embed
 
+## 1.8.0
+
+### Minor Changes
+
+- 862c151: Markdown: a ```video or ```audio block's relative paths — `src`, sources, tracks, `poster`, `thumbnails` — resolve against the markdown's `image-base`, as its images do. A block takes `preload: none | metadata | auto`. Task lists (`- [ ]` / `- [x]`) render as checkboxes. Runtime: @dskripchenko/ui 1.22.0, @dskripchenko/diagrams 1.3.4 (edge labels and lines no longer cover frame titles).
+
 ## 1.7.0
 
 ### Minor Changes
