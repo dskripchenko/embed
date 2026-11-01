@@ -470,7 +470,7 @@ for (const browserName of Object.keys(browsers)) {
       await page.waitForFunction(() => !!document.querySelector('#md-relative .uid-video video'), null, { timeout: 10000 }).catch(() => {})
       const rel = await page.evaluate(() => {
         const v = document.querySelector('#md-relative .uid-video video')
-        const path = (u) => (u ? new URL(u, location.href).pathname : null)
+        const path = (u) => (u ? new URL(u, document.baseURI).pathname : null)
         return {
           image: path(document.querySelector('#md-relative img')?.getAttribute('src')),
           video: path(v?.currentSrc || v?.querySelector('source')?.getAttribute('src') || v?.getAttribute('src')),
