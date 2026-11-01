@@ -853,6 +853,18 @@ for (const browserName of Object.keys(browsers)) {
       await page.waitForSelector('#md-edit textarea', { timeout: 5000 }).catch(() => {})
       const source = await page.evaluate(() => document.querySelector('#md-edit textarea')?.value ?? null)
       check(`${tag}: <dsk-markdown-editor> mode="source" shows the Markdown itself`, typeof source === 'string' && source.startsWith('# A note — edited'), String(source).slice(0, 60))
+      // The page's own controls: the toolbar in its bar, no mode buttons; modes still switch through `mode`.
+      await page.waitForFunction(() => !!document.querySelector('#host-bar .dsk-wysiwyg-toolbar'), null, { timeout: 10000 }).catch(() => {})
+      const hosted = await page.evaluate(async () => {
+        const el = document.querySelector('#md-hosted')
+        const inBar = !!document.querySelector('#host-bar .dsk-wysiwyg-toolbar--detached')
+        const inEditor = !!el.querySelector('.dsk-wysiwyg-toolbar')
+        const modes = !!el.querySelector('.dsk-md__modes')
+        el.mode = 'source'
+        await new Promise((r) => setTimeout(r, 300))
+        return { inBar, inEditor, modes, source: !!el.querySelector('textarea'), barAfter: !!document.querySelector('#host-bar .dsk-wysiwyg-toolbar') }
+      })
+      check(`${tag}: <dsk-markdown-editor toolbar-target mode-switch="false"> — the toolbar in the page's bar, no mode buttons`, hosted.inBar && !hosted.inEditor && !hosted.modes && hosted.source && !hosted.barAfter, JSON.stringify(hosted))
       // A ```video block's relative paths resolve against the markdown's image-base, as its images do.
       await page.waitForFunction(() => !!document.querySelector('#md-relative .uid-video video'), null, { timeout: 10000 }).catch(() => {})
       const rel = await page.evaluate(() => {
