@@ -14,7 +14,8 @@ restore()
 The browser's own print (Ctrl+P / ⌘P) does the same by itself through
 `beforeprint` and `afterprint`; forms that take a moment to build (an API
 reference) are only certain to be there when `prepare()` was awaited first.
-`prepare()` first waits (up to ten seconds) for the widgets that are still
+Forms the page prepared itself stay through those events (a print to PDF
+fires them too). `prepare()` first waits (up to ten seconds) for the widgets that are still
 drawing — an element loading, a markdown block not mounted yet — so it can
 be called the moment the content is on the page. `prepare(root)` limits it
 to a part of the page.
