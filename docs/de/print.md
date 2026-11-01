@@ -15,6 +15,9 @@ restore()
 Der Druck des Browsers selbst (Strg+P / ⌘P) erledigt das von allein über
 `beforeprint` und `afterprint`; Formen, die einen Moment brauchen (eine
 API-Referenz), sind nur sicher da, wenn zuvor auf `prepare()` gewartet wurde.
+`prepare()` wartet zuerst (bis zu zehn Sekunden) auf Widgets, die noch
+zeichnen — ein Element, das lädt, ein noch nicht eingehängter Markdown-Block —,
+kann also aufgerufen werden, sobald der Inhalt auf der Seite ist.
 `prepare(root)` beschränkt es auf einen Teil der Seite.
 
 ## Was jedes Widget druckt

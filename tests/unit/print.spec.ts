@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest'
 import type { Host } from '../../src/core/types'
-import { printable } from '../../src/plugins/print'
+import { installPrinter, printable } from '../../src/plugins/print'
 
 const host = () => ({}) as Host
 const widget = (parent: HTMLElement = document.body) => {
@@ -64,22 +64,37 @@ describe('print forms', () => {
   it('a restore while forms are built leaves nothing behind; the browser print events do both', async () => {
     const h = host()
     const a = widget()
-    let release!: () => void
-    printable(h, a, () => new Promise<string>((r) => (release = () => r('late'))))
-    const pending = h.printer!.prepare(document)
-    h.printer!.restore()
-    release()
-    await pending
+    // The print is called off while this very form is being built.
+    printable(h, a, () => {
+      h.printer!.restore()
+      return 'late'
+    })
+    await h.printer!.prepare(document)
     expect(a.classList.contains('dsk-print-hidden')).toBe(false)
-    expect([...document.querySelectorAll('.dsk-print-form')].map((f) => f.textContent)).toEqual([])
+    expect(document.querySelectorAll('.dsk-print-form')).toHaveLength(0)
+    a.remove()
 
     const b = widget()
     printable(h, b, () => 'auto')
     window.dispatchEvent(new Event('beforeprint'))
-    release()
-    await new Promise((r) => setTimeout(r, 0))
-    expect(b.nextElementSibling?.textContent).toBe('auto')
+    await vi.waitFor(() => expect(b.nextElementSibling?.textContent).toBe('auto'))
     window.dispatchEvent(new Event('afterprint'))
     expect(b.classList.contains('dsk-print-hidden')).toBe(false)
+  })
+
+  it('waits for the widgets in its scope that are still drawing', async () => {
+    const h = host()
+    const part = widget()
+    const loading = widget(part)
+    loading.setAttribute('data-dsk-state', 'loading')
+    // A plugin with Vue sets the printer up when it loads, before any form exists.
+    const prepared = installPrinter(h).prepare(part)
+    // The widget finishes drawing and registers its form while prepare waits.
+    await new Promise((r) => setTimeout(r, 120))
+    printable(h, loading, () => 'drawn')
+    loading.setAttribute('data-dsk-state', 'ready')
+    await prepared
+    expect(loading.nextElementSibling?.textContent).toBe('drawn')
+    h.printer!.restore()
   })
 })

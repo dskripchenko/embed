@@ -23,6 +23,7 @@ import {
 } from 'vue'
 import { en, markdownBlockRenderersKey, provideAppLocale, provideLocale, ru } from '@dskripchenko/ui'
 import type { BlockRenderer, ElementContext, Host, Locale, ResolvedTheme } from '../core/types'
+import { installPrinter } from './print'
 
 export interface RuntimeState {
   locale: Locale
@@ -42,6 +43,7 @@ const providedRenderers: Record<string, BlockRenderer> = {}
 export function setupRuntime(h: Host): void {
   if (host) return
   host = h
+  installPrinter(h)
   app = createApp({ render: () => null })
   app.config.errorHandler = (error, _instance, info) => {
     console.error(`[dsk-embed] ${info}:`, error)

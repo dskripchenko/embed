@@ -694,6 +694,19 @@ for (const browserName of Object.keys(browsers)) {
       await page.emulateMedia({ media: 'screen' })
       const back = await page.evaluate(() => ({ forms: document.querySelectorAll('.dsk-print-form').length, hidden: document.querySelectorAll('.dsk-print-hidden').length }))
       check(`${tag}: restore takes the forms away`, back.forms === 0 && back.hidden === 0, JSON.stringify(back))
+      // Printed the moment it is on the page: prepare waits for what is still drawing.
+      const fresh = await page.evaluate(async () => {
+        const box = document.createElement('section')
+        box.innerHTML = '<dsk-markdown><script type="text/markdown">```flow\nflowchart LR\n  P[Fresh] --> Q[Printed]\n```\n</script></dsk-markdown>'
+        document.body.append(box)
+        const restore = await window.DskEmbed.print.prepare(box)
+        const svg = box.querySelector('.dsk-print-form > svg')
+        const text = svg?.textContent ?? ''
+        restore()
+        box.remove()
+        return text
+      })
+      check(`${tag}: a widget printed as soon as it is added is waited for`, fresh.includes('Printed'), JSON.stringify(fresh))
       check(`${tag}: no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '))
     } catch (error) {
       check(`${tag}: ran`, false, error.message.split('\n')[0])
