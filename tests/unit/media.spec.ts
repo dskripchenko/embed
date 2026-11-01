@@ -90,3 +90,11 @@ describe('media blocks: paths relative to the markdown', () => {
     expect(resolveMediaUrls(props, undefined)).toBe(props)
   })
 })
+
+describe('media blocks: preload', () => {
+  it('takes preload none | metadata | auto and ignores anything else', () => {
+    expect(videoBlockProps('src: a.mp4\npreload: none').preload).toBe('none')
+    expect(audioBlockProps('src: a.mp3\npreload: auto').preload).toBe('auto')
+    expect(videoBlockProps('src: a.mp4\npreload: eager').preload).toBeUndefined()
+  })
+})

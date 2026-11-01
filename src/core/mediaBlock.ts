@@ -166,9 +166,15 @@ export function videoBlockProps(code: string): Record<string, unknown> {
     autoplay: bool(o.autoplay),
     muted: bool(o.muted) ?? bool(o.autoplay),
     loop: bool(o.loop),
+    preload: preload(o.preload),
     maxWidth: typeof o.maxWidth === 'number' || typeof o.maxWidth === 'string' ? o.maxWidth : undefined,
   }
   return Object.fromEntries(Object.entries(props).filter(([, v]) => v !== undefined))
+}
+
+/** `preload: none | metadata | auto`; anything else is left to the player. */
+function preload(v: unknown): string | undefined {
+  return v === 'none' || v === 'metadata' || v === 'auto' ? v : undefined
 }
 
 /** The props of `<dsk-audio>` an ```audio block describes: one track or a playlist. */
@@ -183,6 +189,7 @@ export function audioBlockProps(code: string): Record<string, unknown> {
     waveform: bool(o.waveform),
     loop: bool(o.loop),
     variant: o.mini === true || o.variant === 'mini' ? 'mini' : undefined,
+    preload: preload(o.preload),
     peaks: Array.isArray(o.peaks) ? o.peaks.filter((p): p is number => typeof p === 'number') : undefined,
     maxWidth: typeof o.maxWidth === 'number' || typeof o.maxWidth === 'string' ? o.maxWidth : undefined,
   }

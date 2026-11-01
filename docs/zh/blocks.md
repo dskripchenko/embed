@@ -53,8 +53,9 @@ tracks:
 ````
 
 视频的键：`src` / `sources`、`poster`、`tracks`、`thumbnails`、`title`、
-`aspectRatio`、`autoplay`、`muted`、`loop`、`maxWidth`。音频：`src` / `tracks`、
-`title`、`artist`、`waveform`、`peaks`、`loop`、`mini`、`maxWidth`。
+`aspectRatio`、`autoplay`、`muted`、`loop`、`preload`、`maxWidth`。音频：`src` / `tracks`、
+`title`、`artist`、`waveform`、`peaks`、`loop`、`mini`、`preload`、`maxWidth`。相对路径与 Markdown
+的图片一样，相对于其 `image-base` 解析。
 
 块播放器通过 `blockEl.dskPlayer` 提供与元素相同的方法（`play()`、`seek()`、
 `playChapter()` 等），其事件也像元素的事件一样从块冒泡。
