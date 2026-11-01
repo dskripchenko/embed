@@ -8,7 +8,7 @@ import { UidAudio, UidVideo } from '@dskripchenko/ui'
 import { audioProps, videoProps } from '../core/media'
 import { cssLength } from '../core/attrs'
 import { findChapter, type Chapter } from '../core/chapters'
-import { MediaBlockError, audioBlockProps, videoBlockProps } from '../core/mediaBlock'
+import { MediaBlockError, audioBlockProps, resolveMediaUrls, videoBlockProps } from '../core/mediaBlock'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
 import { instanceRef, mountElementView, mountView, runtimeHost, setupRuntime, hc } from './runtime'
 
@@ -151,8 +151,10 @@ export function mountElement(ctx: ElementContext): ElementInstance {
 }
 
 function blockRenderer(kind: 'video' | 'audio'): BlockRenderer {
-  return (code) => {
-    const toProps = kind === 'video' ? videoBlockProps : audioBlockProps
+  return (code, ctx) => {
+    // Paths relative to the markdown — `src: intro.mp4` — resolve as its images do.
+    const parse = kind === 'video' ? videoBlockProps : audioBlockProps
+    const toProps = (source: string) => resolveMediaUrls(parse(source), ctx?.imageBase ?? ctx?.linkBase)
     let initial: Record<string, unknown>
     try {
       initial = toProps(code)

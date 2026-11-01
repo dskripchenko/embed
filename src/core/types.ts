@@ -53,7 +53,9 @@ export interface BlockResult {
   mount?: (el: HTMLElement, ctx: BlockMountContext) => BlockMountHandle | (() => void) | void
 }
 
-export type BlockRenderer = (code: string, ctx: { language: string; index: number }) => BlockResult | Promise<BlockResult>
+/** The block's language and number; the markdown's image and link bases when it has them. */
+export type BlockContext = { language: string; index: number; imageBase?: string; linkBase?: string }
+export type BlockRenderer = (code: string, ctx: BlockContext) => BlockResult | Promise<BlockResult>
 
 /** What `blocks.register` accepts: a renderer, or a fixed result (`{ html }` / `{ mount }`). */
 export type BlockRendererInput = BlockRenderer | BlockResult

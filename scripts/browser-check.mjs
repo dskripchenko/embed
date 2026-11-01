@@ -466,6 +466,19 @@ for (const browserName of Object.keys(browsers)) {
       check(`${tag}: <dsk-board> renders a board read-only`, bd.view === 2 && !bd.viewTools, JSON.stringify(bd))
       check(`${tag}: <dsk-board editable> has the tools`, bd.editTools)
       check(`${tag}: a \`\`\`board block in markdown`, bd.block === 1, JSON.stringify(bd))
+      // A ```video block's relative paths resolve against the markdown's image-base, as its images do.
+      await page.waitForFunction(() => !!document.querySelector('#md-relative .uid-video video'), null, { timeout: 10000 }).catch(() => {})
+      const rel = await page.evaluate(() => {
+        const v = document.querySelector('#md-relative .uid-video video')
+        const path = (u) => (u ? new URL(u, location.href).pathname : null)
+        return {
+          image: path(document.querySelector('#md-relative img')?.getAttribute('src')),
+          video: path(v?.currentSrc || v?.querySelector('source')?.getAttribute('src') || v?.getAttribute('src')),
+          poster: path(v?.getAttribute('poster')),
+          track: path(v?.querySelector('track')?.getAttribute('src')),
+        }
+      })
+      check(`${tag}: markdown media blocks resolve relative paths against image-base`, rel.image === '/media/poster.jpg' && rel.video === '/media/walkthrough.webm' && rel.poster === '/media/poster.jpg' && rel.track === '/media/captions-en.vtt', JSON.stringify(rel))
       const eb = await page.locator('#edit-board .bd-canvas').boundingBox()
       await page.locator('#edit-board').scrollIntoViewIfNeeded()
       const eb2 = await page.locator('#edit-board .bd-canvas').boundingBox()
