@@ -77,6 +77,13 @@ export interface DskEmbedApi {
   off(name: string, fn: BusListener): void
   emit(name: string, detail?: unknown, target?: EventTarget): boolean
   renderBlocks(root?: ParentNode, options?: RenderBlocksOptions): Promise<number>
+  /**
+   * Print forms: `prepare()` puts each widget's static form in its place for
+   * paper (resolving once all are there) and returns the function that takes
+   * them away; the browser's own print (Ctrl+P) does both by itself, as far
+   * as it can before the dialog.
+   */
+  print: { prepare(root?: ParentNode): Promise<() => void> }
   unrenderBlocks(root?: ParentNode): number
   /** Loads a plugin ahead of its first element (e.g. on hover of a link). */
   preload(...names: PluginName[]): Promise<void>
@@ -162,6 +169,10 @@ export function createEmbed(options: EmbedOptions): DskEmbedApi {
     off: bus.off,
     emit: bus.emit,
     renderBlocks: (root = document.body, opts) => renderBlocks(root, registry, opts),
+    print: {
+      // Nothing to prepare before a widget with a print form has started (the plugins install the printer).
+      prepare: async (root = document) => (await host.printer?.prepare(root)) ?? (() => {}),
+    },
     unrenderBlocks: (root = document.body) => unrenderBlocks(root),
     preload: async (...names) => {
       await Promise.all(names.map((n) => host.load(n)))

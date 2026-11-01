@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>embed — print</title>
+  <script src="{{EMBED_SRC}}"></script>
+  <style>body { font: 14px system-ui, sans-serif; margin: 16px; max-width: 900px; } section { margin: 16px 0; }</style>
+</head>
+<body>
+  <h1>Every widget on paper</h1>
+  <section><dsk-diagram id="diagram"><script type="text/plain">flowchart LR
+  Order --> Check --> Ship</script></dsk-diagram></section>
+  <section><dsk-bpmn id="bpmn" src="/fixtures/notations/order.bpmn" height="300"></dsk-bpmn></section>
+  <section><dsk-dmn id="dmn" src="/fixtures/notations/loan.dmn" height="300"></dsk-dmn></section>
+  <section><dsk-drawio id="drawio" src="/fixtures/notations/architecture.drawio"></dsk-drawio></section>
+  <section><dsk-flow id="flow" src="/data/order-process.json" height="260"></dsk-flow></section>
+  <section><dsk-board id="board" height="240"><script type="application/json">{"version":1,"objects":{"a":{"id":"a","type":"sticky","color":"yellow","text":"Far left","x":0,"y":0,"w":160,"h":120,"z":"a0"},"b":{"id":"b","type":"sticky","color":"green","text":"Far right","x":2400,"y":900,"w":160,"h":120,"z":"a1"}}}</script></dsk-board></section>
+  <section><dsk-openapi id="api" src="/data/orders.yaml" height="400" hash-navigation="false"></dsk-openapi></section>
+  <section><dsk-openapi id="op" src="/data/orders.yaml" operation="listOrders"></dsk-openapi></section>
+  <section><dsk-asyncapi id="async" src="/fixtures/notations/orders-3.yaml" height="300"></dsk-asyncapi></section>
+  <section><dsk-kanban id="kanban" editable lockable><script type="text/plain">## To do
+- Write the print forms #print
+## Done {done}
+- Plan the stage</script></dsk-kanban></section>
+  <section><dsk-calendar id="cal" date="2026-11-04" editable lockable><script type="text/plain">2026-11-03 10:00-11:00 Release demo
+2026-11-10..2026-11-14 Code freeze</script></dsk-calendar></section>
+  <section>
+    <dsk-video id="video" label="Walkthrough" poster="/media/poster.jpg">
+      <source src="/media/walkthrough.mp4" type="video/mp4">
+      <track kind="chapters" src="/media/chapters.vtt" default>
+    </dsk-video>
+  </section>
+  <section><dsk-audio id="audio" tracks='[{"src":"/media/track-1.mp3","title":"First"},{"src":"/media/track-2.mp3","title":"Second"}]'></dsk-audio></section>
+  <section>
+    <dsk-markdown id="md"><script type="text/markdown"># Notes
+
+```flow
+flowchart LR
+  A[Start] --> B[Finish]
+```
+
+```video
+src: /media/walkthrough.mp4
+poster: /media/poster.jpg
+title: In the notes
+```
+
+```js
+const aVeryLongLine = 'that has to wrap on paper instead of being cut off at the right edge of the sheet, whatever the width'
+```
+</script></dsk-markdown>
+  </section>
+</body>
+</html>

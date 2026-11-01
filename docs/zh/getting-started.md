@@ -181,4 +181,5 @@ API 遵循 semver。
 - [元素](elements.md)——所有特性、属性、方法和事件
 - [块](blocks.md)——块渲染器注册表和 `renderBlocks()`
 - [配置与事件](config-and-events.md)——主题、语言、事件总线、协同
+- [打印](print.md)——每个元素的纸面形式，`DskEmbed.print.prepare()`
 - [框架](frameworks.md)——React、Vue、WordPress、Blade、普通表单

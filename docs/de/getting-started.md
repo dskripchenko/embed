@@ -217,4 +217,5 @@ SemVer.
 - [Elemente](elements.md) — jedes Attribut, jede Property, Methode und jedes Event
 - [Blöcke](blocks.md) — die Registry der Block-Renderer und `renderBlocks()`
 - [Konfiguration und Events](config-and-events.md) — Theme, Locale, der Event-Bus, Zusammenspiel
+- [Druck](print.md) — jedes Element auf Papier, `DskEmbed.print.prepare()`
 - [Frameworks](frameworks.md) — React, Vue, WordPress, Blade, einfache Formulare

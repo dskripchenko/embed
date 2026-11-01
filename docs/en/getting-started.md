@@ -207,4 +207,5 @@ attributes, properties, events and the `DskEmbed` API follow semver.
 - [Elements](elements.md) — every attribute, property, method and event
 - [Blocks](blocks.md) — the block-renderer registry and `renderBlocks()`
 - [Configuration and events](config-and-events.md) — theme, locale, the event bus, cooperation
+- [Print](print.md) — every element on paper, `DskEmbed.print.prepare()`
 - [Frameworks](frameworks.md) — React, Vue, WordPress, Blade, plain forms

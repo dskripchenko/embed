@@ -8,6 +8,7 @@
 import { DrawioError, parseDrawio, render, type DrawioFile } from '@dskripchenko/drawio'
 import type { BlockRenderer, ElementContext, ElementInstance } from '../core/types'
 import { withFullscreen } from './fullscreen'
+import { figure, printable } from './print'
 import drawioCss from '../drawio.css?inline'
 import { injectStyle } from '../core/styles'
 
@@ -144,9 +145,22 @@ export function mountElement(ctx: ElementContext): ElementInstance {
 
   void load()
   const fs = withFullscreen(ctx)
+  // On paper every page, one after another, each named when there are several.
+  const unprint = printable(ctx.host, root, () => {
+    if (!file) return null
+    const f = file
+    const props = ctx.props()
+    const out = document.createDocumentFragment()
+    f.pages.forEach((p, i) => {
+      const { svg } = render(f, { page: i, idPrefix: `dsk-dwp-${++sequence}`, allowExternalImages: props.externalImages === true })
+      out.append(figure(svg, f.pages.length > 1 ? (p.name ?? `${i + 1}`) : undefined))
+    })
+    return out
+  })
   return {
     update: () => void load(),
     destroy: () => {
+      unprint()
       fs?.destroy()
       root.remove()
     },
