@@ -574,3 +574,37 @@ WYSIWYG 编辑器（`@dskripchenko/wysiwyg`）——工具栏（使用元素的�
 
 编辑器内部自身的 `input`/`change` 事件不会传出元素，因此
 `el.addEventListener('input', () => el.value)` 读到的始终是 HTML。
+
+## `<dsk-markdown-editor>`
+
+```html
+<dsk-markdown-editor name="body" image-base="/docs/" mode="visual">
+  <script type="text/plain"># 发布说明
+
+一张图片：![示意图](img/scheme.png)
+</script>
+</dsk-markdown-editor>
+```
+
+基于 **Markdown** 的同样编辑能力（`@dskripchenko/markdown-editor`）：可视化模式
+（带所有已注册实时块的所见即所得编辑器）、Markdown 本身，以及两者并排并带实时预览。
+值为 Markdown；可视化编辑器无法容纳的内容（h3 以下的标题、任务列表、提示框、HTML、
+脚注）按原样保留。相对图片从 `image-base` 显示，并以相对路径保存回去。
+
+初始值：`value` 属性，否则为元素的文本（`<script type="text/plain">` 可原样保留），
+否则为绑定输入框的值。
+
+| 属性 | 特性 | |
+|---|---|---|
+| `value` | `value` | Markdown。读取得到当前文本，写入则替换。 |
+| `mode` | `mode` | `visual`（默认）、`source` 或 `split`；读取得到当前模式。 |
+| `modes` | `modes` | 提供的模式：`visual,source`；默认三种全部提供。 |
+| `name`、`input` | | 绑定的输入框，与 `<dsk-editor>` 相同。 |
+| `placeholder`、`readonly` | | |
+| `min-height`、`max-height` | camelCase | CSS 长度。 |
+| `image-base`、`link-base` | camelCase | 相对图片解析所依据的文件夹；预览中链接的基准。 |
+
+方法：`focus()`、`insert(markdown)`（在光标处）。事件：每次修改时触发 `input` /
+`dsk:input` `{ value }`，编辑器在值已更改的情况下失去焦点时触发 `change` /
+`dsk:change`，以及 `dsk:modechange` `{ mode }`。
+

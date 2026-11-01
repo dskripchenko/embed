@@ -742,6 +742,29 @@ for (const browserName of Object.keys(browsers)) {
       await page.locator('#cal-edit .uid-event-calendar__lock').click()
       await sleep(200)
       check(`${tag}: the calendar lock hides the editing tools`, (await page.locator('#cal-edit .uid-event-calendar__btn').count()) === 0 && (await page.locator('#cal-edit .uid-calendar--editable').count()) === 0)
+      // <dsk-markdown-editor>: the visual editor over Markdown, live blocks, pictures from image-base, the value as Markdown.
+      await page.waitForFunction(() => !!document.querySelector('#md-edit [contenteditable="true"] svg.dg'), null, { timeout: 15000 }).catch(() => {})
+      const mde = await page.evaluate(() => {
+        const el = document.querySelector('#md-edit')
+        const img = el.querySelector('[contenteditable="true"] img')
+        return { editable: !!el.querySelector('[contenteditable="true"]'), diagram: !!el.querySelector('[contenteditable="true"] svg.dg'), img: img ? new URL(img.getAttribute('src'), document.baseURI).pathname : null, mode: el.mode }
+      })
+      check(`${tag}: <dsk-markdown-editor> edits Markdown visually with live blocks`, mde.editable && mde.diagram && mde.mode === 'visual', JSON.stringify(mde))
+      check(`${tag}: <dsk-markdown-editor> shows pictures from image-base`, mde.img === '/media/poster.jpg', mde.img)
+      await page.evaluate(() => {
+        window.__mdInputs = []
+        document.querySelector('#md-edit').addEventListener('input', (e) => window.__mdInputs.push(e.target.value))
+      })
+      await page.locator('#md-edit [contenteditable="true"] h1').click()
+      await page.keyboard.press('End')
+      await page.keyboard.type(' — edited')
+      await sleep(300)
+      const typed = await page.evaluate(() => ({ value: document.querySelector('#md-edit').value, inputs: window.__mdInputs.length }))
+      check(`${tag}: <dsk-markdown-editor> gives Markdown back, pictures relative`, typed.inputs > 0 && typed.value.startsWith('# A note — edited\n') && typed.value.includes('![poster](poster.jpg)') && typed.value.includes('```mermaid'), JSON.stringify(typed).slice(0, 200))
+      await page.evaluate(() => (document.querySelector('#md-edit').mode = 'source'))
+      await page.waitForSelector('#md-edit textarea', { timeout: 5000 }).catch(() => {})
+      const source = await page.evaluate(() => document.querySelector('#md-edit textarea')?.value ?? null)
+      check(`${tag}: <dsk-markdown-editor> mode="source" shows the Markdown itself`, typeof source === 'string' && source.startsWith('# A note — edited'), String(source).slice(0, 60))
       // A ```video block's relative paths resolve against the markdown's image-base, as its images do.
       await page.waitForFunction(() => !!document.querySelector('#md-relative .uid-video video'), null, { timeout: 10000 }).catch(() => {})
       const rel = await page.evaluate(() => {

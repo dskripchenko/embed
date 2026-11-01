@@ -10,7 +10,7 @@ export const PLUGIN_STYLES: Readonly<Record<PluginName, readonly StyleName[]>> =
   markdown: ['tokens', 'themes', 'kit'],
   openapi: ['tokens', 'themes', 'kit', 'openapi'],
   flow: ['tokens', 'themes', 'kit', 'flow'],
-  editor: ['tokens', 'themes', 'kit', 'editor'],
+  editor: ['tokens', 'themes', 'kit', 'editor', 'markdownEditor'],
   board: ['tokens', 'themes', 'kit', 'board'],
   bpmn: ['tokens', 'themes', 'kit', 'bpmn'],
   drawio: ['tokens', 'themes'],
