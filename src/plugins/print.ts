@@ -3,7 +3,8 @@
  * zoom, a player, a reference with navigation — registers a form: static
  * markup that takes its place on paper. `prepare` builds every form and puts
  * it right after its widget, which print CSS then hides; `restore` takes them
- * away. The browser's own print triggers both through `beforeprint` and
+ * away. `prepare` first waits for the widgets in its scope that are still
+ * drawing. The browser's own print triggers both through `beforeprint` and
  * `afterprint` (forms that need a moment to build are ready only when
  * `DskEmbed.print.prepare()` is awaited before printing).
  *
@@ -14,6 +15,23 @@ import { injectStyle } from '../core/styles'
 import type { Host, PrintForm, Printer } from '../core/types'
 
 const HIDDEN = 'dsk-print-hidden'
+
+/** Widgets still drawing: an element loading its plugin or source, a markdown block not mounted yet. */
+const BUSY = '[data-dsk-state="loading"], .uid-markdown__block--pending'
+
+const frame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+
+/**
+ * Waits (up to `timeout` ms) until nothing in the scope is still drawing, then
+ * two frames for the last drawings to lay out: a form is made from what a
+ * widget drew, and a block mounted a moment ago has not registered its form yet.
+ */
+async function settled(scope: ParentNode, timeout = 10000): Promise<void> {
+  const until = Date.now() + timeout
+  while (scope.querySelector(BUSY) && Date.now() < until) await new Promise((r) => setTimeout(r, 50))
+  await frame()
+  await frame()
+}
 
 function createPrinter(host: Host): Printer {
   let placed: { root: HTMLElement; box: HTMLElement }[] = []
@@ -30,6 +48,8 @@ function createPrinter(host: Host): Printer {
     async prepare(scope) {
       restore()
       const mine = run
+      await settled(scope)
+      if (mine !== run) return restore
       const wanted = [...(host.printables ?? [])].filter((p) => p.root.isConnected && (scope === document || scope.contains(p.root)))
       const forms = await Promise.all(
         wanted.map(async (p) => {
@@ -61,8 +81,13 @@ function createPrinter(host: Host): Printer {
   }
 }
 
-/** Sets up printing once per page: the printer on the host, its stylesheet, the browser's print events. */
-function install(host: Host): Printer {
+/**
+ * Sets up printing once per page: the printer on the host, its stylesheet,
+ * the browser's print events. Every plugin with Vue does it when it loads (so
+ * a page whose widgets are still drawing can already wait for them); the
+ * others with their first print form.
+ */
+export function installPrinter(host: Host): Printer {
   if (host.printer) return host.printer
   const printer = createPrinter(host)
   host.printer = printer
@@ -82,7 +107,7 @@ function install(host: Host): Printer {
 
 /** Registers a widget's print form; the returned function unregisters it. */
 export function printable(host: Host, root: HTMLElement, form: PrintForm): () => void {
-  install(host)
+  installPrinter(host)
   const entry = { root, form }
   const all = (host.printables ??= new Set())
   all.add(entry)
