@@ -212,4 +212,5 @@ ES2022. Legacy-сборки нет.
 - [Элементы](elements.md) — все атрибуты, свойства, методы и события
 - [Блоки](blocks.md) — реестр рендереров блоков и `renderBlocks()`
 - [Настройка и события](config-and-events.md) — тема, локаль, шина событий, взаимодействие
+- [Печать](print.md) — каждый элемент на бумаге, `DskEmbed.print.prepare()`
 - [Фреймворки](frameworks.md) — React, Vue, WordPress, Blade, обычные формы

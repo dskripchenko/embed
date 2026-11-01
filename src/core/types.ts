@@ -95,8 +95,26 @@ export interface PluginModule {
   renderers?: Record<string, BlockRenderer>
 }
 
+/** A widget's print form: static markup or a node that takes its place on paper; null keeps the widget (its print CSS is enough). */
+export type PrintForm = () => Node | string | null | Promise<Node | string | null>
+
+/** A widget that has a print form: `root` is what the form replaces on paper. */
+export interface Printable {
+  root: HTMLElement
+  form: PrintForm
+}
+
+/** Puts print forms in place and takes them away (installed by the plugins' side). */
+export interface Printer {
+  prepare(scope: ParentNode): Promise<() => void>
+  restore(): void
+}
+
 export interface Host {
   version: string
+  /** The widgets with a print form, from every plugin (set up by the first of them). */
+  printables?: Set<Printable>
+  printer?: Printer
   config(): Readonly<EmbedConfig>
   onConfig(fn: (config: Readonly<EmbedConfig>) => void): () => void
   blocks: BlockRegistry

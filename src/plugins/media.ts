@@ -11,6 +11,7 @@ import { findChapter, type Chapter } from '../core/chapters'
 import { MediaBlockError, audioBlockProps, resolveMediaUrls, videoBlockProps } from '../core/mediaBlock'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
 import { instanceRef, mountElementView, mountView, runtimeHost, setupRuntime, hc } from './runtime'
+import { printable } from './print'
 
 export function setup(host: Host): void {
   setupRuntime(host)
@@ -122,6 +123,81 @@ function playerBindings(emit: (name: string, detail?: unknown) => void) {
   return { handlers, api }
 }
 
+const clock = (t: number): string => {
+  const s = Math.max(0, Math.floor(t))
+  const hms = [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60]
+  return (hms[0] ? `${hms[0]}:${String(hms[1]).padStart(2, '0')}` : `${hms[1]}`) + `:${String(hms[2]).padStart(2, '0')}`
+}
+
+/** The frame on screen, as a picture: none before the video has one, or from another origin without CORS. */
+function frameOf(media: HTMLMediaElement | null): HTMLImageElement | null {
+  if (!(media instanceof HTMLVideoElement) || media.readyState < 2 || !media.videoWidth) return null
+  try {
+    const canvas = document.createElement('canvas')
+    canvas.width = media.videoWidth
+    canvas.height = media.videoHeight
+    canvas.getContext('2d')!.drawImage(media, 0, 0)
+    const img = document.createElement('img')
+    img.src = canvas.toDataURL('image/jpeg', 0.85)
+    return img
+  } catch {
+    return null
+  }
+}
+
+/**
+ * A player on paper: the poster (else the frame on screen), the title, where
+ * the media is, and the chapters or the playlist — nothing that plays.
+ */
+function mediaForm(kind: 'video' | 'audio', props: Record<string, unknown>, api: { media: HTMLMediaElement | null; chapters: Chapter[] }): HTMLElement {
+  const fig = document.createElement('figure')
+  fig.className = 'dsk-print-media'
+  fig.style.margin = '0'
+  if (kind === 'video') {
+    let picture: HTMLImageElement | null
+    if (typeof props.poster === 'string' && props.poster !== '') {
+      picture = document.createElement('img')
+      picture.src = props.poster
+    } else picture = frameOf(api.media)
+    if (picture) {
+      picture.alt = typeof props.title === 'string' ? props.title : ''
+      fig.append(picture)
+    }
+  }
+  const sources = kind === 'video' ? ((props.sources as { src: string }[] | undefined) ?? []) : []
+  const tracks = kind === 'audio' ? ((props.tracks as { src: string; title?: string }[] | undefined) ?? (typeof props.src === 'string' ? [{ src: props.src, title: props.title as string | undefined }] : [])) : []
+  const where = sources[0]?.src ?? tracks[0]?.src
+  const cap = document.createElement('figcaption')
+  const title = typeof props.title === 'string' ? props.title : kind === 'audio' && tracks.length === 1 ? tracks[0]!.title : undefined
+  if (title) {
+    const strong = document.createElement('strong')
+    strong.textContent = title
+    cap.append(strong)
+  }
+  if (where) {
+    if (title) cap.append(' — ')
+    const a = document.createElement('a')
+    a.className = 'dsk-print-link'
+    a.href = new URL(where, document.baseURI).href
+    a.textContent = a.href
+    cap.append(a)
+  }
+  if (cap.childNodes.length) fig.append(cap)
+  const items = kind === 'video' ? api.chapters.map((c) => `${clock(c.start)} — ${c.title}`) : tracks.length > 1 ? tracks.map((t, i) => t.title ?? `${i + 1}. ${t.src.split('/').pop()}`) : []
+  if (items.length) {
+    const list = document.createElement('ol')
+    list.className = 'dsk-print-list'
+    for (const item of items) {
+      const li = document.createElement('li')
+      li.textContent = item
+      list.append(li)
+    }
+    if (kind === 'video') list.style.listStyle = 'none'
+    fig.append(list)
+  }
+  return fig
+}
+
 /** The key that remounts a player when its media changes, not when a flag does. */
 function mediaKey(props: Record<string, unknown>): string {
   return JSON.stringify(props.sources ?? props.tracks ?? props.src ?? '')
@@ -140,9 +216,14 @@ export function mountElement(ctx: ElementContext): ElementInstance {
       ...(isVideo ? {} : { 'onUpdate:index': (index: number) => ctx.emit('trackchange', { index }) }),
     })
   })
+  const unprint = printable(ctx.host, ctx.container, () => {
+    const props = isVideo ? videoProps(ctx.props(), ctx.children()) : audioProps(ctx.props(), ctx.children())
+    return mediaForm(isVideo ? 'video' : 'audio', props, api)
+  })
   return {
     update: () => v.refresh(),
     destroy() {
+      unprint()
       api.dispose()
       v.unmount()
     },
@@ -179,6 +260,7 @@ function blockRenderer(kind: 'video' | 'audio'): BlockRenderer {
           const props = kind === 'video' ? videoProps(view.props) : audioProps(view.props)
           return hc(kind === 'video' ? UidVideo : UidAudio, { ...props, key: mediaKey(props), ...handlers })
         })
+        const unprint = printable(host, el, () => mediaForm(kind, kind === 'video' ? videoProps(view.props) : audioProps(view.props), api))
         return {
           update(next) {
             try {
@@ -188,6 +270,7 @@ function blockRenderer(kind: 'video' | 'audio'): BlockRenderer {
             }
           },
           destroy() {
+            unprint()
             api.dispose()
             mounted.unmount()
           },

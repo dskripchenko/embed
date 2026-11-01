@@ -18,6 +18,7 @@ import { cssLength } from '../core/attrs'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
 import { errorText, fetchText, instanceRef, mountElementView, mountView, setupRuntime, state, hc } from './runtime'
 import { withFullscreen } from './fullscreen'
+import { printable } from './print'
 
 export function setup(host: Host): void {
   setupRuntime(host)
@@ -61,7 +62,22 @@ export function anchorOf(target: string): string {
   return /^(operation|schema|tag|webhook)\//.test(target) || target.startsWith('#') ? target.replace(/^#/, '') : `operation/${target}`
 }
 
-type Reference = { go(anchor: string, options?: { tryIt?: boolean }): Promise<void>; open(id: string): Promise<void>; spec: unknown; print?: () => void }
+type PrintView = { html: string; css: string; title: string }
+type Reference = { go(anchor: string, options?: { tryIt?: boolean }): Promise<void>; open(id: string): Promise<void>; spec: unknown; print?: () => void; printView?: () => Promise<PrintView | null> }
+
+/**
+ * The reference's (or the operation's) own print view — every operation, its
+ * parameters, bodies and responses, the schemas — in a shadow root, so its
+ * stylesheet and the page's stay apart.
+ */
+function printViewNode(view: PrintView | null): HTMLElement | null {
+  if (!view) return null
+  const host = document.createElement('div')
+  host.className = 'dsk-openapi-print'
+  const root = host.attachShadow({ mode: 'open' })
+  root.innerHTML = `<style>${view.css}</style><div class="oap-body">${view.html}</div>`
+  return host
+}
 
 const COMMON = ['tryIt', 'baseUrl', 'defaultSnippet', 'snippetTargets', 'persistCredentials', 'send', 'labels'] as const
 
@@ -238,6 +254,8 @@ export function mountElement(ctx: ElementContext): ElementInstance {
   }
 
   const fs = withFullscreen(ctx)
+  // Reference and operation modes print their static view; a block or the editor prints as it is.
+  const unprint = printable(ctx.host, ctx.container, async () => printViewNode((await comp.ref.value?.printView?.()) ?? null))
   return {
     update() {
       // A new source from outside replaces what was edited in the widget.
@@ -245,6 +263,7 @@ export function mountElement(ctx: ElementContext): ElementInstance {
       v.refresh()
     },
     destroy: () => {
+      unprint()
       fs?.destroy()
       v.unmount()
     },

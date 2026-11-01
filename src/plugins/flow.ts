@@ -20,8 +20,9 @@ import { parseGraph, type Graph } from '@dskripchenko/flow'
 import { FlowEditor, FlowView } from '@dskripchenko/flow/vue'
 import { cssLength } from '../core/attrs'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
-import { errorText, fetchText, instanceRef, mountElementView, mountView, setupRuntime, state, hc } from './runtime'
+import { errorText, fetchText, instanceRef, mountElementView, mountView, runtimeHost, setupRuntime, state, hc } from './runtime'
 import { withFullscreen } from './fullscreen'
+import { printable, wholeSvg } from './print'
 
 export function setup(host: Host): void {
   setupRuntime(host)
@@ -258,6 +259,7 @@ export function mountElement(ctx: ElementContext): ElementInstance {
   }
 
   const fs = withFullscreen(ctx, () => comp.ref.value?.fit?.())
+  const unprint = printable(ctx.host, ctx.container, () => wholeFlow(ctx.container))
   return {
     update() {
       v.refresh()
@@ -265,6 +267,7 @@ export function mountElement(ctx: ElementContext): ElementInstance {
       if (ctx.props().editable && !mermaidSync) void loadMermaid().then((m) => (mermaidSync = m.fromMermaid), () => undefined)
     },
     destroy() {
+      unprint()
       fs?.destroy()
       v.unmount()
       input?.remove()
@@ -290,6 +293,13 @@ export function mountElement(ctx: ElementContext): ElementInstance {
       },
     },
   }
+}
+
+/** On paper the whole process, whatever part of it the canvas shows: its drawing without the canvas. */
+function wholeFlow(root: HTMLElement): SVGSVGElement | null {
+  const svg = root.querySelector<SVGSVGElement>('svg.fl-svg')
+  const content = svg?.querySelector<SVGGraphicsElement>('g.fl-viewport')
+  return svg && content ? wholeSvg(svg, content, ['.fl-bg', '.fl-grid-dot', 'pattern']) : null
 }
 
 export const renderers: Record<string, BlockRenderer> = {
@@ -319,11 +329,15 @@ export const renderers: Record<string, BlockRenderer> = {
             },
           }),
         )
+        const unprint = printable(runtimeHost(), el, () => wholeFlow(el))
         return {
           update(next) {
             toGraph(next).then((g) => (view.graph = g), () => undefined)
           },
-          destroy: () => mounted.unmount(),
+          destroy: () => {
+            unprint()
+            mounted.unmount()
+          },
         }
       },
     }

@@ -15,6 +15,7 @@ import { cssLength } from '../core/attrs'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
 import { errorText, fetchText, instanceRef, mountElementView, setupRuntime, hc } from './runtime'
 import { withFullscreen } from './fullscreen'
+import { printable } from './print'
 
 export function setup(host: Host): void {
   setupRuntime(host)
@@ -118,12 +119,19 @@ export function mountElement(ctx: ElementContext): ElementInstance {
   }
 
   const fs = withFullscreen(ctx, () => comp.ref.value?.fit?.())
+  // On paper the whole diagram as drawn statically (and, for DMN, every decision's table): no canvas, no palette.
+  const unprint = printable(ctx.host, ctx.container, () => {
+    if (!xml.value) return null
+    const prefix = `dsk-bpp-${++sequence}`
+    return dmn ? dmnHtml(xml.value, prefix) : renderBpmn(xml.value, { idPrefix: prefix }).svg
+  })
   return {
     update() {
       v.refresh()
       void load()
     },
     destroy() {
+      unprint()
       fs?.destroy()
       v.unmount()
       input?.remove()
@@ -153,6 +161,14 @@ export function mountElement(ctx: ElementContext): ElementInstance {
   }
 }
 
+/** The decision requirements diagram, then each decision's table or expression. */
+function dmnHtml(code: string, idPrefix: string): string {
+  const model = parseDmn(code)
+  const parts = [renderDmn(model, { idPrefix }).svg]
+  for (const d of model.decisions) if (d.logic && d.logic.kind !== 'other') parts.push(renderDecision(model, d.id, { idPrefix }).html)
+  return `<div class="dsk-dmn-block">${parts.join('')}</div>`
+}
+
 export const renderers: Record<string, BlockRenderer> = {
   bpmn(code) {
     try {
@@ -161,14 +177,9 @@ export const renderers: Record<string, BlockRenderer> = {
       return { error: message(error) }
     }
   },
-  /** The decision requirements diagram, then each decision's table or expression. */
   dmn(code) {
     try {
-      const model = parseDmn(code)
-      const id = `dsk-dm-${++sequence}`
-      const parts = [renderDmn(model, { idPrefix: id }).svg]
-      for (const d of model.decisions) if (d.logic && d.logic.kind !== 'other') parts.push(renderDecision(model, d.id, { idPrefix: id }).html)
-      return { html: `<div class="dsk-dmn-block">${parts.join('')}</div>` }
+      return { html: dmnHtml(code, `dsk-dm-${++sequence}`) }
     } catch (error) {
       return { error: message(error) }
     }

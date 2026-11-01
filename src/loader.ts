@@ -40,9 +40,9 @@ function boot(): void {
     return
   }
   const script = ownScript()
-  if (!script) console.warn('[dsk-embed] cannot find its own <script>; assuming the default CDN')
+  if (!script) console.warn('[dsk-embed] own <script> not found; using the default CDN')
   if (script?.type === 'module') {
-    console.warn('[dsk-embed] load embed.js as a classic <script>: from a module the import map may come too late')
+    console.warn('[dsk-embed] load embed.js as a classic <script>: from a module the import map comes too late')
   }
   const src = script?.src ?? `${DEFAULT_CDN}@dskripchenko/embed@${VERSION}/dist/embed.js`
   const config = pageConfig(script)
@@ -52,7 +52,7 @@ function boot(): void {
 
   const { map, conflicts } = installImportMap(buildImportMap(cdnBase, versions))
   for (const c of conflicts) {
-    console.warn(`[dsk-embed] the page maps "${c.specifier}" to ${c.page}, the embed expects ${c.embed}: map both to the same file (two copies of Vue or the kit break the elements)`)
+    console.warn(`[dsk-embed] the page maps "${c.specifier}" to ${c.page}, the embed expects ${c.embed}: map both to one file (two copies of Vue or the kit break the elements)`)
   }
 
   injectStyle('base', BASE_CSS)

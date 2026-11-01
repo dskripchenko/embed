@@ -13,12 +13,13 @@
  * (long polling), `POST {base}/presence`.
  */
 import { h, shallowRef } from 'vue'
-import { httpProvider, parseBoard, type Board, type BoardProvider } from '@dskripchenko/board'
+import { boardToSvg, httpProvider, parseBoard, type Board, type BoardProvider } from '@dskripchenko/board'
 import { BoardEditor } from '@dskripchenko/board/vue'
 import { cssLength } from '../core/attrs'
 import type { BlockRenderer, ElementContext, ElementInstance, Host } from '../core/types'
-import { errorText, fetchText, instanceRef, mountElementView, mountView, setupRuntime, state, hc } from './runtime'
+import { errorText, fetchText, instanceRef, mountElementView, mountView, runtimeHost, setupRuntime, state, hc } from './runtime'
 import { withFullscreen } from './fullscreen'
+import { printable } from './print'
 
 export function setup(host: Host): void {
   setupRuntime(host)
@@ -129,12 +130,15 @@ export function mountElement(ctx: ElementContext): ElementInstance {
   }
 
   const fs = withFullscreen(ctx, () => comp.ref.value?.fit?.())
+  // On paper the whole board as one picture: what the editor exports, else the board as loaded.
+  const unprint = printable(ctx.host, ctx.container, () => comp.ref.value?.toSvg?.().svg ?? (model.value ? boardToSvg(model.value).svg : null))
   return {
     update() {
       v.refresh()
       void load()
     },
     destroy() {
+      unprint()
       fs?.destroy()
       v.unmount()
       provider?.close?.()
@@ -173,6 +177,7 @@ export const renderers: Record<string, BlockRenderer> = {
         el.style.height = '420px'
         const current = shallowRef(board)
         const mounted = mountView(el, () => hc(BoardEditor, { modelValue: current.value, readonly: true, minimap: false, locale: state.locale, style: { height: '100%' } }))
+        const unprint = printable(runtimeHost(), el, () => boardToSvg(current.value).svg)
         return {
           update(next) {
             try {
@@ -181,7 +186,10 @@ export const renderers: Record<string, BlockRenderer> = {
               // Keep the last good board while the source is being typed.
             }
           },
-          destroy: () => mounted.unmount(),
+          destroy: () => {
+            unprint()
+            mounted.unmount()
+          },
         }
       },
     }

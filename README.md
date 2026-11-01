@@ -70,6 +70,10 @@ light DOM (your CSS applies); diagrams, processes, flows, boards and references 
   stored HTML (`<pre><code class="language-…">`) into widgets. → [Blocks](docs/en/blocks.md)
 - **Configuration.** `DskEmbed.configure({ theme: 'light' | 'dark' | 'system', locale: 'en' | 'ru' })`,
   or just the page's `<html data-theme lang>`. → [Configuration and events](docs/en/config-and-events.md)
+- **Print.** On paper every element is a document: controls stay off, a
+  canvas prints whole, a player as its poster and chapters, a reference as
+  its static view — `await DskEmbed.print.prepare()` before printing, or just
+  the browser's Ctrl+P. → [Print](docs/en/print.md)
 - **Events.** `DskEmbed.on('node', …)`, or `addEventListener('dsk:node', …)` on
   any ancestor; React and other hosts use refs and plain listeners. →
   [Frameworks](docs/en/frameworks.md)

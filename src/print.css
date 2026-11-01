@@ -1,0 +1,21 @@
+/*
+ * Print forms (plugins/print.ts): on screen a widget, on paper its static
+ * form in its place; and what is never printed — the widgets' own controls.
+ */
+.dsk-print-form { display: none; }
+@media print {
+  .dsk-print-hidden { display: none !important; }
+  /* What holds a form had the widget's height on screen: on paper, the form's own. */
+  :has(> .dsk-print-form) { height: auto !important; min-height: 0 !important; max-height: none !important; overflow: visible !important; }
+  .dsk-print-form { display: block; break-inside: avoid; }
+  .dsk-print-form svg, .dsk-print-form img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+  .dsk-print-form figcaption, .dsk-print-form .dsk-print-caption { margin: 4px 0 8px; color: var(--uid-text-secondary, #4b5563); font-size: 0.85em; text-align: center; }
+  .dsk-print-form .dsk-print-page { break-inside: avoid; margin: 0 0 12px; }
+  .dsk-print-form .dsk-print-page + .dsk-print-page { break-before: auto; }
+  .dsk-print-form .dsk-print-list { margin: 4px 0 0; padding-left: 1.2em; font-size: 0.9em; }
+  .dsk-print-form .dsk-print-link { color: inherit; font-size: 0.85em; overflow-wrap: anywhere; }
+  .dsk-fs-button { display: none !important; }
+  :where([data-dsk]) { break-inside: avoid; }
+  /* Scroll boxes and fixed heights give way: everything on paper. */
+  :where(dsk-openapi, dsk-asyncapi, dsk-markdown, dsk-kanban, dsk-calendar) { height: auto !important; max-height: none !important; overflow: visible !important; }
+}

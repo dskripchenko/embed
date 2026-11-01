@@ -628,6 +628,81 @@ for (const browserName of Object.keys(browsers)) {
   }
 }
 
+// ---------------------------------------------------------------- print: every widget on paper
+for (const browserName of Object.keys(browsers)) {
+  for (const variant of ['loader', 'bundle']) {
+    const tag = `${browserName}/${variant}/print`
+    if (!wants(tag)) continue
+    const { page, errors, close } = await open(browserName, `/print.html?embed=${variant}`)
+    try {
+      await settle(page, 40000)
+      await page.waitForFunction(() => document.querySelector('#api .oa-reference') && document.querySelector('#op .oa-embed__card') && document.querySelector('#flow svg.fl-svg g.fl-nodes *') && document.querySelector('#md .dsk-flow-frame svg.fl-svg g.fl-nodes *'), null, { timeout: 20000 })
+      await page.waitForFunction(() => document.querySelector('#video')?.chapters?.length > 0, null, { timeout: 10000 }).catch(() => {})
+      await page.emulateMedia({ media: 'print' })
+      await page.evaluate(() => window.DskEmbed.print.prepare())
+      const r = await page.evaluate(() => {
+        const visible = (el) => !!el && getComputedStyle(el).display !== 'none' && el.getClientRects().length > 0
+        const form = (id) => document.querySelector(`#${id} .dsk-print-form`)
+        const any = (sel) => [...document.querySelectorAll(sel)].some(visible)
+        const flowSvg = form('flow')?.querySelector('svg')
+        const vb = flowSvg?.getAttribute('viewBox')?.split(' ').map(Number)
+        return {
+          // Each canvas or player gives way to its static form.
+          forms: Object.fromEntries(['bpmn', 'dmn', 'drawio', 'flow', 'board', 'api', 'op', 'video', 'audio'].map((id) => [id, visible(form(id))])),
+          liveHidden: ['bpmn', 'dmn', 'drawio', 'flow', 'board', 'video'].every((id) => !visible(document.querySelector(`#${id} .dsk-print-hidden`)) && !!document.querySelector(`#${id} .dsk-print-hidden`)),
+          dmnTables: form('dmn')?.querySelectorAll('table').length ?? 0,
+          drawioPages: form('drawio')?.querySelectorAll('figure svg').length ?? 0,
+          drawioNames: [...(form('drawio')?.querySelectorAll('figcaption') ?? [])].map((c) => c.textContent),
+          flowWhole: !!vb && vb[2] > 0 && !flowSvg.querySelector('g.fl-viewport[transform]'),
+          board: (form('board')?.textContent ?? '').includes('Far right'),
+          api: form('api')?.querySelector('.dsk-openapi-print')?.shadowRoot?.textContent?.includes('listOrders') || form('api')?.querySelector('.dsk-openapi-print')?.shadowRoot?.textContent?.includes('List'),
+          op: (form('op')?.querySelector('.dsk-openapi-print')?.shadowRoot?.textContent ?? '').length > 20,
+          video: { img: !!form('video')?.querySelector('img[src*="poster"]'), chapters: form('video')?.querySelectorAll('li').length ?? 0, link: !!form('video')?.querySelector('a[href*="walkthrough"]') },
+          audio: [...(form('audio')?.querySelectorAll('li') ?? [])].map((li) => li.textContent),
+          mdBlocks: { flow: [...document.querySelectorAll('#md .dsk-print-form > svg')].some(visible), video: !!document.querySelector('#md .dsk-print-form img[src*="poster"]') },
+          // Never on paper: the widgets' controls.
+          controls: ['.dsk-fs-button', '.uid-kanban__actions', '.uid-kanban__lock', '.uid-event-calendar__actions', '.uid-calendar__nav', '.uid-calendar__views', '.uid-code__copy', '.uid-video__controls'].filter(any),
+          // A form takes its own room: nothing laid over the next widget.
+          overlaps: [...document.querySelectorAll('.dsk-print-form')].filter((f) => f.getClientRects().length && f.offsetHeight > 0).filter((f) => {
+            let next = f.closest('section, .uid-markdown__block')?.nextElementSibling
+            // What is laid out after it (a toast list fixed to the screen is not).
+            while (next && ['fixed', 'absolute'].includes(getComputedStyle(next).position)) next = next.nextElementSibling
+            return !!next && f.getBoundingClientRect().bottom > next.getBoundingClientRect().top + 1
+          }).map((f) => f.parentElement.closest('[id]')?.id),
+          codeWraps: getComputedStyle(document.querySelector('#md .uid-code__pre') ?? document.body).whiteSpace,
+        }
+      })
+      check(`${tag}: each canvas and player gives way to its print form`, Object.values(r.forms).every(Boolean) && r.liveHidden, JSON.stringify(r.forms))
+      check(`${tag}: DMN prints its decision tables, draw.io every page with its name`, r.dmnTables > 0 && r.drawioPages === 2 && r.drawioNames.length === 2, JSON.stringify([r.dmnTables, r.drawioPages, r.drawioNames]))
+      check(`${tag}: a flow and a board print whole, not the part on screen`, r.flowWhole && r.board, JSON.stringify([r.flowWhole, r.board]))
+      check(`${tag}: the reference and the operation print their static views`, !!r.api && r.op, JSON.stringify([r.api, r.op]))
+      check(`${tag}: a video prints its poster, link and chapters; a playlist its tracks`, r.video.img && r.video.link && r.video.chapters > 0 && r.audio.join() === 'First,Second', JSON.stringify([r.video, r.audio]))
+      check(`${tag}: live blocks in markdown print too`, r.mdBlocks.flow && r.mdBlocks.video, JSON.stringify(r.mdBlocks))
+      check(`${tag}: no controls on paper; code wraps`, r.controls.length === 0 && r.codeWraps === 'pre-wrap', JSON.stringify([r.controls, r.codeWraps]))
+      check(`${tag}: every form fits the box it is in`, r.overlaps.length === 0, JSON.stringify(r.overlaps))
+      if (browserName === 'chromium') {
+        const pdf = await page.pdf({ format: 'A4', printBackground: true })
+        check(`${tag}: prints to PDF`, pdf.length > 20000, `${pdf.length} bytes`)
+        if (variant === 'loader') {
+          const { writeFileSync } = await import('node:fs')
+          writeFileSync(resolve(out, 'print.pdf'), pdf)
+          await shot(page, 'print-media', { fullPage: true })
+        }
+      }
+      // Back on screen: the widgets again, no forms left.
+      await page.evaluate(() => window.DskEmbed.print.prepare().then((restore) => restore()))
+      await page.emulateMedia({ media: 'screen' })
+      const back = await page.evaluate(() => ({ forms: document.querySelectorAll('.dsk-print-form').length, hidden: document.querySelectorAll('.dsk-print-hidden').length }))
+      check(`${tag}: restore takes the forms away`, back.forms === 0 && back.hidden === 0, JSON.stringify(back))
+      check(`${tag}: no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '))
+    } catch (error) {
+      check(`${tag}: ran`, false, error.message.split('\n')[0])
+    } finally {
+      await close()
+    }
+  }
+}
+
 // ---------------------------------------------------------------- planning: kanban (and calendar)
 for (const browserName of Object.keys(browsers)) {
   for (const variant of ['loader', 'bundle']) {
