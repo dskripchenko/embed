@@ -82,6 +82,22 @@ describe('print forms', () => {
     expect(b.classList.contains('dsk-print-hidden')).toBe(false)
   })
 
+  it('forms the page prepared itself stay through the browser print events', async () => {
+    const h = host()
+    const a = widget()
+    printable(h, a, () => 'mine')
+    const restore = await h.printer!.prepare(document)
+    // A print to PDF fires beforeprint and afterprint around the printing.
+    window.dispatchEvent(new Event('beforeprint'))
+    expect(a.nextElementSibling?.textContent).toBe('mine')
+    window.dispatchEvent(new Event('afterprint'))
+    await new Promise((r) => setTimeout(r, 50))
+    expect(document.querySelectorAll('.dsk-print-form')).toHaveLength(1)
+    restore()
+    expect(document.querySelectorAll('.dsk-print-form')).toHaveLength(0)
+    a.remove()
+  })
+
   it('waits for the widgets in its scope that are still drawing', async () => {
     const h = host()
     const part = widget()

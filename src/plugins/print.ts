@@ -33,51 +33,65 @@ async function settled(scope: ParentNode, timeout = 10000): Promise<void> {
   await frame()
 }
 
-function createPrinter(host: Host): Printer {
+function createPrinter(host: Host): Printer & { busy(): boolean } {
   let placed: { root: HTMLElement; box: HTMLElement }[] = []
   let run = 0
+  let preparing = false
   const restore = (): void => {
     run++
+    preparing = false
     for (const { root, box } of placed) {
       box.remove()
       root.classList.remove(HIDDEN)
     }
     placed = []
   }
+
+  async function build(scope: ParentNode, mine: number): Promise<() => void> {
+    await settled(scope)
+    if (mine !== run) return restore
+    const wanted = [...(host.printables ?? [])].filter((p) => p.root.isConnected && (scope === document || scope.contains(p.root)))
+    const forms = await Promise.all(
+      wanted.map(async (p) => {
+        try {
+          return await p.form()
+        } catch (error) {
+          console.warn('[dsk-embed] a print form failed; the widget prints as it is', error)
+          return null
+        }
+      }),
+    )
+    // A restore (or another prepare) came while the forms were built.
+    if (mine !== run) return restore
+    wanted.forEach((p, i) => {
+      const form = forms[i]
+      if (form === null || form === undefined || !p.root.isConnected) return
+      const box = document.createElement('div')
+      box.className = 'dsk-print-form'
+      box.setAttribute('aria-hidden', 'true')
+      if (typeof form === 'string') box.innerHTML = form
+      else box.append(form)
+      p.root.after(box)
+      p.root.classList.add(HIDDEN)
+      placed.push({ root: p.root, box })
+    })
+    return restore
+  }
+
   return {
     async prepare(scope) {
       restore()
       const mine = run
-      await settled(scope)
-      if (mine !== run) return restore
-      const wanted = [...(host.printables ?? [])].filter((p) => p.root.isConnected && (scope === document || scope.contains(p.root)))
-      const forms = await Promise.all(
-        wanted.map(async (p) => {
-          try {
-            return await p.form()
-          } catch (error) {
-            console.warn('[dsk-embed] a print form failed; the widget prints as it is', error)
-            return null
-          }
-        }),
-      )
-      // A restore (or another prepare) came while the forms were built.
-      if (mine !== run) return restore
-      wanted.forEach((p, i) => {
-        const form = forms[i]
-        if (form === null || form === undefined || !p.root.isConnected) return
-        const box = document.createElement('div')
-        box.className = 'dsk-print-form'
-        box.setAttribute('aria-hidden', 'true')
-        if (typeof form === 'string') box.innerHTML = form
-        else box.append(form)
-        p.root.after(box)
-        p.root.classList.add(HIDDEN)
-        placed.push({ root: p.root, box })
-      })
-      return restore
+      preparing = true
+      try {
+        return await build(scope, mine)
+      } finally {
+        if (mine === run) preparing = false
+      }
     },
     restore,
+    /** Forms in place, or being made: the page prepared itself before printing. */
+    busy: () => preparing || placed.length > 0,
   }
 }
 
@@ -94,6 +108,8 @@ export function installPrinter(host: Host): Printer {
   injectStyle('print', printCss)
   let auto = false
   window.addEventListener('beforeprint', () => {
+    // The page prepared the forms itself (and awaited them): printing is what it asked for, they stay.
+    if (printer.busy()) return
     auto = true
     void printer.prepare(document)
   })
