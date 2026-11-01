@@ -1,5 +1,11 @@
 # @dskripchenko/embed
 
+## 1.10.2
+
+### Patch Changes
+
+- 21bec70: Print forms a page prepared itself (`await DskEmbed.print.prepare()`) stay through `beforeprint` / `afterprint`: a print to PDF fires those events too, and the automatic handling took the forms away and rebuilt them too late, so the live widgets were printed.
+
 ## 1.10.1
 
 ### Patch Changes
