@@ -599,6 +599,8 @@ WYSIWYG 编辑器（`@dskripchenko/wysiwyg`）——工具栏（使用元素的�
 | `value` | `value` | Markdown。读取得到当前文本，写入则替换。 |
 | `mode` | `mode` | `visual`（默认）、`source` 或 `split`；读取得到当前模式。 |
 | `modes` | `modes` | 提供的模式：`visual,source`；默认三种全部提供。 |
+| `toolbar-target` | `toolbarTarget` | 页面元素的 CSS 选择器：在其中显示可视模式的工具栏，代替文本上方——页面自己的栏或浮动面板。 |
+| `mode-switch` | `modeSwitch` | `mode-switch="false"`：页面通过 `mode` 自行切换模式时，编辑器上方不显示模式按钮。 |
 | `name`、`input` | | 绑定的输入框，与 `<dsk-editor>` 相同。 |
 | `placeholder`、`readonly` | | |
 | `min-height`、`max-height` | camelCase | CSS 长度。 |

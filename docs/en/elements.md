@@ -694,6 +694,8 @@ The initial value: the `value` attribute, else the element's text (a
 | `value` | `value` | The Markdown. Reading gives the current text; setting replaces it. |
 | `mode` | `mode` | `visual` (default), `source` or `split`; reading gives the current mode. |
 | `modes` | `modes` | The modes offered: `visual,source`; all three by default. |
+| `toolbar-target` | `toolbarTarget` | A CSS selector of the page's element to show the visual mode's toolbar in, instead of above the text — the page's own bar or a floating panel. |
+| `mode-switch` | `modeSwitch` | `mode-switch="false"`: no mode buttons above the editor, when the page switches modes itself through `mode`. |
 | `name`, `input` | | Bound inputs, as on `<dsk-editor>`. |
 | `placeholder`, `readonly` | | |
 | `min-height`, `max-height` | camelCase | CSS lengths. |

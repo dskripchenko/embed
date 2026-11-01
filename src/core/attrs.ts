@@ -314,6 +314,8 @@ export const SCHEMAS: Readonly<Record<string, Schema>> = {
     { prop: 'maxHeight', type: 'string' },
     { prop: 'imageBase', type: 'string' },
     { prop: 'linkBase', type: 'string' },
+    { prop: 'toolbarTarget', type: 'string' },
+    { prop: 'modeSwitch', type: 'boolean' },
   ],
 }
 

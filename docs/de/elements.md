@@ -711,6 +711,8 @@ gebundenen Feldes.
 | `value` | `value` | Das Markdown. Lesen gibt den aktuellen Text, Setzen ersetzt ihn. |
 | `mode` | `mode` | `visual` (Standard), `source` oder `split`; Lesen gibt den aktuellen Modus. |
 | `modes` | `modes` | Die angebotenen Modi: `visual,source`; standardmäßig alle drei. |
+| `toolbar-target` | `toolbarTarget` | Ein CSS-Selektor des Seitenelements, in dem die Toolbar des visuellen Modus statt über dem Text erscheint — die eigene Leiste der Seite oder ein schwebendes Panel. |
+| `mode-switch` | `modeSwitch` | `mode-switch="false"`: keine Modusknöpfe über dem Editor, wenn die Seite die Modi selbst über `mode` umschaltet. |
 | `name`, `input` | | Gebundene Felder, wie bei `<dsk-editor>`. |
 | `placeholder`, `readonly` | | |
 | `min-height`, `max-height` | camelCase | CSS-Längen. |
