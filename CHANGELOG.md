@@ -1,5 +1,11 @@
 # @dskripchenko/embed
 
+## 1.11.0
+
+### Minor Changes
+
+- 31c49d7: `<dsk-markdown-editor toolbar-target="#bar" mode-switch="false">`: the visual mode's toolbar in the page's own element, and no mode buttons when the page switches modes itself through `mode` (markdown-editor 0.3, wysiwyg 0.7).
+
 ## 1.10.2
 
 ### Patch Changes
