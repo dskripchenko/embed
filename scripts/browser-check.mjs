@@ -697,7 +697,7 @@ for (const browserName of Object.keys(browsers)) {
       // Printed the moment it is on the page: prepare waits for what is still drawing.
       const fresh = await page.evaluate(async () => {
         const box = document.createElement('section')
-        box.innerHTML = '<dsk-markdown><script type="text/markdown">```flow\nflowchart LR\n  P[Fresh] --> Q[Printed]\n```\n<\/script></dsk-markdown>'
+        box.innerHTML = '<dsk-markdown><script type="text/markdown">```flow\nflowchart LR\n  P[Fresh] --> Q[Printed]\n```\n</script></dsk-markdown>'
         document.body.append(box)
         const restore = await window.DskEmbed.print.prepare(box)
         const svg = box.querySelector('.dsk-print-form > svg')
