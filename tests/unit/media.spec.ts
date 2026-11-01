@@ -1,5 +1,5 @@
 import { HLS_TYPE, audioProps, videoProps } from '../../src/core/media'
-import { audioBlockProps, videoBlockProps } from '../../src/core/mediaBlock'
+import { audioBlockProps, resolveAgainst, resolveMediaUrls, videoBlockProps } from '../../src/core/mediaBlock'
 import { readMediaChildren } from '../../src/core/source'
 
 function element(html: string) {
@@ -59,5 +59,42 @@ describe('chapters', () => {
     expect(findChapter(chapters, 'payment')?.start).toBe(8.5)
     expect(findChapter(chapters, 'creat')?.index).toBe(1)
     expect(findChapter(chapters, 'nope')).toBeUndefined()
+  })
+})
+
+describe('media blocks: paths relative to the markdown', () => {
+  it('resolves a relative path against a rooted or absolute base, leaving the rest', () => {
+    expect(resolveAgainst('intro.mp4', '/download/attachments/42/')).toBe('/download/attachments/42/intro.mp4')
+    expect(resolveAgainst('media/a.vtt', '/download/attachments/42')).toBe('/download/attachments/42/media/a.vtt')
+    expect(resolveAgainst('../b.mp3', 'https://cdn.example.com/docs/page/')).toBe('https://cdn.example.com/docs/b.mp3')
+    for (const kept of ['/abs.mp4', 'https://x.example/a.mp4', 'data:video/mp4;base64,AA', '#t', '']) {
+      expect(resolveAgainst(kept, '/base/')).toBe(kept)
+    }
+  })
+
+  it('resolves sources, tracks, the poster and thumbnails of a block', () => {
+    const props = resolveMediaUrls(
+      videoBlockProps('src: intro.mp4\nposter: intro.jpg\nthumbnails: thumbs.vtt\ntracks:\n  - src: intro.en.vtt\n    srclang: en'),
+      '/files/7/',
+    )
+    expect(props.sources).toEqual([expect.objectContaining({ src: '/files/7/intro.mp4' })])
+    expect(props.poster).toBe('/files/7/intro.jpg')
+    expect(props.thumbnails).toBe('/files/7/thumbs.vtt')
+    expect(props.tracks).toEqual([{ src: '/files/7/intro.en.vtt', srclang: 'en' }])
+    const audio = resolveMediaUrls(audioBlockProps('- one.mp3\n- https://x.example/two.mp3'), '/files/7/')
+    expect(audio.tracks).toEqual(['/files/7/one.mp3', 'https://x.example/two.mp3'])
+  })
+
+  it('leaves the props as they are without a base', () => {
+    const props = videoBlockProps('intro.mp4')
+    expect(resolveMediaUrls(props, undefined)).toBe(props)
+  })
+})
+
+describe('media blocks: preload', () => {
+  it('takes preload none | metadata | auto and ignores anything else', () => {
+    expect(videoBlockProps('src: a.mp4\npreload: none').preload).toBe('none')
+    expect(audioBlockProps('src: a.mp3\npreload: auto').preload).toBe('auto')
+    expect(videoBlockProps('src: a.mp4\npreload: eager').preload).toBeUndefined()
   })
 })

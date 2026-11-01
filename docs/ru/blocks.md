@@ -55,8 +55,10 @@ tracks:
 ````
 
 Ключи видео: `src` / `sources`, `poster`, `tracks`, `thumbnails`, `title`,
-`aspectRatio`, `autoplay`, `muted`, `loop`, `maxWidth`. Аудио: `src` /
-`tracks`, `title`, `artist`, `waveform`, `peaks`, `loop`, `mini`, `maxWidth`.
+`aspectRatio`, `autoplay`, `muted`, `loop`, `preload`, `maxWidth`. Аудио: `src` /
+`tracks`, `title`, `artist`, `waveform`, `peaks`, `loop`, `mini`, `preload`,
+`maxWidth`. Относительные пути считаются от `image-base` разметки, как у её
+картинок.
 
 Плеер-блок отвечает на методы элемента через `blockEl.dskPlayer`
 (`play()`, `seek()`, `playChapter()`, …), а его события всплывают от блока

@@ -166,9 +166,15 @@ export function videoBlockProps(code: string): Record<string, unknown> {
     autoplay: bool(o.autoplay),
     muted: bool(o.muted) ?? bool(o.autoplay),
     loop: bool(o.loop),
+    preload: preload(o.preload),
     maxWidth: typeof o.maxWidth === 'number' || typeof o.maxWidth === 'string' ? o.maxWidth : undefined,
   }
   return Object.fromEntries(Object.entries(props).filter(([, v]) => v !== undefined))
+}
+
+/** `preload: none | metadata | auto`; anything else is left to the player. */
+function preload(v: unknown): string | undefined {
+  return v === 'none' || v === 'metadata' || v === 'auto' ? v : undefined
 }
 
 /** The props of `<dsk-audio>` an ```audio block describes: one track or a playlist. */
@@ -183,8 +189,48 @@ export function audioBlockProps(code: string): Record<string, unknown> {
     waveform: bool(o.waveform),
     loop: bool(o.loop),
     variant: o.mini === true || o.variant === 'mini' ? 'mini' : undefined,
+    preload: preload(o.preload),
     peaks: Array.isArray(o.peaks) ? o.peaks.filter((p): p is number => typeof p === 'number') : undefined,
     maxWidth: typeof o.maxWidth === 'number' || typeof o.maxWidth === 'string' ? o.maxWidth : undefined,
   }
   return Object.fromEntries(Object.entries(props).filter(([, v]) => v !== undefined))
+}
+
+/** A path relative to the document (`intro.mp4`, `media/a.vtt`): no scheme, not rooted, not a fragment. */
+function isRelative(url: string): boolean {
+  return url !== '' && !/^([a-z][a-z\d+.-]*:|\/|#|\?)/i.test(url)
+}
+
+/** `url` against `base`, the way the markdown's images resolve; anything not relative stays. */
+export function resolveAgainst(url: string, base: string): string {
+  if (!isRelative(url) || base === '') return url
+  const dir = base.endsWith('/') ? base : `${base}/`
+  // A base without a scheme (`/download/attachments/42/`) is resolved on a
+  // placeholder origin and given back without it.
+  const absolute = /^[a-z][a-z\d+.-]*:/i.test(dir)
+  const resolved = new URL(url, absolute ? dir : new URL(dir, 'http://base.invalid/'))
+  return absolute ? resolved.href : resolved.pathname + resolved.search + resolved.hash
+}
+
+/**
+ * The file paths of a ```video / ```audio block's props resolved against the
+ * markdown's base: sources, tracks (subtitles, playlist items), the poster
+ * and the thumbnails track.
+ */
+export function resolveMediaUrls(props: Record<string, unknown>, base: string | undefined): Record<string, unknown> {
+  if (!base) return props
+  const one = (v: unknown): unknown => (typeof v === 'string' ? resolveAgainst(v, base) : v)
+  const item = (v: unknown): unknown => {
+    if (typeof v === 'string') return resolveAgainst(v, base)
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      const o = { ...(v as Record<string, unknown>) }
+      for (const key of ['src', 'url', 'poster', 'cover']) if (typeof o[key] === 'string') o[key] = one(o[key])
+      return o
+    }
+    return v
+  }
+  const out = { ...props }
+  for (const key of ['poster', 'thumbnails']) if (typeof out[key] === 'string') out[key] = one(out[key])
+  for (const key of ['sources', 'tracks']) if (Array.isArray(out[key])) out[key] = (out[key] as unknown[]).map(item)
+  return out
 }

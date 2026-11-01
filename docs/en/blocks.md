@@ -55,8 +55,10 @@ tracks:
 ````
 
 Video keys: `src` / `sources`, `poster`, `tracks`, `thumbnails`, `title`,
-`aspectRatio`, `autoplay`, `muted`, `loop`, `maxWidth`. Audio: `src` /
-`tracks`, `title`, `artist`, `waveform`, `peaks`, `loop`, `mini`, `maxWidth`.
+`aspectRatio`, `autoplay`, `muted`, `loop`, `preload`, `maxWidth`. Audio: `src` /
+`tracks`, `title`, `artist`, `waveform`, `peaks`, `loop`, `mini`, `preload`,
+`maxWidth`. Relative paths resolve against the markdown's `image-base`, as its
+images do.
 
 A block player answers the element's methods through `blockEl.dskPlayer`
 (`play()`, `seek()`, `playChapter()`, …), and its events bubble from the
