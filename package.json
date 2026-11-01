@@ -1,6 +1,6 @@
 {
   "name": "@dskripchenko/embed",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Drop-in custom elements for any web page from a CDN: video and audio players, Mermaid diagrams, OpenAPI references, process flows, live markdown and a WYSIWYG editor, sharing one Vue runtime and cooperating through a block registry and an event bus.",
   "type": "module",
   "license": "MIT",
