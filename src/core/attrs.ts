@@ -301,6 +301,20 @@ export const SCHEMAS: Readonly<Record<string, Schema>> = {
     { prop: 'maxHeight', type: 'string' },
     { prop: 'resizable', type: 'boolean' },
   ],
+  'dsk-markdown-editor': [
+    ...COMMON,
+    { prop: 'value', type: 'string' },
+    { prop: 'name', type: 'string' },
+    { prop: 'input', type: 'string' },
+    { prop: 'mode', type: 'enum', values: ['visual', 'source', 'split'] },
+    { prop: 'modes', type: 'list' },
+    { prop: 'placeholder', type: 'string' },
+    { prop: 'readonly', type: 'boolean' },
+    { prop: 'minHeight', type: 'string' },
+    { prop: 'maxHeight', type: 'string' },
+    { prop: 'imageBase', type: 'string' },
+    { prop: 'linkBase', type: 'string' },
+  ],
 }
 
 /** `16:9` → `16 / 9`, the CSS aspect-ratio the kit takes. */

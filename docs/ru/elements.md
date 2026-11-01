@@ -674,3 +674,40 @@ WYSIWYG-редактор (`@dskripchenko/wysiwyg`) — панель инстру
 Внутренние события `input`/`change` самого редактора не выходят за пределы
 элемента, поэтому `el.addEventListener('input', () => el.value)` всегда читает
 HTML.
+
+## `<dsk-markdown-editor>`
+
+```html
+<dsk-markdown-editor name="body" image-base="/docs/" mode="visual">
+  <script type="text/plain"># Заметки к выпуску
+
+Картинка: ![схема](img/scheme.png)
+</script>
+</dsk-markdown-editor>
+```
+
+Та же правка, но над **Markdown** (`@dskripchenko/markdown-editor`):
+визуальный режим (визивиг со всеми зарегистрированными живыми блоками), сам
+Markdown и оба рядом с живым превью. Значение — Markdown; то, что визуальный
+редактор не держит (заголовки ниже h3, чек-листы, выноски, HTML, сноски),
+сохраняется как написано. Относительные картинки показываются от `image-base`
+и сохраняются обратно относительными.
+
+Начальное значение: атрибут `value`, иначе текст элемента
+(`<script type="text/plain">` сохраняет его как есть), иначе значение
+связанного поля.
+
+| Атрибут | Свойство | |
+|---|---|---|
+| `value` | `value` | Markdown. Чтение даёт текущий текст, запись заменяет его. |
+| `mode` | `mode` | `visual` (по умолчанию), `source` или `split`; чтение даёт текущий режим. |
+| `modes` | `modes` | Предлагаемые режимы: `visual,source`; по умолчанию все три. |
+| `name`, `input` | | Связанные поля, как у `<dsk-editor>`. |
+| `placeholder`, `readonly` | | |
+| `min-height`, `max-height` | camelCase | CSS-длины. |
+| `image-base`, `link-base` | camelCase | Папка, от которой считаются относительные картинки; база ссылок превью. |
+
+Методы: `focus()`, `insert(markdown)` (в позицию курсора). События: `input` /
+`dsk:input` `{ value }` на каждое изменение, `change` / `dsk:change`, когда
+редактор теряет фокус с изменённым значением, `dsk:modechange` `{ mode }`.
+

@@ -683,3 +683,41 @@ Events — wie bei einem Formularelement:
 Die eigenen internen `input`/`change`-Events des Editors verlassen das Element
 nicht, daher liest `el.addEventListener('input', () => el.value)` immer das
 HTML.
+
+## `<dsk-markdown-editor>`
+
+```html
+<dsk-markdown-editor name="body" image-base="/docs/" mode="visual">
+  <script type="text/plain"># Release Notes
+
+Ein Bild: ![Schema](img/scheme.png)
+</script>
+</dsk-markdown-editor>
+```
+
+Dasselbe Bearbeiten über **Markdown** (`@dskripchenko/markdown-editor`):
+ein visueller Modus (der WYSIWYG-Editor mit allen registrierten lebenden
+Blöcken), das Markdown selbst und beides nebeneinander mit lebender Vorschau.
+Der Wert ist Markdown; was der visuelle Editor nicht halten kann (Überschriften
+unter h3, Aufgabenlisten, Hinweisboxen, HTML, Fußnoten), bleibt wie geschrieben.
+Relative Bilder werden von `image-base` gezeigt und wieder relativ gespeichert.
+
+Der Anfangswert: das Attribut `value`, sonst der Text des Elements (ein
+`<script type="text/plain">` hält ihn unverändert), sonst der Wert des
+gebundenen Feldes.
+
+| Attribut | Eigenschaft | |
+|---|---|---|
+| `value` | `value` | Das Markdown. Lesen gibt den aktuellen Text, Setzen ersetzt ihn. |
+| `mode` | `mode` | `visual` (Standard), `source` oder `split`; Lesen gibt den aktuellen Modus. |
+| `modes` | `modes` | Die angebotenen Modi: `visual,source`; standardmäßig alle drei. |
+| `name`, `input` | | Gebundene Felder, wie bei `<dsk-editor>`. |
+| `placeholder`, `readonly` | | |
+| `min-height`, `max-height` | camelCase | CSS-Längen. |
+| `image-base`, `link-base` | camelCase | Der Ordner relativer Bilder; die Basis der Links in der Vorschau. |
+
+Methoden: `focus()`, `insert(markdown)` (an der Einfügemarke). Ereignisse:
+`input` / `dsk:input` `{ value }` bei jeder Änderung, `change` / `dsk:change`,
+wenn der Editor mit geändertem Wert den Fokus verliert, `dsk:modechange`
+`{ mode }`.
+

@@ -19,6 +19,7 @@ export const RUNTIME_FILES: Readonly<Record<string, readonly [string, string]>> 
   '@dskripchenko/ui': ['@dskripchenko/ui', 'dist/index.mjs'],
   '@dskripchenko/ui/hls': ['@dskripchenko/ui', 'dist/hls/index.mjs'],
   '@dskripchenko/wysiwyg': ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
+  '@dskripchenko/markdown-editor': ['@dskripchenko/markdown-editor', 'dist/index.mjs'],
   '@dskripchenko/diagrams': ['@dskripchenko/diagrams', 'dist/index.mjs'],
   '@dskripchenko/openapi': ['@dskripchenko/openapi', 'dist/index.mjs'],
   '@dskripchenko/openapi/vue': ['@dskripchenko/openapi', 'dist/vue.mjs'],
@@ -42,6 +43,7 @@ export const RUNTIME_STYLES: Readonly<Record<string, readonly [string, string]>>
   board: ['@dskripchenko/board', 'dist/style.css'],
   bpmn: ['@dskripchenko/bpmn', 'dist/style.css'],
   editor: ['@dskripchenko/wysiwyg', 'dist/style.css'],
+  markdownEditor: ['@dskripchenko/markdown-editor', 'dist/style.css'],
 }
 
 export interface ImportMap {

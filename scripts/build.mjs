@@ -14,7 +14,7 @@ const dist = resolve(root, 'dist')
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
 
 /** The runtime packages, pinned to the exact versions installed (and tested). */
-const RUNTIME = ['vue', '@dskripchenko/ui', '@dskripchenko/wysiwyg', '@dskripchenko/diagrams', '@dskripchenko/openapi', '@dskripchenko/flow', '@dskripchenko/board', '@dskripchenko/bpmn', '@dskripchenko/drawio']
+const RUNTIME = ['vue', '@dskripchenko/ui', '@dskripchenko/wysiwyg', '@dskripchenko/markdown-editor', '@dskripchenko/diagrams', '@dskripchenko/openapi', '@dskripchenko/flow', '@dskripchenko/board', '@dskripchenko/bpmn', '@dskripchenko/drawio']
 // Not every package exports ./package.json: read it from node_modules directly.
 const pkgDir = (name) => realpathSync(resolve(root, 'node_modules', name))
 const versions = Object.fromEntries(RUNTIME.map((name) => [name, JSON.parse(readFileSync(join(pkgDir(name), 'package.json'), 'utf8')).version]))
@@ -63,6 +63,7 @@ for (const [name, file] of [
   ['@dskripchenko/board', 'dist/vue.mjs'],
   ['@dskripchenko/bpmn', 'dist/vue.mjs'],
   ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
+  ['@dskripchenko/markdown-editor', 'dist/index.mjs'],
 ]) {
   const code = readFileSync(join(pkgDir(name), file), 'utf8')
   if (/(?:from\s*|import\s*\(\s*)"(?:lucide-vue-next|@dskripchenko\/ui\/icons)"/.test(code)) {
@@ -154,6 +155,7 @@ const files = {
   '@dskripchenko/ui': ['@dskripchenko/ui', 'dist/index.mjs'],
   '@dskripchenko/ui/hls': ['@dskripchenko/ui', 'dist/hls/index.mjs'],
   '@dskripchenko/wysiwyg': ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
+  '@dskripchenko/markdown-editor': ['@dskripchenko/markdown-editor', 'dist/index.mjs'],
   '@dskripchenko/diagrams': ['@dskripchenko/diagrams', 'dist/index.mjs'],
   '@dskripchenko/openapi': ['@dskripchenko/openapi', 'dist/index.mjs'],
   '@dskripchenko/openapi/vue': ['@dskripchenko/openapi', 'dist/vue.mjs'],
