@@ -39,7 +39,7 @@ mkdirSync(vue, { recursive: true })
 cpSync(join(dirOf('vue'), 'dist/vue.runtime.esm-browser.prod.js'), join(vue, 'vue.runtime.esm-browser.prod.js'))
 
 // The packages: their dist/ (ESM and CSS; maps, types and CommonJS left out).
-for (const name of ['@dskripchenko/ui', '@dskripchenko/wysiwyg', '@dskripchenko/diagrams', '@dskripchenko/openapi', '@dskripchenko/flow', '@dskripchenko/board', '@dskripchenko/bpmn', '@dskripchenko/drawio']) {
+for (const name of ['@dskripchenko/ui', '@dskripchenko/syntax', '@dskripchenko/wysiwyg', '@dskripchenko/diagrams', '@dskripchenko/openapi', '@dskripchenko/flow', '@dskripchenko/board', '@dskripchenko/bpmn', '@dskripchenko/drawio']) {
   cpSync(join(dirOf(name), 'dist'), join(out, `${name}@${versionOf(name)}/dist`), { recursive: true, filter: skipMaps })
 }
 console.log(`mirrored into ${out}`)

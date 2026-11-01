@@ -14,7 +14,7 @@ const dist = resolve(root, 'dist')
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'))
 
 /** The runtime packages, pinned to the exact versions installed (and tested). */
-const RUNTIME = ['vue', '@dskripchenko/ui', '@dskripchenko/wysiwyg', '@dskripchenko/markdown-editor', '@dskripchenko/diagrams', '@dskripchenko/openapi', '@dskripchenko/flow', '@dskripchenko/board', '@dskripchenko/bpmn', '@dskripchenko/drawio']
+const RUNTIME = ['vue', '@dskripchenko/ui', '@dskripchenko/syntax', '@dskripchenko/wysiwyg', '@dskripchenko/markdown-editor', '@dskripchenko/diagrams', '@dskripchenko/openapi', '@dskripchenko/flow', '@dskripchenko/board', '@dskripchenko/bpmn', '@dskripchenko/drawio']
 // Not every package exports ./package.json: read it from node_modules directly.
 const pkgDir = (name) => realpathSync(resolve(root, 'node_modules', name))
 const versions = Object.fromEntries(RUNTIME.map((name) => [name, JSON.parse(readFileSync(join(pkgDir(name), 'package.json'), 'utf8')).version]))
@@ -154,6 +154,7 @@ const files = {
   vue: ['vue', 'dist/vue.runtime.esm-browser.prod.js'],
   '@dskripchenko/ui': ['@dskripchenko/ui', 'dist/index.mjs'],
   '@dskripchenko/ui/hls': ['@dskripchenko/ui', 'dist/hls/index.mjs'],
+  '@dskripchenko/syntax': ['@dskripchenko/syntax', 'dist/index.mjs'],
   '@dskripchenko/wysiwyg': ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
   '@dskripchenko/markdown-editor': ['@dskripchenko/markdown-editor', 'dist/index.mjs'],
   '@dskripchenko/diagrams': ['@dskripchenko/diagrams', 'dist/index.mjs'],
