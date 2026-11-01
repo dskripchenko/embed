@@ -18,6 +18,7 @@ export const RUNTIME_FILES: Readonly<Record<string, readonly [string, string]>> 
   vue: ['vue', 'dist/vue.runtime.esm-browser.prod.js'],
   '@dskripchenko/ui': ['@dskripchenko/ui', 'dist/index.mjs'],
   '@dskripchenko/ui/hls': ['@dskripchenko/ui', 'dist/hls/index.mjs'],
+  '@dskripchenko/syntax': ['@dskripchenko/syntax', 'dist/index.mjs'],
   '@dskripchenko/wysiwyg': ['@dskripchenko/wysiwyg', 'dist/index.mjs'],
   '@dskripchenko/markdown-editor': ['@dskripchenko/markdown-editor', 'dist/index.mjs'],
   '@dskripchenko/diagrams': ['@dskripchenko/diagrams', 'dist/index.mjs'],
