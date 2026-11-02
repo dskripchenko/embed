@@ -598,6 +598,8 @@ Getter: `value` (das Markup). Ereignisse: `dsk:change` `{ source }`,
 
 ## `<dsk-markdown>`
 
+TeX-Formeln werden als MathML gezeichnet: `$…$` in einer Zeile, `$$…$$` und ```` ```math ```` in eigenen Zeilen; `==Text==` wird hervorgehoben; `[[Notiz]]` ist ein interner Link (`data-wikilink`), den die Seite auflöst.
+
 ```html
 <dsk-markdown toc>
   <script type="text/markdown">

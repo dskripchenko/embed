@@ -5,6 +5,7 @@ const VERSIONS = {
   vue: '3.5.44',
   '@dskripchenko/ui': '1.15.1',
   '@dskripchenko/syntax': '0.3.2',
+  '@dskripchenko/math': '0.1.0',
   '@dskripchenko/wysiwyg': '0.5.0',
   '@dskripchenko/markdown-editor': '0.2.1',
   '@dskripchenko/diagrams': '1.1.0',

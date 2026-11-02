@@ -497,6 +497,8 @@ Getter：`value`（标记）。事件：`dsk:change` `{ source }`、`dsk:lock` `
 
 ## `<dsk-markdown>`
 
+TeX 公式以 MathML 绘制：行内的 `$…$`，以及独占一行的 `$$…$$` 和 ```` ```math ````；`==文字==` 会被高亮；`[[笔记]]` 是内部链接（`data-wikilink`），由页面决定指向。
+
 ```html
 <dsk-markdown toc>
   <script type="text/markdown">
