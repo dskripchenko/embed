@@ -869,6 +869,20 @@ for (const browserName of Object.keys(browsers)) {
       await sleep(200)
       const linked = await page.evaluate(() => document.querySelector('#md-edit textarea')?.value ?? '')
       check(`${tag}: <dsk-markdown-editor> linkSuggest offers notes after [[ and writes the link`, offered.includes('Alpha note') && !offered.includes('Beta') && /\[\[Alpha note\]\]\s*$/.test(linked), JSON.stringify({ offered, tail: linked.slice(-40) }))
+      // `saveImage` set from script: a picture pasted into the source is saved by the page and written as Markdown.
+      await page.evaluate(() => {
+        const el = document.querySelector('#md-edit')
+        el.saveImage = (file) => `pictures/${file.name}`
+      })
+      await sleep(200)
+      await page.evaluate(() => {
+        const dt = new window.DataTransfer()
+        dt.items.add(new window.File([new Uint8Array([137, 80, 78, 71])], 'shot.png', { type: 'image/png' }))
+        document.querySelector('#md-edit textarea').dispatchEvent(new window.ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: dt }))
+      })
+      await sleep(200)
+      const pictured = await page.evaluate(() => document.querySelector('#md-edit').value)
+      check(`${tag}: <dsk-markdown-editor> saveImage takes a pasted picture`, pictured.includes('![shot](pictures/shot.png)'), pictured.slice(-60))
       // The page's own controls: the toolbar in its bar, no mode buttons; modes still switch through `mode`.
       await page.waitForFunction(() => !!document.querySelector('#host-bar .dsk-wysiwyg-toolbar'), null, { timeout: 10000 }).catch(() => {})
       const hosted = await page.evaluate(async () => {

@@ -609,6 +609,9 @@ WYSIWYG 编辑器（`@dskripchenko/wysiwyg`）——工具栏（使用元素的�
 属性 `linkSuggest`（仅限脚本设置）：函数 `(query) => items`（或返回它们的 Promise），
 在输入 `[[` 后提示笔记；条目为 `{ label, insert, detail? }`，选中后写入 `[[insert]]`。
 
+属性 `saveImage`（仅限脚本设置）：函数 `(file) => path`（或其 Promise），保存粘贴、拖放或通过图片按钮选择的图片，
+并返回 Markdown 中使用的路径；在光标处写入 `![名称](路径)`。未设置则不接受图片。
+
 方法：`focus()`、`insert(markdown)`（在光标处）。事件：每次修改时触发 `input` /
 `dsk:input` `{ value }`，编辑器在值已更改的情况下失去焦点时触发 `change` /
 `dsk:change`，以及 `dsk:modechange` `{ mode }`。
