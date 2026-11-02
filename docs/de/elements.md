@@ -721,6 +721,11 @@ gebundenen Feldes.
 Eigenschaft `linkSuggest` (nur per Skript): eine Funktion `(query) => items` (oder ein Promise davon),
 die nach `[[` Notizen vorschlägt; ein Eintrag ist `{ label, insert, detail? }`, die Auswahl schreibt `[[insert]]`.
 
+Eigenschaft `saveImage` (nur per Skript): eine Funktion `(file) => path` (oder ein Promise davon),
+die ein eingefügtes, abgelegtes oder per Bild-Schaltfläche gewähltes Bild speichert und seinen Pfad
+für das Markdown zurückgibt; an der Einfügemarke wird `![Name](Pfad)` geschrieben. Ohne sie werden
+Bilder nicht angenommen.
+
 Methoden: `focus()`, `insert(markdown)` (an der Einfügemarke). Ereignisse:
 `input` / `dsk:input` `{ value }` bei jeder Änderung, `change` / `dsk:change`,
 wenn der Editor mit geändertem Wert den Fokus verliert, `dsk:modechange`

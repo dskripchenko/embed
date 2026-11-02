@@ -145,6 +145,7 @@ function mountMarkdownEditor(ctx: ElementContext): ElementInstance {
       ...(typeof p.toolbarTarget === 'string' && p.toolbarTarget !== '' ? { toolbarTarget: p.toolbarTarget } : {}),
       ...(p.modeSwitch === false ? { modeSwitch: false } : {}),
       ...(typeof p.linkSuggest === 'function' ? { linkSuggest: p.linkSuggest } : {}),
+      ...(typeof p.saveImage === 'function' ? { saveImage: p.saveImage } : {}),
       'onUpdate:modelValue': (markdown: string) => {
         if (markdown === model.value) return
         model.value = markdown

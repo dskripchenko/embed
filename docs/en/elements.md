@@ -704,6 +704,10 @@ The initial value: the `value` attribute, else the element's text (a
 Property `linkSuggest` (script only): a function `(query) => items` (or a promise of them) that
 suggests notes after `[[`; an item is `{ label, insert, detail? }`, and choosing it writes `[[insert]]`.
 
+Property `saveImage` (script only): a function `(file) => path` (or a promise of it) that saves a
+picture pasted, dropped or chosen with the image button and returns its path for the Markdown;
+`![name](path)` is written at the caret. Without it pictures are not taken.
+
 Methods: `focus()`, `insert(markdown)` (at the caret). Events: `input` /
 `dsk:input` `{ value }` on every change, `change` / `dsk:change` when the
 editor loses focus with a changed value, `dsk:modechange` `{ mode }`.
