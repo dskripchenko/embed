@@ -709,6 +709,9 @@ Markdown и оба рядом с живым превью. Значение — M
 | `min-height`, `max-height` | camelCase | CSS-длины. |
 | `image-base`, `link-base` | camelCase | Папка, от которой считаются относительные картинки; база ссылок превью. |
 
+Свойство `linkSuggest` (только из скрипта): функция `(query) => items` (или промис с ними),
+подсказывающая заметки после `[[`; элемент — `{ label, insert, detail? }`, выбор пишет `[[insert]]`.
+
 Методы: `focus()`, `insert(markdown)` (в позицию курсора). События: `input` /
 `dsk:input` `{ value }` на каждое изменение, `change` / `dsk:change`, когда
 редактор теряет фокус с изменённым значением, `dsk:modechange` `{ mode }`.

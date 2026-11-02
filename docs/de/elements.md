@@ -718,6 +718,9 @@ gebundenen Feldes.
 | `min-height`, `max-height` | camelCase | CSS-Längen. |
 | `image-base`, `link-base` | camelCase | Der Ordner relativer Bilder; die Basis der Links in der Vorschau. |
 
+Eigenschaft `linkSuggest` (nur per Skript): eine Funktion `(query) => items` (oder ein Promise davon),
+die nach `[[` Notizen vorschlägt; ein Eintrag ist `{ label, insert, detail? }`, die Auswahl schreibt `[[insert]]`.
+
 Methoden: `focus()`, `insert(markdown)` (an der Einfügemarke). Ereignisse:
 `input` / `dsk:input` `{ value }` bei jeder Änderung, `change` / `dsk:change`,
 wenn der Editor mit geändertem Wert den Fokus verliert, `dsk:modechange`

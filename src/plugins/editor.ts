@@ -144,6 +144,7 @@ function mountMarkdownEditor(ctx: ElementContext): ElementInstance {
       // The page's own controls: the toolbar in its bar, the modes switched by it (through `mode`).
       ...(typeof p.toolbarTarget === 'string' && p.toolbarTarget !== '' ? { toolbarTarget: p.toolbarTarget } : {}),
       ...(p.modeSwitch === false ? { modeSwitch: false } : {}),
+      ...(typeof p.linkSuggest === 'function' ? { linkSuggest: p.linkSuggest } : {}),
       'onUpdate:modelValue': (markdown: string) => {
         if (markdown === model.value) return
         model.value = markdown
