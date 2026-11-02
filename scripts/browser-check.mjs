@@ -711,17 +711,17 @@ for (const browserName of Object.keys(browsers)) {
       await page.evaluate(() => {
         const box = document.createElement('section')
         box.id = 'math-box'
-        box.innerHTML = '<dsk-markdown><script type="text/markdown">Euler: $e^{i\\pi} + 1 = 0$, ==marked==.\n\n$$\\sum_{i=1}^{n} i$$\n</script></dsk-markdown>'
+        box.innerHTML = '<dsk-markdown><script type="text/markdown">---\ntags: [physics]\n---\n\nEuler: $e^{i\\pi} + 1 = 0$, ==marked== #famous.\n\n$$\\sum_{i=1}^{n} i$$\n</script></dsk-markdown>'
         document.body.append(box)
       })
       await page.waitForFunction(() => !!document.querySelector('#math-box math[display="block"]'), null, { timeout: 10000 }).catch(() => {})
       const math = await page.evaluate(() => {
         const box = document.querySelector('#math-box')
-        const out = { inline: box.querySelectorAll('math:not([display])').length, block: box.querySelectorAll('math[display="block"]').length, mark: box.querySelector('mark')?.textContent ?? null, height: box.querySelector('math[display="block"]')?.getBoundingClientRect().height ?? 0 }
+        const out = { inline: box.querySelectorAll('math:not([display])').length, block: box.querySelectorAll('math[display="block"]').length, mark: box.querySelector('mark')?.textContent ?? null, tags: [...box.querySelectorAll('.uid-markdown__tag')].map((t) => t.dataset.tag).join(','), props: !!box.querySelector('table.uid-markdown__props'), height: box.querySelector('math[display="block"]')?.getBoundingClientRect().height ?? 0 }
         box.remove()
         return out
       })
-      check(`${tag}: <dsk-markdown> draws TeX math and highlights`, math.inline === 1 && math.block === 1 && math.mark === 'marked' && math.height > 20, JSON.stringify(math))
+      check(`${tag}: <dsk-markdown> draws TeX math, highlights, tags and properties`, math.inline === 1 && math.block === 1 && math.mark === 'marked' && math.height > 20 && math.tags === 'physics,famous' && math.props, JSON.stringify(math))
       check(`${tag}: no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '))
     } catch (error) {
       check(`${tag}: ran`, false, error.message.split('\n')[0])
