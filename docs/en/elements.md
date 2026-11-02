@@ -585,6 +585,8 @@ Getter: `value` (the markup). Events: `dsk:change` `{ source }`, `dsk:lock`
 
 ## `<dsk-markdown>`
 
+TeX math is drawn as MathML: `$…$` in a line, `$$…$$` and ```` ```math ```` on lines of their own; `==text==` is highlighted; `[[note]]` is an internal link (`data-wikilink`) for the page to resolve.
+
 ```html
 <dsk-markdown toc>
   <script type="text/markdown">
