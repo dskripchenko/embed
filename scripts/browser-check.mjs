@@ -853,6 +853,22 @@ for (const browserName of Object.keys(browsers)) {
       await page.waitForSelector('#md-edit textarea', { timeout: 5000 }).catch(() => {})
       const source = await page.evaluate(() => document.querySelector('#md-edit textarea')?.value ?? null)
       check(`${tag}: <dsk-markdown-editor> mode="source" shows the Markdown itself`, typeof source === 'string' && source.startsWith('# A note — edited'), String(source).slice(0, 60))
+      // `linkSuggest` set from script: `[[` in the source offers notes, choosing one writes the link.
+      await page.evaluate(() => {
+        const el = document.querySelector('#md-edit')
+        el.linkSuggest = (q) => [{ label: 'Alpha note', insert: 'Alpha note' }, { label: 'Beta', insert: 'Beta' }].filter((n) => n.label.toLowerCase().includes(q.toLowerCase()))
+      })
+      await sleep(200)
+      await page.locator('#md-edit textarea').click()
+      await page.keyboard.press('Control+End')
+      await page.keyboard.press('Meta+ArrowDown')
+      await page.keyboard.type('\n[[alp')
+      await page.waitForSelector('.dsk-md__suggest', { timeout: 5000 }).catch(() => {})
+      const offered = await page.evaluate(() => document.querySelector('.dsk-md__suggest')?.textContent ?? '')
+      await page.keyboard.press('Enter')
+      await sleep(200)
+      const linked = await page.evaluate(() => document.querySelector('#md-edit textarea')?.value ?? '')
+      check(`${tag}: <dsk-markdown-editor> linkSuggest offers notes after [[ and writes the link`, offered.includes('Alpha note') && !offered.includes('Beta') && /\[\[Alpha note\]\]\s*$/.test(linked), JSON.stringify({ offered, tail: linked.slice(-40) }))
       // The page's own controls: the toolbar in its bar, no mode buttons; modes still switch through `mode`.
       await page.waitForFunction(() => !!document.querySelector('#host-bar .dsk-wysiwyg-toolbar'), null, { timeout: 10000 }).catch(() => {})
       const hosted = await page.evaluate(async () => {

@@ -606,6 +606,9 @@ WYSIWYG 编辑器（`@dskripchenko/wysiwyg`）——工具栏（使用元素的�
 | `min-height`、`max-height` | camelCase | CSS 长度。 |
 | `image-base`、`link-base` | camelCase | 相对图片解析所依据的文件夹；预览中链接的基准。 |
 
+属性 `linkSuggest`（仅限脚本设置）：函数 `(query) => items`（或返回它们的 Promise），
+在输入 `[[` 后提示笔记；条目为 `{ label, insert, detail? }`，选中后写入 `[[insert]]`。
+
 方法：`focus()`、`insert(markdown)`（在光标处）。事件：每次修改时触发 `input` /
 `dsk:input` `{ value }`，编辑器在值已更改的情况下失去焦点时触发 `change` /
 `dsk:change`，以及 `dsk:modechange` `{ mode }`。

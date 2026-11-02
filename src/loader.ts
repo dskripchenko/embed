@@ -42,7 +42,8 @@ function boot(): void {
   const script = ownScript()
   if (!script) console.warn('[dsk-embed] own <script> not found; using the default CDN')
   if (script?.type === 'module') {
-    console.warn('[dsk-embed] load embed.js as a classic <script>: from a module the import map comes too late')
+    // From a module, the import map would come too late for the plugins.
+    console.warn('[dsk-embed] load embed.js as a classic <script>, not a module')
   }
   const src = script?.src ?? `${DEFAULT_CDN}@dskripchenko/embed@${VERSION}/dist/embed.js`
   const config = pageConfig(script)
