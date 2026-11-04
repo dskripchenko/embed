@@ -1,5 +1,11 @@
 # @dskripchenko/embed
 
+## 1.19.0
+
+### Minor Changes
+
+- 478380a: The kit 1.29.0 inside: in `<dsk-markdown>` an embedded picture `![[picture.png|300]]` (or `|300x200`) takes that size, and every embedded picture carries its name in `data-embed` (class `uid-markdown__embed-image`) for a host to find the file by name; an embed of a note or a video gets `data-size`.
+
 ## 1.18.0
 
 ### Minor Changes
