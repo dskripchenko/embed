@@ -13,10 +13,10 @@ importers:
         version: 3.0.3
       '@dskripchenko/board':
         specifier: 0.3.0
-        version: 0.3.0(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 0.3.0(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/bpmn':
         specifier: 0.4.1
-        version: 0.4.1(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 0.4.1(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/diagrams':
         specifier: 1.3.4
         version: 1.3.4
@@ -25,25 +25,25 @@ importers:
         version: 0.1.0
       '@dskripchenko/flow':
         specifier: 1.2.0
-        version: 1.2.0(@dskripchenko/diagrams@1.3.4)(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 1.2.0(@dskripchenko/diagrams@1.3.4)(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/markdown-editor':
         specifier: 0.9.0
-        version: 0.9.0(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(@dskripchenko/wysiwyg@0.13.0(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 0.9.0(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(@dskripchenko/wysiwyg@0.13.0(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/math':
         specifier: 0.1.0
         version: 0.1.0
       '@dskripchenko/openapi':
         specifier: 1.3.1
-        version: 1.3.1(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 1.3.1(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/syntax':
         specifier: 0.4.1
         version: 0.4.1
       '@dskripchenko/ui':
-        specifier: 1.29.0
-        version: 1.29.0(vue@3.5.44(typescript@6.0.3))
+        specifier: 1.47.2
+        version: 1.47.2(vue@3.5.44(typescript@6.0.3))
       '@dskripchenko/wysiwyg':
         specifier: 0.13.0
-        version: 0.13.0(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+        version: 0.13.0(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.13.0)
@@ -302,8 +302,8 @@ packages:
     resolution: {integrity: sha512-da8l9z7h01QmOPKrFj9QXcsvTwPF7IAOgI11GJIHoga0Eobo64nGyP7gBlWHMNaEXNidGEO4ynkA32GyWH9Tdg==}
     engines: {node: '>=20'}
 
-  '@dskripchenko/ui@1.29.0':
-    resolution: {integrity: sha512-hje4FvPzV+1Tv8/wBPeAE2YTneTIp8PSaEHvEAYcWhPt266qEerM4Lt2WJY3nrKsyVDXLvKEJ6lnQRU5SY3npw==}
+  '@dskripchenko/ui@1.47.2':
+    resolution: {integrity: sha512-XbmOa6rUR1usIbUTRRJ73jAF2xfAdvdeSmxc1blSd899/rJ4WO+Y/QB6AffOkO1d68CZhVUlN6EN7rF/DUTcRQ==}
     engines: {node: '>=20'}
     peerDependencies:
       vue: ^3.4.0
@@ -1503,55 +1503,55 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.2': {}
 
-  '@dskripchenko/board@0.3.0(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/board@0.3.0(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
-      '@dskripchenko/ui': 1.29.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.47.2(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/bpmn@0.4.1(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/bpmn@0.4.1(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
-      '@dskripchenko/ui': 1.29.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.47.2(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
   '@dskripchenko/diagrams@1.3.4': {}
 
   '@dskripchenko/drawio@0.1.0': {}
 
-  '@dskripchenko/flow@1.2.0(@dskripchenko/diagrams@1.3.4)(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/flow@1.2.0(@dskripchenko/diagrams@1.3.4)(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
       '@dskripchenko/diagrams': 1.3.4
-      '@dskripchenko/ui': 1.29.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.47.2(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/markdown-editor@0.9.0(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(@dskripchenko/wysiwyg@0.13.0(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/markdown-editor@0.9.0(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(@dskripchenko/wysiwyg@0.13.0(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     dependencies:
-      '@dskripchenko/ui': 1.29.0(vue@3.5.44(typescript@6.0.3))
-      '@dskripchenko/wysiwyg': 0.13.0(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.47.2(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/wysiwyg': 0.13.0(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
   '@dskripchenko/math@0.1.0': {}
 
-  '@dskripchenko/openapi@1.3.1(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/openapi@1.3.1(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
-      '@dskripchenko/ui': 1.29.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.47.2(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
   '@dskripchenko/syntax@0.4.1': {}
 
-  '@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       '@dskripchenko/math': 0.1.0
       '@dskripchenko/syntax': 0.4.1
       lucide-vue-next: 0.460.0(vue@3.5.44(typescript@6.0.3))
       vue: 3.5.44(typescript@6.0.3)
 
-  '@dskripchenko/wysiwyg@0.13.0(@dskripchenko/ui@1.29.0(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
+  '@dskripchenko/wysiwyg@0.13.0(@dskripchenko/ui@1.47.2(vue@3.5.44(typescript@6.0.3)))(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       '@dskripchenko/math': 0.1.0
       '@dskripchenko/syntax': 0.4.1
       vue: 3.5.44(typescript@6.0.3)
     optionalDependencies:
-      '@dskripchenko/ui': 1.29.0(vue@3.5.44(typescript@6.0.3))
+      '@dskripchenko/ui': 1.47.2(vue@3.5.44(typescript@6.0.3))
 
   '@eslint-community/eslint-utils@4.10.1(eslint@10.13.0)':
     dependencies:
