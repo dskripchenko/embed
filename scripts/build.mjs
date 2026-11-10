@@ -33,7 +33,13 @@ function lightFallback() {
   const themes = readFileSync(join(pkgDir('@dskripchenko/ui'), 'dist/styles/themes.css'), 'utf8')
   const block = /:root\[data-theme='light'\]\s*\{[^}]*\}/.exec(themes)?.[0]
   if (!block) throw new Error('light theme block not found in @dskripchenko/ui themes.css')
-  return block.replace(":root[data-theme='light']", ':root:not([data-theme])').replace(/\s+/g, ' ')
+  // Minified: the kit's comments and spaces are no part of the loader's 10.5 KB.
+  return block
+    .replace(":root[data-theme='light']", ':root:not([data-theme])')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s*([{};:,])\s*/g, '$1')
+    .trim()
 }
 
 const virtualLight = {

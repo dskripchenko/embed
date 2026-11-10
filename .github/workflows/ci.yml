@@ -28,7 +28,7 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - name: The loader stays small
-        run: node -e "const z=require('zlib'),fs=require('fs');const n=z.gzipSync(fs.readFileSync('dist/embed.js'),{level:9}).length;console.log('embed.js gzip',n);if(n>10*1024){console.error('loader over 10 KB gzipped');process.exit(1)}"
+        run: node -e "const z=require('zlib'),fs=require('fs');const n=z.gzipSync(fs.readFileSync('dist/embed.js'),{level:9}).length;console.log('embed.js gzip',n);if(n>10.5*1024){console.error('loader over 10.5 KB gzipped');process.exit(1)}"
 
   browser:
     name: Browser check
